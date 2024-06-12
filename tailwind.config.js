@@ -12,7 +12,20 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      screens: {
+        '3xl': '1920px',
+      },
+    fontSize: {
+      '2.5xl': '1.6875rem'
+    }
     },
   },
-  plugins: [],
+  // safelist: [
+  //   {
+  //     pattern: /bg-(rose|amber)-(400|500)/,
+  //   },
+  // ],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 };
