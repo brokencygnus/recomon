@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import Layout from '../../app/components/layout';
+import RootLayout from '../../app/components/layout';
 import Breadcrumbs from '../../app/components/breadcrumbs';
 import { FiatIconSmall } from '../../app/components/fiaticons';
 import { Dropdown } from '../../app/components/dropdown';
@@ -95,7 +95,7 @@ export default function AccountPage() {
   }, [accountFilters])
 
   return (
-    <Layout>
+    <RootLayout>
       <main>
         <Breadcrumbs breadcrumbPages={breadcrumbPages} />
         <AccountHeader />
@@ -110,7 +110,7 @@ export default function AccountPage() {
           filteredAccounts={filteredAccounts}
         />
       </main>
-    </Layout>
+    </RootLayout>
   )
 }
 

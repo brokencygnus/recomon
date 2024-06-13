@@ -334,7 +334,7 @@ export function Layout({ children }) {
           </div>
 
           <main className="py-10">
-            <div className="px-8 sm:px-12 lg:px-16">{children}</div>
+            <div className="px-6 2xl:px-8 3xl:px-16">{children}</div>
           </main>
         </div>
       </div>

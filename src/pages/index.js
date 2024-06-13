@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Layout } from '../app/components/layout';
+import RootLayout from '../app/components/layout';
 import { Dropdown } from '../app/components/dropdown';
 import Breadcrumbs from '../app/components/breadcrumbs';
 import { BigIntToString } from '../app/utils';
@@ -67,8 +67,8 @@ export default function CurrenciesPage() {
   const [selectedCurrency, setSelectedCurrency] = useState({name: 'Bitcoin', value: 'BTC'});
   
   return (
-    <Layout>
-      <main className="sm:px-6 lg:px-8">
+    <RootLayout>
+      <main>
         <Breadcrumbs breadcrumbPages={breadcrumbPages} />
         <CurrencyHeader selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} />
         <div className="min-h-60 flex flex-row mt-8">
@@ -80,7 +80,7 @@ export default function CurrenciesPage() {
           </div>
         </div>
       </main>
-    </Layout>
+    </RootLayout>
   );
 }
 
