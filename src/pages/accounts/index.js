@@ -53,8 +53,9 @@ const accounts = [
 // mock data end
 
 export default function AccountPage() {
+  const defaultFilters = {currency:{name: "All", value:null}, type:{name: "All", value:null}, data_source:{name: "All", value:null}}
   const [filteredAccounts, setFilteredAccounts] = useState(accounts);
-  const [accountFilters, setAccountFilters] = useState({currency:{name: "All", value:null}, type:{name: "All", value:null}, data_source:{name: "All", value:null}});
+  const [accountFilters, setAccountFilters] = useState(defaultFilters);
 
   const handleCurrencyFilter = (value) => {
     let tempAccountFilters = structuredClone(accountFilters)
@@ -73,6 +74,10 @@ export default function AccountPage() {
     tempAccountFilters.data_source = value
     setAccountFilters(tempAccountFilters)
   };
+
+  const handleResetFilters = () => {
+    setAccountFilters(defaultFilters)
+  }
 
   useEffect(() => {
     let tempFilteredAccounts = []
@@ -99,6 +104,7 @@ export default function AccountPage() {
           handleCurrencyFilter={handleCurrencyFilter}
           handleTypeFilter={handleTypeFilter}
           handleDataSourceFilter={handleDataSourceFilter}
+          handleResetFilters={handleResetFilters}
         />
         <AccountGrid 
           filteredAccounts={filteredAccounts}
@@ -164,9 +170,9 @@ export function AccountGrid({ filteredAccounts }) {
   )
 }
 
-function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter }) {
+function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter, handleResetFilters }) {
   return (
-    <div className="flex flex-row mt-2 gap-x-3">
+    <div className="flex flex-row items-end mt-2 gap-x-3">
       <div>
         <Dropdown
           label='Currency:'
@@ -193,6 +199,15 @@ function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter,
           selectedOption={accountFilters.data_source.name}
           onSelect={handleDataSourceFilter}
         />
+      </div>
+      <div>
+        <button
+          type="button"
+          className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600 shadow-sm"
+          onClick={handleResetFilters}
+        >
+          Reset filters
+        </button>
       </div>
     </div>
   )
