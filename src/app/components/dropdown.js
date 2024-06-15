@@ -1,5 +1,3 @@
-'use client'
-import { useState } from 'react'
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
@@ -9,7 +7,7 @@ function classNames(...classes) {
 
 // options: [{name: a, value: aaa}, {name: b, value: bbb}, ...]
 // size: small | medium | large
-export function Dropdown({ label, options, selectedOption, onSelect, width }) {
+export function Dropdown({ labelText, options, selectedOption, onSelect, width }) {
   const dropdownWidth = (width) => {
     switch (width) {
       case "small": return "w-24";
@@ -21,9 +19,9 @@ export function Dropdown({ label, options, selectedOption, onSelect, width }) {
 
   return (
     <Menu as="div" className="relative inline-block w-full text-left">
-      <label htmlFor="currency" className="block text-sm font-medium text-gray-900">
-        {label}
-      </label>
+      <p className="mb-1 block text-sm font-medium text-gray-900">
+        {labelText}
+      </p>
       <MenuButton className={classNames(
         dropdownWidth(width),
         "place-content-between flex grid-row-1 gap-x-1.5 rounded-md bg-white px-3 py-2 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
@@ -46,8 +44,7 @@ export function Dropdown({ label, options, selectedOption, onSelect, width }) {
         )}>
           <div className="py-1">
             {options.map((option) => (
-              <MenuItem
-              >
+              <MenuItem key={option.value}>
                 {({ focus }) => (
                   <p
                     onClick={() => (onSelect(option))}

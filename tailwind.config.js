@@ -5,6 +5,11 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  // safelist: [
+  //   {
+  //     pattern: /text-(rose|amber)-(500|600)/,
+  //   },
+  // ],
   theme: {
     extend: {
       backgroundImage: {
@@ -15,16 +20,14 @@ module.exports = {
       screens: {
         '3xl': '1920px',
       },
-    fontSize: {
-      '2.5xl': '1.6875rem'
-    }
+      transitionProperty: {
+        'height': 'height'
+      },
+      fontSize: {
+        '2.5xl': '1.6875rem'
+      }
     },
   },
-  // safelist: [
-  //   {
-  //     pattern: /bg-(rose|amber)-(400|500)/,
-  //   },
-  // ],
   plugins: [
     require('@tailwindcss/forms'),
   ],

@@ -1,5 +1,3 @@
-'use client'
-import { useState } from 'react'
 // add children with text, e.g. Rp or $
 
 // 32x32
