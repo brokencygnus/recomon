@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Layout from '../../../app/components/layout';
 import { Dropdown } from '../../../app/components/dropdown';
 import { Breadcrumbs } from '../../../app/components/breadcrumbs';
-import { convertMsToTime, convertAgeMsToDateTime } from '../../../app/utils';
+import {DataSourceDictionary,  convertMsToTime, convertAgeMsToDateTime } from '../../../app/utils';
 import { PopoverComp } from '../../../app/components/popover';
 
 function classNames(...classes) {
@@ -210,19 +210,19 @@ function ReconciliationSummary({ selectedCurrency }) {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
-                    <tr key={item.code}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-500 sm:pl-0">{item.code}</td>
+                    <tr key={item.code} className="bg-white hover:bg-gray-50">
+                      <td className="whitespace-nowrap py-4 pl-1 pr-3 text-sm text-gray-500">{item.code}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600">{item.name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.balance + " " + 'BTC'}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.balance + " " + (selectedCurrency.value == 'self' ? 'BTC' : selectedCurrency.value)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.data_source}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{DataSourceDictionary(item.data_source)}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <PopoverComp>
-                          <p className="font-medium hover:text-gray-700">{convertMsToTime(item.ageMS)}</p>
+                          <p className="font-medium hover:text-gray-900">{convertMsToTime(item.ageMS)}</p>
                           <p className="text-sm text-gray-900">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
                         </PopoverComp>
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-1 text-right text-sm font-semibold">
                         <a href="#" className="text-indigo-600 hover:text-indigo-900">
                           Configure<span className="sr-only">, {item.name}</span>
                         </a>
