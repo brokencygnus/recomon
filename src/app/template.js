@@ -1,5 +1,5 @@
-import Layout from './components/layout';
-import { Breadcrumbs } from './components/breadcrumbs';
+import Layout from '@/app/components/layout';
+import { Breadcrumbs } from '@/app/components/breadcrumbs';
 
 export default function APIPage() {
   const breadcrumbPages = [

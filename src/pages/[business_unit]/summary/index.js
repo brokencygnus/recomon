@@ -1,10 +1,11 @@
-import { useRouter } from 'next/router';
 import { useState } from 'react'
-import Layout from '../../../app/components/layout';
-import { Dropdown } from '../../../app/components/dropdown';
-import { Breadcrumbs } from '../../../app/components/breadcrumbs';
-import {DataSourceDictionary,  convertMsToTime, convertAgeMsToDateTime } from '../../../app/utils';
-import { PopoverComp } from '../../../app/components/popover';
+import Layout from '@/app/components/layout';
+import { Dropdown } from '@/app/components/dropdown';
+import { Breadcrumbs } from '@/app/components/breadcrumbs';
+import { convertMsToTime, convertAgeMsToDateTime } from '@/app/utils';
+import { PopoverComp } from '@/app/components/popover';
+import { accounts, currencies } from '@/app/constants/mockdata'
+import { dataSources } from '@/app/constants/types'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -13,23 +14,6 @@ function classNames(...classes) {
 // Mock data start
 
 const businessUnit = {name: "Exchange", slug: "exchange"}
-
-// Storing as string because float screws it up
-// API definitely wouldn't return age (but instead updatedAt), I'm leaving it constant so that the screenshots look pretty
-const accounts = [
-  { code: "C001", name: 'Treasury', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 654432449},
-  { code: "C002", name: 'Hibah Kementerian Perhutanan', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 2557147855},
-  { code: "C003", name: 'Dana Camping Pecinta Alam', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 1847314768},
-  { code: "C004", name: 'Rika\'s Rainy Day Savings', currency: 'BTC', data_source: "manual", type: "capital", balance: "9912345678.12345678", ageMS: 590993467},
-  { code: "A001", name: 'CAMP Hot Wallet', currency: 'BTC', data_source: "blockchain", type: "asset", balance: "12345678.12345678", ageMS: 602763},
-  { code: "A002", name: 'Fireblocks Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 7527951},
-  { code: "A003", name: 'Anchorage Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 41357},
-  { code: "A004", name: 'Coinbase Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 17472025},
-  { code: "A005", name: 'INDODAX Balance', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 477732},
-  { code: "A006", name: 'FalconX Balance', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 6149116},
-  { code: "L001", name: 'FalconX Pending Settlement', currency: 'BTC', data_source: "api", type: "liability", balance: "12345678.12345678", ageMS: 128684},
-  { code: "L002", name: 'Customer Funds', currency: 'BTC', data_source: "api", type: "liability", balance: "12345678.12345678", ageMS: 46343658},
-]
 
 const capitals = accounts.filter(account => account.type === "capital");
 const assets = accounts.filter(account => account.type === "asset");
@@ -42,16 +26,6 @@ const getTotal = (data) => {
   }, 0);
   return total;
 };
-
-const currencies = [
-  { name: 'Bitcoin', symbol: 'BTC', href: '#', discrepancy:"81234.12345678", current: true },
-  { name: 'Ethereum', symbol: 'ETH', href: '#', discrepancy:"0", current: false },
-  { name: 'USD Tether', symbol: 'USDT', href: '#', discrepancy:"62.85267819928", current: false },
-  { name: 'Solana', symbol: 'SOL', href: '#', discrepancy:"-354.12345678", current: false },
-  { name: 'Indonesian Rupiah', symbol: 'IDR', href: '#', discrepancy:"0.12345678", current: false },
-  { name: 'United States Dollar', symbol: 'USD', href: '#', discrepancy:"225.12345678", current: false },
-]
-
 const discrAlertConf = {
   critHigh: 10000,
   acctbleHigh: 200,
@@ -76,9 +50,6 @@ var discrepancyColor = (highlight, discrepancy) => {
 }
 
 export default function SummaryPage() {
-  const router = useRouter();
-  const { business_unit } = router.query;
-
   const [selectedCurrency, setSelectedCurrency] = useState({name: 'Bitcoin', value: 'BTC'});
 
   const breadcrumbPages = [
@@ -88,7 +59,7 @@ export default function SummaryPage() {
   
   return (
     <Layout>
-      <main>
+      <main className="py-10 px-12 2xl:px-16">
         <Breadcrumbs breadcrumbPages={breadcrumbPages} />
         <CurrencyHeader selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} />
         <div className="min-h-60 flex flex-row mt-8">
@@ -211,18 +182,18 @@ function ReconciliationSummary({ selectedCurrency }) {
                 <tbody className="divide-y divide-gray-200">
                   {data.map((item) => (
                     <tr key={item.code} className="bg-white hover:bg-gray-50">
-                      <td className="whitespace-nowrap py-4 pl-1 pr-3 text-sm text-gray-500">{item.code}</td>
+                      <td className="whitespace-nowrap py-4 pl-2 pr-3 text-sm text-gray-500">{item.code}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600">{item.name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.balance + " " + 'BTC'}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.balance + " " + (selectedCurrency.value == 'self' ? 'BTC' : selectedCurrency.value)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{DataSourceDictionary(item.data_source)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{dataSources.find((data) => data.value == item.data_source).name}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-indigo-600">
                         <PopoverComp>
-                          <p className="font-medium hover:text-gray-900">{convertMsToTime(item.ageMS)}</p>
+                          <p className="hover:text-indigo-900">{convertMsToTime(item.ageMS)}</p>
                           <p className="text-sm text-gray-900">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
                         </PopoverComp>
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-1 text-right text-sm font-semibold">
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-2 text-right text-sm font-semibold">
                         <a href="#" className="text-indigo-600 hover:text-indigo-900">
                           Configure<span className="sr-only">, {item.name}</span>
                         </a>
@@ -305,12 +276,15 @@ function CurrencyHeader({ selectedCurrency, setSelectedCurrency }) {
   ]
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center mb-4">
       <div className="flex-auto">
         <div className="py-4">
           <header>
             <div className="max-w-7xl">
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Exchange</h1>
+              <div className="flex items-baseline">
+                <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Exchange</h1>
+                <p className="pl-3 text-xl font-medium leading-tight tracking-tight text-gray-400">EXCG</p>
+              </div>
               <p className="mt-2 text-sm text-gray-700">View your tracked currencies in this business unit and monitor their discrepancies.</p>
             </div>
           </header>

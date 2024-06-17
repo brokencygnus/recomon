@@ -11,26 +11,6 @@ export const SymbolDictionary = (symbol) => {
   }
 }
 
-
-// not just for capitalization, but will help translation later 
-export const DataSourceDictionary = (dataSource) => {
-  switch (dataSource) {
-    case "manual": return "Manual";
-    case "blockchain": return "Blockchain";
-    case "api": return "API";
-  }
-}
- 
-
-// not just for capitalization, but will help translation later 
-export const AccountTypeDictionary = (type) => {
-  switch (type) {
-    case "capital": return "Capital";
-    case "asset": return "Asset";
-    case "liability": return "Liability";
-  }
-}
-
 // converts milliseconds to .. days .. hours .. minutes .. seconds 
 export const convertMsToTime = (ms) => {
   let seconds = Math.floor(ms / 1000);

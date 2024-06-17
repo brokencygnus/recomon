@@ -1,37 +1,21 @@
-import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react'
-import Layout from '../../../app/components/layout';
-import { Breadcrumbs } from '../../../app/components/breadcrumbs';
-import { FiatIconSmall } from '../../../app/components/fiaticons';
-import { Dropdown } from '../../../app/components/dropdown';
-import { SlideOver } from '../../../app/components/slideover';
-import { NumberInput } from '../../../app/components/numberinput';
-import { SymbolDictionary, DataSourceDictionary, AccountTypeDictionary } from '../../../app/utils';
+import Layout from '@/app/components/layout';
+import { Breadcrumbs } from '@/app/components/breadcrumbs';
+import { FiatIconSmall } from '@/app/components/fiaticons';
+import { Dropdown } from '@/app/components/dropdown';
+import { SlideOver } from '@/app/components/slideover';
+import { NumberInput } from '@/app/components/numberinput';
+import { SymbolDictionary } from '@/app/utils';
 import { PencilSquareIcon } from '@heroicons/react/20/solid'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { APIs, accounts, currencies } from '@/app/constants/mockdata'
+import { accountTypes, dataSources } from '@/app/constants/types'
 
-const availableCurrencies = [
-  { name: 'Bitcoin', symbol: 'BTC', is_blockchain: true,  networks: ["Bitcoin"]},
-  { name: 'Ethereum', symbol: 'ETH', is_blockchain: true, networks: ["ERC20"],},
-  { name: 'USD Tether', symbol: 'USDT', is_blockchain: true, networks: ["ERC20", "TRC20"]},
-  { name: 'Solana', symbol: 'SOL', is_blockchain: true, networks: ["Solana"]},
-  { name: 'Indonesian Rupiah', symbol: 'IDR', is_blockchain: false, networks: []},
-  { name: 'United States Dollar', symbol: 'USD', is_blockchain: false, networks: []},
-]
-const accountTypes = [
-  { name: AccountTypeDictionary("capital"), value: "capital"},
-  { name: AccountTypeDictionary("asset"), value: "asset"},
-  { name: AccountTypeDictionary("liability"), value: "liability"}
-]
-const dataSources = [
-  { name: DataSourceDictionary("manual"), value: "manual"},
-  { name: DataSourceDictionary("api"), value: "api"},
-  { name: DataSourceDictionary("blockchain"), value: "blockchain"}
-]
+// TODO Route and intercept the /edit and /(.)edit pages so that it can be linked from summary 
 
 const filterCurrencies = [
-  { name: 'None', value: 'self' },
-  ...availableCurrencies.map(currency => ({
+  { name: 'All', value: null },
+  ...currencies.map(currency => ({
     name: currency.name,
     value: currency.symbol
   }))
@@ -43,36 +27,19 @@ const filterDataSources = [{ name: "All", value: null}, ...dataSources]
 
 const businessUnit = {name: "Exchange", slug: "exchange"}
 
-const accounts = [
-  { code: "C001", name: 'Treasury', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 65432449},
-  { code: "C002", name: 'Hibah Kementerian Perhutanan', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 455714855},
-  { code: "C003", name: 'Dana Camping Pecinta Alam', currency: 'BTC', data_source: "manual", type: "capital", balance: "12345678.12345678", ageMS: 684734768},
-  { code: "C004", name: 'Rika\'s Rainy Day Savings', currency: 'BTC', data_source: "manual", type: "capital", balance: "9912345678.12345678", ageMS: 598099167},
-  { code: "A001", name: 'CAMP Hot Wallet', currency: 'BTC', data_source: "blockchain", type: "asset", balance: "12345678.12345678", ageMS: 60163},
-  { code: "A002", name: 'Fireblocks Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 752751},
-  { code: "A003", name: 'Anchorage Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 437},
-  { code: "A004", name: 'Coinbase Cold Storage', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 1747025},
-  { code: "A005", name: 'INDODAX Balance', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 47732},
-  { code: "A006", name: 'FalconX Balance', currency: 'BTC', data_source: "api", type: "asset", balance: "12345678.12345678", ageMS: 619116},
-  { code: "L001", name: 'FalconX Pending Settlement', currency: 'BTC', data_source: "api", type: "liability", balance: "12345678.12345678", ageMS: 128684},
-  { code: "L002", name: 'Customer Funds', currency: 'BTC', data_source: "api", type: "liability", balance: "12345678.12345678", ageMS: 9634368},
-]
-
-const availableAPIs = [
-  { id: 1, name: "Anchorage API"},
-  { id: 2, name: "Fireblocks API"},
-  { id: 3, name: "Coinbase API"},
-  { id: 4, name: "INDODAX Balance API"},
-  { id: 5, name: "FalconX API"},
-  { id: 6, name: "CAMP Internal API"},
-]
-
 // mock data end
 
 export default function AccountPage() {
-  const router = useRouter();
-  const { business_unit } = router.query;
+  return (
+    <Layout>
+      <main className="py-10 px-12 2xl:px-16">
+        <AccountContent />
+      </main>
+    </Layout>
+  )
+}
 
+function AccountContent() {
   const breadcrumbPages = [
     { name: 'Business Units', href: '#', current: false },
     { name: businessUnit.name, href: `/${businessUnit.slug}/summary`, current: true },
@@ -134,46 +101,44 @@ export default function AccountPage() {
   }
 
   return (
-    <Layout>
-      <main>
-        <Breadcrumbs breadcrumbPages={breadcrumbPages} />
-        <AccountHeader />
-        <AccountFilter
-          accountFilters={accountFilters}
-          handleCurrencyFilter={handleCurrencyFilter}
-          handleTypeFilter={handleTypeFilter}
-          handleDataSourceFilter={handleDataSourceFilter}
-          handleSearchChange={null}
-          handleResetFilters={handleResetFilters}
-          openSlideOver={openSlideOver}
+    <>
+      <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+      <AccountHeader />
+      <AccountFilter
+        accountFilters={accountFilters}
+        handleCurrencyFilter={handleCurrencyFilter}
+        handleTypeFilter={handleTypeFilter}
+        handleDataSourceFilter={handleDataSourceFilter}
+        handleSearchChange={null}
+        handleResetFilters={handleResetFilters}
+        openSlideOver={openSlideOver}
+      />
+      <AccountGrid 
+        accounts={filteredAccounts}
+        openSlideOver={openSlideOver}
+      />
+      <SlideOver
+        isSlideOverOpen={isSlideOverOpen}
+        setIsSlideOverOpen={setIsSlideOverOpen}
+        panelTitle={slideOverMode === "edit" ? "Edit Account" : "New Account"}
+      >
+        <EditAccount
+          accountData={slideOverData}
+          slideOverMode={slideOverMode}
         />
-        <AccountGrid 
-          filteredAccounts={filteredAccounts}
-          openSlideOver={openSlideOver}
-        />
-        <SlideOver
-          isSlideOverOpen={isSlideOverOpen}
-          setIsSlideOverOpen={setIsSlideOverOpen}
-          panelTitle={slideOverMode === "edit" ? "Edit Account" : "New Account"}
-        >
-          <EditAccount
-            accountData={slideOverData}
-            slideOverMode={slideOverMode}
-          />
-        </SlideOver>
-      </main>
-    </Layout>
+      </SlideOver>
+    </>
   )
 }
 
 function AccountHeader() {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center mb-4">
       <div className="flex-auto">
         <div className="py-4">
           <header>
             <div className="max-w-7xl">
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Accounts</h1>
+              <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Accounts</h1>
               <p className="mt-2 text-sm text-gray-700">View and manage your accounts in this business unit.</p>
             </div>
           </header>
@@ -183,37 +148,39 @@ function AccountHeader() {
   );
 }
 
-export function AccountGrid({ filteredAccounts, openSlideOver }) {
+export function AccountGrid({ accounts, openSlideOver }) {
   return (
     <ul role="list" className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
-      {filteredAccounts.map((account) => (
+      {accounts.map((account) => (
         <li key={account.code} className="relative z-0 flex flex-row rounded-lg shadow">
           <div className="relative grow w-0 z-0 col-span-1 rounded-lg bg-white">
             <div className="flex w-full items-center justify-between p-6">
               <FiatIconSmall>{SymbolDictionary(account.currency)}</FiatIconSmall>
               <div className="w-5/12">
-                <div className="flex items-center space-x-2">
-                  <h3 className="text-sm text-gray-500">{account.code}</h3>
-                  <span className="inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                <div className="flex items-end gap-x-3">
+                  <p className="truncate mt-1 text-sm font-medium text-gray-900">{account.name}</p>
+                  <p className="inline-flex flex-shrink-0 items-center rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                     {account.currency}
-                  </span>
+                  </p>
                 </div>
-                <h3 className="truncate mt-1 text-md font-medium text-gray-900">{account.name}</h3>
+                <div className="mt-1 text-right text-xs text-gray-500 flex flex-cols-3 items-center">
+                  <p className="mr-2">{accountTypes.find((data) => data.value == account.type).name}</p>
+                  <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
+                    <circle cx={1} cy={1} r={1} />
+                  </svg>
+                  <p className="ml-2">{dataSources.find((data) => data.value == account.data_source).name}</p>
+                </div>
               </div>
               <div className="w-5/12 grid justify-items-end">
-                <div className="mt-1 text-right text-sm text-gray-500 flex flex-cols-3 items-center">
-                  <p className="mr-2">{AccountTypeDictionary(account.type)}</p>
-                  <p className="block h-1.5 w-1.5 rounded-full bg-gray-300 hover:bg-gray-400"></p>
-                  <p className="ml-2">{DataSourceDictionary(account.data_source)}</p>
-                </div>
-                <p className="mt-1 truncate text-sm text-gray-500">{account.balance + " " + account.currency}</p>
+                <p className="text-xs font-medium text-gray-500">{account.code}</p>
+                <p className="mt-1 truncate text-xs text-gray-500">{account.balance + " " + account.currency}</p>
               </div>
             </div>
           </div>
           <div className="w-8 -z-10"></div>
           <div
             onClick={() => {openSlideOver(account, "edit")}}
-            className="absolute inset-y-0 right-0 w-12 -z-[1] grid items-center justify-items-end rounded-lg bg-gray-200 hover:bg-indigo-400 hover:cursor-pointer"
+            className="absolute inset-y-0 right-0 w-12 -z-[1] grid items-center justify-items-end rounded-lg bg-indigo-100 hover:bg-indigo-400 hover:cursor-pointer"
           >
             <div className="w-8 grid items-center justify-items-center">
               <PencilSquareIcon className="h-5 w-5 text-white"></PencilSquareIcon>
@@ -301,6 +268,8 @@ function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter,
   )
 }
 
+// slideOverData = accounts[index]
+// mode = "edit" | "new"
 function EditAccount({ accountData, slideOverMode }) {
   const [formState, setFormState] = useState({
     "code": accountData?.code ?? '',
@@ -404,7 +373,7 @@ function EditAccount({ accountData, slideOverMode }) {
                     onChange={handleFormChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   >
-                    {availableCurrencies.map((currency) => (
+                    {currencies.map((currency) => (
                       <option key={currency.symbol} value={currency.symbol}>{currency.name}</option>
                     ))}
                     <option hidden key="" value=""></option>
@@ -448,13 +417,13 @@ function EditAccount({ accountData, slideOverMode }) {
                     onChange={handleFormChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   >
-                    <option key={"manual"} value={"manual"}>{DataSourceDictionary("manual")}</option>
-                    <option key={"api"} value={"api"}>{DataSourceDictionary("api")}</option>
+                    <option key={"manual"} value={"manual"}>{"Manual"}</option>
+                    <option key={"api"} value={"api"}>{"API"}</option>
                     <option
-                      hidden={!availableCurrencies
+                      hidden={!currencies
                         .find(currency => currency.symbol === formState["currency"])
                         ?.is_blockchain}
-                      key={"blockchain"} value={"blockchain"}>{DataSourceDictionary("blockchain")}</option>
+                      key={"blockchain"} value={"blockchain"}>{"Blockchain"}</option>
                     <option hidden key="" value=""></option>
                   </select>
                 </div>
@@ -497,7 +466,7 @@ function EditAccount({ accountData, slideOverMode }) {
                     onChange={handleFormChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   >
-                    {availableAPIs.map((api) => (
+                    {APIs.map((api) => (
                         <option key={api.id} value={api.id}>{api.name}</option>
                     ))}
                     <option hidden key="" value=""></option>
@@ -524,7 +493,7 @@ function EditAccount({ accountData, slideOverMode }) {
                     onChange={handleFormChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                   >
-                    {availableCurrencies
+                    {currencies
                       .find(currency => currency.symbol === formState["currency"])
                       ?.networks
                       ?.map((network) => (

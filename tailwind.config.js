@@ -21,10 +21,13 @@ module.exports = {
         '3xl': '1920px',
       },
       transitionProperty: {
-        'sidebar': 'width, opacity',
+        'sidebar': 'width, opacity, transform',
       },
       fontSize: {
         '2.5xl': '1.6875rem'
+      },
+      width: {
+        '68': '17rem',
       }
     },
   },

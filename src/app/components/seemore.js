@@ -1,24 +1,35 @@
 
-import { useState } from "react";
+import { useState, useLayoutEffect, useRef } from "react";
 import { Transition } from "@headlessui/react";
 
-export function SeeMore({ threshold, content }) {
+// Parent component needs to bound width
+
+export function SeeMore({ content }) {
+  const ref = useRef(null);
+  const [isTruncated, setIsTruncated] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  useLayoutEffect(() => {
+    const { offsetHeight, scrollHeight } = ref.current || {};
+    
+    if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
+      setIsTruncated(true);
+    } else {
+      setIsTruncated(false);
+    }
+  }, [ref]);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
+
   
   return (
     <>
-      {/* See More is displayed after 46 characters, since the content
-        is displayed in monospace. This is a stop gap solution. Finding
-        out when the content begins to truncate is necessary for a
-        permanent solution. */}
       {expanded ? null : (
         <>
-          <span className="font-mono truncate overflow-hidden">{content}</span>
-          {content.length > threshold && (
+          <span ref={ref} className="break-all text-wrap line-clamp-1">{content}</span>
+          {isTruncated && (
           <button
             className="font-medium text-indigo-600 hover:text-indigo-900 ml-2 focus:outline-none"
             onClick={() => toggleExpand()}
@@ -37,8 +48,8 @@ export function SeeMore({ threshold, content }) {
       leaveFrom="hidden"
       leaveTo="hidden"
       >
-        <div className="flex justify-between items-center max-w-80">
-          <span className="font-mono text-wrap break-all">{content}
+        <div className="flex justify-between items-center">
+          <span className="text-wrap break-all">{content}
             <span>
             <button
               className="font-sans font-medium text-indigo-600 hover:text-indigo-900 hover:cursor-pointer ml-2 focus:outline-none"

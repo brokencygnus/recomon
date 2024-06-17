@@ -2,33 +2,26 @@
 import "../globals.css";
 import { Fragment, useState } from 'react'
 import {
-  Dialog,
-  DialogPanel,
   Menu,
   MenuButton,
   MenuItem,
   MenuItems,
   Transition,
-  TransitionChild,
 } from '@headlessui/react'
 import {
-  Bars3Icon,
   BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
   Square3Stack3DIcon,
   HomeIcon,
   CodeBracketIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { businessUnits } from "@/app/constants/mockdata";
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true},
-  { name: 'Business Units', href: '#', icon: CodeBracketIcon, current: false},
-  { name: 'Manage APIs', href: '#', icon: Square3Stack3DIcon, current: false},
+  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true, submenus: []},
+  { name: 'Business Units', href: '#', icon: CodeBracketIcon, current: false, submenus: businessUnits},
+  { name: 'Manage APIs', href: '/api-list', icon: Square3Stack3DIcon, current: false, submenus: []},
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -41,24 +34,34 @@ function classNames(...classes) {
 
 export function Layout({ children }) {
   const [expanded, setExpanded] = useState(false)
+  const [hoveredMenu, setHoveredMenu] = useState(null)
 
-  const handleMouseEnter = () => {
+  const handleMouseEnterSidebar = () => {
     setExpanded(true);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeaveSidebar = () => {
     setExpanded(false);
+  };
+
+  const handleMouseEnterMenu = (name) => {
+    const id = name;
+    setHoveredMenu(id);
+  };
+
+  const handleMouseLeaveMenu = () => {
+    setHoveredMenu(null);
   };
 
   return (
     <>
       <div>
         <div
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={handleMouseEnterSidebar}
+          onMouseLeave={handleMouseLeaveSidebar}
           className={classNames(
             'transition-sidebar ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
-            "fixed inset-y-0 left-0 z-50 block w-20 overflow-y-auto bg-indigo-600 pb-10"
+            "fixed inset-y-0 left-0 z-50 block w-20 overflow-visible bg-indigo-600 pb-10"
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
             <div className="flex pt-6 shrink-0 items-center justify-center">
@@ -72,30 +75,55 @@ export function Layout({ children }) {
               <nav className="mt-8">
                 <ul role="list" className="flex flex-1 flex-col items-start gap-y-1">
                   {navigation.map((item) => (
-                    <li key={item.name} className="w-full">
+                    <li
+                      onMouseEnter={() => handleMouseEnterMenu(item.name)}
+                      onMouseLeave={handleMouseLeaveMenu}
+                      key={item.name}
+                      className="relative w-full">
                       <a
                         href={item.href}
                         className={classNames(
-                          item.current ? 'bg-indigo-700 text-white' : 'text-gray-400 hover:bg-indigo-700 hover:text-white',
-                          'transition-sidebar ease-in-out', expanded ? 'w-60' : 'w-12', 'duration-300 delay-75',
+                          item.current ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
+                          'transition-sidebar ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
                         <item.icon
                           className={classNames(
-                            item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white',
+                            item.current ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
                             'h-6 w-6 shrink-0'
                           )}
                           aria-hidden="true"
                         />
                         <p className={classNames(
-                          'transition-sidebar ease-in-out', expanded ? 'opacity-100' : 'opacity-0', 'duration-200 delay-150',
+                          'transition-sidebar ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                           'text-nowrap overflow-hidden',
                         )}>
                           {item.name}
                         </p>
                         <span className="sr-only">{item.name}</span>
                       </a>
+                      { item.submenus.length > 0 ? (
+                        <div className={classNames(
+                          'transition-sidebar ease-in-out', hoveredMenu === item.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
+                          "absolute left-12 top-0"
+                          )}>{/* Hacky way to extend the hover surface */}
+                          <div
+                            hidden = {hoveredMenu !== item.name}
+                            className={classNames(
+                              "ml-8",
+                              "rounded-md bg-white shadow-sm border border-gray-200 overflow-hidden"
+                          )}>
+                            <dl className="grid grid-cols-1 divide-y-2 divide-gray-200 text-sm leading-6">
+                              { item.submenus.map((item) => (
+                                <a href={item.href} className="group flex items-center pl-6 pr-20 py-3 hover:bg-gray-100">
+                                  <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">{item.name}</dt>
+                                </a>
+                              ))}
+                            </dl>
+                          </div>
+                        </div>
+                      ) : null}
                     </li>
                   ))}
                 </ul>
@@ -105,8 +133,8 @@ export function Layout({ children }) {
                     <a
                       href="#"
                       className={classNames(
-                        'transition-sidebar ease-in-out', expanded ? 'w-60' : 'w-12', 'duration-300 delay-75',
-                        'group flex gap-x-3 rounded-md p-3 text-gray-400 hover:bg-indigo-700 hover:text-white text-sm font-semibold leading-6'
+                        'transition-sidebar ease-in-out', expanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
+                        'group flex gap-x-3 rounded-md p-3 text-indigo-200 hover:bg-indigo-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
                       <Cog6ToothIcon
@@ -114,7 +142,7 @@ export function Layout({ children }) {
                         aria-hidden="true"
                       />
                       <p className={classNames(
-                        'transition-sidebar ease-in-out', expanded ? 'opacity-100' : 'opacity-0', 'duration-200 delay-150',
+                        'transition-sidebar ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                         'text-nowrap overflow-hidden',
                       )}>
                         Settings
@@ -126,7 +154,7 @@ export function Layout({ children }) {
           </div>
         </div>
 
-        <div className="pl-20">
+        <div className="pl-20 h-screen">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
@@ -205,9 +233,8 @@ export function Layout({ children }) {
             </div>
           </div>
 
-          <main className="py-10">
-            <div className="px-6 2xl:px-8 3xl:px-16">{children}</div>
-          </main>
+          {children}
+
         </div>
       </div>
     </>
