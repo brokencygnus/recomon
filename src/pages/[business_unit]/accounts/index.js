@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react'
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
@@ -39,7 +40,10 @@ export default function AccountPage() {
   )
 }
 
+
 function AccountContent() {
+  const router = useRouter()
+
   const breadcrumbPages = [
     { name: 'Business Units', href: '#', current: false },
     { name: businessUnit.name, href: `/${businessUnit.slug}/summary`, current: true },
@@ -88,16 +92,28 @@ function AccountContent() {
   }, [accountFilters])
 
   // slideover
-  const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
-  const [slideOverData, setSlideOverData] = useState({});
-  const [slideOverMode, setSlideOverMode] = useState("edit");
+  var isSlideOverOpen = (router.query.action ? true : false)
+  var slideOverMode = (router.query.action)
+  var slideOverData = accounts.find((account) => account.code == router.query.edit)
 
   // slideOverData = accounts[index]
   // mode = "edit" | "new"
   const openSlideOver = (slideOverData, mode) => {
-    setSlideOverData(slideOverData)
-    setSlideOverMode(mode)
-    setIsSlideOverOpen(true);
+    if (mode === "edit") {
+      router.query.action = "edit"
+      router.query.edit = slideOverData.code
+      router.push(router)
+    } else {
+      router.query.action = "new"
+      router.push(router)
+    }
+  }
+
+  const closeSlideOver = () => {
+    router.replace({
+      pathname: '/[business_unit]/accounts',
+      query: { business_unit: 'exchange'}
+    });
   }
 
   return (
@@ -119,7 +135,7 @@ function AccountContent() {
       />
       <SlideOver
         isSlideOverOpen={isSlideOverOpen}
-        setIsSlideOverOpen={setIsSlideOverOpen}
+        setIsSlideOverOpen={closeSlideOver}
         panelTitle={slideOverMode === "edit" ? "Edit Account" : "New Account"}
       >
         <EditAccount

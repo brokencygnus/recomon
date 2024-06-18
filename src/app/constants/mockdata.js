@@ -34,20 +34,20 @@ export const currencies = [
 ]
 
 export const businessUnits = [
-  { name: 'Exchange', href: '/exchange/summary', current: false },
-  { name: 'Fixed Deposit', href: '/fixed-deposit/summary', current: false },
-  { name: 'Staking', href: '/staking/summary', current: false },
+  { id: 1, name: 'Exchange', href: '/exchange/summary', current: false },
+  { id: 2, name: 'Fixed Deposit', href: '/fixed-deposit/summary', current: false },
+  { id: 3, name: 'Staking', href: '/staking/summary', current: false },
 ]
 
 export const accountsUsingAPI = [
   {
-    business_unit: 'Exchange', accounts: [
+    id: 1, business_unit: 'Exchange', accounts: [
       { code: 'BTC-A002', currency: 'BTC', name: 'Fireblocks Cold Storage' },
       { code: 'ETH-A001', currency: 'ETH', name: 'Fireblocks Cold Storage' }
     ]
   },
   {
-    business_unit: 'Fixed Deposit',
+    id: 2, business_unit: 'Fixed Deposit',
     accounts: [
       { code: 'BTC-FDA006', currency: 'BTC', name: 'Fireblocks Cold Storage' },
       { code: 'BTC-FDA007', currency: 'BTC', name: 'Fireblocks Hot Wallet' },
@@ -56,7 +56,7 @@ export const accountsUsingAPI = [
     ]
   },
   {
-    business_unit: 'Staking', accounts: [
+    id: 3, business_unit: 'Staking', accounts: [
       { code: 'ETH-A001', currency: 'ETH', name: 'Fireblocks Cold Storage' },
       { code: 'SOL-A001', currency: 'SOL', name: 'Fireblocks Cold Storage' }
     ]

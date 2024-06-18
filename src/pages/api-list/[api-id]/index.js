@@ -15,7 +15,10 @@ export default function APIPage() {
   return (
     <Layout>
       <main className="relative flex flex-rows">
-        <div className="h-screen w-full overflow-y-auto -mt-16 pt-[6.5rem] py-10">
+        <div
+          style={{ scrollbarGutter: "stable" }}
+          className="h-screen w-full overflow-y-auto -mt-16 pt-[6.5rem] py-10"
+        >
           <div className="w-3/5 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <APIDetailsHeader
@@ -28,7 +31,7 @@ export default function APIPage() {
             />
           </div>
         </div>
-        <aside className="h-screen -mt-16 flex flex-col block w-2/5 absolute inset-y-0 right-0 gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-[6.5rem] pb-16 xl:px-8">
+        <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-[6.5rem] pb-16 xl:px-8">
           <AccountListCard />
         </aside>
       </main>
@@ -127,15 +130,14 @@ function APIDetailsContent({ APIData, isEdit }) {
             <div className="grid grid-cols-4 gap-x-4 gap-y-6">
               <div className="flex grid grid-cols-5 col-span-4 gap-x-6 ">
                 <div className="col-span-1">
-                  <label htmlFor="code" className="block text-sm font-medium leading-6 text-gray-900">
+                  <p className="block text-sm font-medium leading-6 text-gray-900">
                     Code
-                  </label>
+                  </p>
                   {isEdit ? (
                     <div className="mt-2">
                       <input
                         type="text"
                         name="code"
-                        id="code"
                         value={formState["code"]}
                         onChange={handleFormChange}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
@@ -148,15 +150,14 @@ function APIDetailsContent({ APIData, isEdit }) {
                 </div>
 
                 <div className="col-span-4">
-                  <label htmlFor="api-name" className="block text-sm font-medium leading-6 text-gray-900">
+                  <p className="block text-sm font-medium leading-6 text-gray-900">
                     API name
-                  </label>
+                  </p>
                   {isEdit ? (
                     <div className="mt-2">
                       <input
                         type="text"
                         name="api-name"
-                        id="api-name"
                         value={formState["api-name"]}
                         onChange={handleFormChange}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
@@ -170,9 +171,9 @@ function APIDetailsContent({ APIData, isEdit }) {
               </div>
 
               <div className="col-span-full">
-                <label htmlFor="url" className="block text-sm font-medium leading-6 text-gray-900">
+                <p className="block text-sm font-medium leading-6 text-gray-900">
                   URL
-                </label>
+                </p>
                   {isEdit ? (
                     <div className="mt-2">
                       <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
@@ -180,8 +181,8 @@ function APIDetailsContent({ APIData, isEdit }) {
                         <input
                           type="text"
                           name="url"
-                          id="url"
                           value={formState["url"]}
+                          onChange={handleFormChange}
                           autoComplete="url"
                           className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 leading-6"
                         />
@@ -193,18 +194,18 @@ function APIDetailsContent({ APIData, isEdit }) {
               </div>
 
               <div className="col-span-full">
-                <label htmlFor="custom-headers" className="block text-sm font-medium leading-6 text-gray-900">
+                <p className="block text-sm font-medium leading-6 text-gray-900">
                   Custom headers &#40;optional&#41;
-                </label>
+                </p>
                 {isEdit ? (
                   <>
-                    <div className="mt-2 font-mono text-wrap break-all">
+                    <div className="mt-2 font-mono text-wrap break-all max-h-[8.5rem]">
                       <textarea
                         name="custom-headers"
-                        id="custom-headers"
                         value={formState["custom-headers"]}
                         onChange={handleHeaderChange}
-                        rows={5}
+                        style={{ maxHeight: "136px", resize: "none" }}
+                        rows={6}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6"
                         placeholder={`{
   "Authorization": "Bearer token",
@@ -224,7 +225,6 @@ function APIDetailsContent({ APIData, isEdit }) {
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@ function AccountListCard() {
         </p>
       </div>
       {accountsUsingAPI.map((businessUnit) => (
-        <div>
+        <div key={businessUnit.business_unit}>
           <div className="mt-8 mb-4">
             <div className="flex items-center">
               <div className="flex-auto">

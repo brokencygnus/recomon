@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react'
 import Layout from '@/app/components/layout';
 import { Dropdown } from '@/app/components/dropdown';
@@ -6,6 +7,7 @@ import { convertMsToTime, convertAgeMsToDateTime } from '@/app/utils';
 import { PopoverComp } from '@/app/components/popover';
 import { accounts, currencies } from '@/app/constants/mockdata'
 import { dataSources } from '@/app/constants/types'
+import Link from 'next/link';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -76,6 +78,9 @@ export default function SummaryPage() {
 }
 
 function ReconciliationSummary({ selectedCurrency }) {
+  const router = useRouter();
+  const { business_unit } = router.query;
+
   return (
     <div>
       <div className="px-4 sm:px-6 lg:px-8 p-4 flow-root bg-gray-100">
@@ -194,9 +199,15 @@ function ReconciliationSummary({ selectedCurrency }) {
                         </PopoverComp>
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-2 text-right text-sm font-semibold">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                        <Link
+                            href={{
+                            pathname: `/${business_unit}/accounts`,
+                            query: { action: 'edit', edit: item.code },
+                          }}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
                           Configure<span className="sr-only">, {item.name}</span>
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   ))}

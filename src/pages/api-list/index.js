@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react'
 import dynamic from 'next/dynamic';
 import Layout from '@/app/components/layout';
@@ -5,7 +6,7 @@ import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { APIs } from '@/app/constants/mockdata';
 
-const APITable = dynamic(() => import('@/app/components/api-list/APITable'), { ssr: false });
+const APITable = dynamic(() => import('@/app/components/api-list/api-table'), { ssr: false });
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

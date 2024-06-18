@@ -116,7 +116,11 @@ export function Layout({ children }) {
                           )}>
                             <dl className="grid grid-cols-1 divide-y-2 divide-gray-200 text-sm leading-6">
                               { item.submenus.map((item) => (
-                                <a href={item.href} className="group flex items-center pl-6 pr-20 py-3 hover:bg-gray-100">
+                                <a
+                                  key={item.id}
+                                  href={item.href}
+                                  className="group flex items-center pl-6 pr-20 py-3 hover:bg-gray-100"
+                                >
                                   <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">{item.name}</dt>
                                 </a>
                               ))}
@@ -129,7 +133,9 @@ export function Layout({ children }) {
                 </ul>
               </nav>
               <ul role="list" className="flex h-full flex-1 flex-col items-start justify-end gap-y-3">
-                  <li className="mt-auto">
+                  <li
+                    className="mt-auto"
+                  >
                     <a
                       href="#"
                       className={classNames(
