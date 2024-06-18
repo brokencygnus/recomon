@@ -4,7 +4,7 @@ import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { FiatIconSmall } from '@/app/components/fiaticons';
 import { Dropdown } from '@/app/components/dropdown';
-import { SlideOver } from '@/app/components/slideover';
+import { Modal } from '@/app/components/modal';
 import { NumberInput } from '@/app/components/numberinput';
 import { SymbolDictionary } from '@/app/utils';
 import { PencilSquareIcon } from '@heroicons/react/20/solid'
@@ -43,7 +43,9 @@ export default function AccountPage() {
 
 function AccountContent() {
   const router = useRouter()
-
+  const { pathname } = router;
+  const query = { ...router.query };
+  
   const breadcrumbPages = [
     { name: 'Business Units', href: '#', current: false },
     { name: businessUnit.name, href: `/${businessUnit.slug}/summary`, current: true },
@@ -91,29 +93,33 @@ function AccountContent() {
     setFilteredAccounts(tempFilteredAccounts)
   }, [accountFilters])
 
-  // slideover
-  var isSlideOverOpen = (router.query.action ? true : false)
-  var slideOverMode = (router.query.action)
-  var slideOverData = accounts.find((account) => account.code == router.query.edit)
+  // modal
+  var isModalOpen = (router.query.action ? true : false)
+  const [modalAction, setModalAction] = useState(router.query.action)
+  var modalData = accounts.find((account) => account.code == router.query.edit)
 
-  // slideOverData = accounts[index]
+  // modalData = accounts[index]
   // mode = "edit" | "new"
-  const openSlideOver = (slideOverData, mode) => {
+  const openModal = (modalData, mode) => {
     if (mode === "edit") {
-      router.query.action = "edit"
-      router.query.edit = slideOverData.code
-      router.push(router)
+      setModalAction("edit");
+      query.action = "edit";
+      query.edit = modalData.code;
     } else {
-      router.query.action = "new"
-      router.push(router)
+      setModalAction("new");
+      query.action = "new";
     }
+
+    router.push({ pathname, query });
   }
 
-  const closeSlideOver = () => {
+  const closeModal = () => {
     router.replace({
       pathname: '/[business_unit]/accounts',
-      query: { business_unit: 'exchange'}
-    });
+      query: { business_unit: 'exchange'}}, 
+      undefined, 
+      {}
+    );
   }
 
   return (
@@ -127,22 +133,22 @@ function AccountContent() {
         handleDataSourceFilter={handleDataSourceFilter}
         handleSearchChange={null}
         handleResetFilters={handleResetFilters}
-        openSlideOver={openSlideOver}
+        openModal={openModal}
       />
       <AccountGrid 
         accounts={filteredAccounts}
-        openSlideOver={openSlideOver}
+        openModal={openModal}
       />
-      <SlideOver
-        isSlideOverOpen={isSlideOverOpen}
-        setIsSlideOverOpen={closeSlideOver}
-        panelTitle={slideOverMode === "edit" ? "Edit Account" : "New Account"}
+      <Modal
+        open={isModalOpen}
+        setOpen={closeModal}
+        panelTitle={modalAction === "edit" ? "Edit Account" : "New Account"}
       >
         <EditAccount
-          accountData={slideOverData}
-          slideOverMode={slideOverMode}
+          accountData={modalData}
+          modalAction={modalAction}
         />
-      </SlideOver>
+      </Modal>
     </>
   )
 }
@@ -164,7 +170,7 @@ function AccountHeader() {
   );
 }
 
-export function AccountGrid({ accounts, openSlideOver }) {
+export function AccountGrid({ accounts, openModal }) {
   return (
     <ul role="list" className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
       {accounts.map((account) => (
@@ -195,7 +201,7 @@ export function AccountGrid({ accounts, openSlideOver }) {
           </div>
           <div className="w-8 -z-10"></div>
           <div
-            onClick={() => {openSlideOver(account, "edit")}}
+            onClick={() => {openModal(account, "edit")}}
             className="absolute inset-y-0 right-0 w-12 -z-[1] grid items-center justify-items-end rounded-lg bg-indigo-100 hover:bg-indigo-400 hover:cursor-pointer"
           >
             <div className="w-8 grid items-center justify-items-center">
@@ -208,7 +214,7 @@ export function AccountGrid({ accounts, openSlideOver }) {
   )
 }
 
-function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter, handleSearchChange, handleResetFilters, openSlideOver }) {
+function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter, handleSearchChange, handleResetFilters, openModal }) {
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
@@ -274,7 +280,7 @@ function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter,
           </a>
           <button
             type="button"
-            onClick={() => openSlideOver({}, "new")}
+            onClick={() => openModal({}, "new")}
             className="ml-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add account
@@ -284,9 +290,9 @@ function AccountFilter({ accountFilters, handleCurrencyFilter, handleTypeFilter,
   )
 }
 
-// slideOverData = accounts[index]
+// accountData = accounts[index]
 // mode = "edit" | "new"
-function EditAccount({ accountData, slideOverMode }) {
+function EditAccount({ accountData, modalAction }) {
   const [formState, setFormState] = useState({
     "code": accountData?.code ?? '',
     "account-name": accountData?.name ?? '',
@@ -331,7 +337,7 @@ function EditAccount({ accountData, slideOverMode }) {
   };
 
   return (
-    <div>
+    <div className="w-[50rem]">
       <form id="edit-account-form">
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
@@ -550,7 +556,7 @@ function EditAccount({ accountData, slideOverMode }) {
             type="submit"
             className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            {slideOverMode == "edit" ? "Save ": "Submit"}
+            {modalAction == "edit" ? "Save ": "Submit"}
           </button>
         </div>
       </form>

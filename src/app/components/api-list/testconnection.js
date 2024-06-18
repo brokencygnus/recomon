@@ -46,11 +46,14 @@ export function TestConnectionList({ item }) {
           </div>
         </div>
       </div>
-      <ResponsePreview
-        item={item}
-        requestState={requestState}
-        expanded={expanded}
-      />
+      <div
+        style={{ display: requestState === "done" ? "" : "none" }}
+        className={classNames(
+          'transition-all ease-out', expanded ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-0 h-0')}>
+        <ResponsePreview
+          item={item}
+        />
+      </div>
     </div>
   )
 }
@@ -61,12 +64,10 @@ export function TestConnectionDetails({ item }) {
   // Mock API
   // Format: [{code: "api001", state: "unstarted | pending | done"}]
   const [requestState, setRequestState] = useState('unstarted')
-  const [expanded, setExpanded] = useState(false)
-
+  
   const handleRequest = () => {
     if (requestState === 'unstarted' || requestState === 'done') {
       setRequestState('pending');
-      setExpanded(false);
 
       // Mock API request
       setTimeout(() => {setRequestState('done')}, 1000);
@@ -110,17 +111,16 @@ export function TestConnectionDetails({ item }) {
           requestState={requestState}
         />
       </div>
-      <ResponsePreview
-        item={item}
-        requestState={requestState}
-        expanded={true}
-      />
       <div
-        style={{ display: requestState === "done" ? "" : "none" }}
-        className="flex flex-col grow items-start pt-6"
-      >
-        <p className="text-gray-900 font-medium text-sm">Detected account codes:</p>
-        <p className="text-gray-600 mt-3 text-sm">{detectCodes(item.testResponse)}</p>
+        className={classNames(
+          'transition-all ease-out', requestState === "done" ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-50 h-0')}>
+          <ResponsePreview
+          item={item}
+        />
+        <div className="flex flex-col grow items-start pt-6">
+          <p className="text-gray-900 font-medium text-sm">Detected account codes:</p>
+          <p className="text-gray-600 mt-3 text-sm">{detectCodes(item.testResponse) ?? "No account codes detected"}</p>
+        </div>
       </div>
     </div>
   )
@@ -193,7 +193,7 @@ function ViewResButton({ toggleExpand, requestState, expanded }) {
 }
 
 
-function ResponsePreview({ item, expanded, requestState }) {
+function ResponsePreview({ item }) {
   const response = () => {
     if (!item.testResponse) {
       console.log("test")
@@ -213,23 +213,15 @@ function ResponsePreview({ item, expanded, requestState }) {
 
   return (
     <div>
-      <Transition
-        show={ expanded && requestState === "done" }
-        enter="transition ease-out duration-200"
-        enterFrom="transform opacity-0 -translate-y-2"
-        enterTo="transform opacity-100 translate-y-0"
-        leave="transition duration-0"
-        leaveFrom="hidden"
-        leaveTo="hidden"
-      >
-        <div className={classNames("text-sm text-gray-900 mt-3 overflow-y-auto max-h-20 rounded-md px-2.5 py-1.5", item?.testResponse ? "font-mono text-wrap break-all bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300" : "text-pretty")}>
-          <p
-            dangerouslySetInnerHTML={{ __html:
-              response()}} 
-          />
-          <p className="text-gray-500">{item?.testResponse ? null : "(No response body was given by the server.)"}</p>
-        </div>
-      </Transition>
+      <div className={classNames(
+        "text-sm text-gray-900 mt-3 overflow-y-auto max-h-20 rounded-md px-2.5 py-1.5",
+        item?.testResponse ? "font-mono text-wrap break-all bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300" : "text-pretty")}>
+        <p
+          dangerouslySetInnerHTML={{ __html:
+            response()}} 
+        />
+        <p className="text-gray-500">{item?.testResponse ? null : "(No response body was given by the server.)"}</p>
+      </div>
     </div>
   )
 }

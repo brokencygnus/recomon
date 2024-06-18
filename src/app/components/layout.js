@@ -60,7 +60,7 @@ export function Layout({ children }) {
           onMouseEnter={handleMouseEnterSidebar}
           onMouseLeave={handleMouseLeaveSidebar}
           className={classNames(
-            'transition-sidebar ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
+            'transition-all ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
             "fixed inset-y-0 left-0 z-50 block w-20 overflow-visible bg-indigo-600 pb-10"
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
@@ -84,7 +84,7 @@ export function Layout({ children }) {
                         href={item.href}
                         className={classNames(
                           item.current ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
-                          'transition-sidebar ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
+                          'transition-all ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
@@ -96,7 +96,7 @@ export function Layout({ children }) {
                           aria-hidden="true"
                         />
                         <p className={classNames(
-                          'transition-sidebar ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
+                          'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                           'text-nowrap overflow-hidden',
                         )}>
                           {item.name}
@@ -105,7 +105,7 @@ export function Layout({ children }) {
                       </a>
                       { item.submenus.length > 0 ? (
                         <div className={classNames(
-                          'transition-sidebar ease-in-out', hoveredMenu === item.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
+                          'transition-all ease-in-out', hoveredMenu === item.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
                           "absolute left-12 top-0"
                           )}>{/* Hacky way to extend the hover surface */}
                           <div
@@ -139,7 +139,7 @@ export function Layout({ children }) {
                     <a
                       href="#"
                       className={classNames(
-                        'transition-sidebar ease-in-out', expanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
+                        'transition-all ease-in-out', expanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
                         'group flex gap-x-3 rounded-md p-3 text-indigo-200 hover:bg-indigo-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
@@ -148,7 +148,7 @@ export function Layout({ children }) {
                         aria-hidden="true"
                       />
                       <p className={classNames(
-                        'transition-sidebar ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
+                        'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                         'text-nowrap overflow-hidden',
                       )}>
                         Settings

@@ -21,7 +21,7 @@ module.exports = {
         '3xl': '1920px',
       },
       transitionProperty: {
-        'sidebar': 'width, opacity, transform',
+        'all': 'width, opacity, transform, translate',
       },
       fontSize: {
         '2.5xl': '1.6875rem'

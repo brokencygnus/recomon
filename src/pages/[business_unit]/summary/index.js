@@ -149,12 +149,18 @@ function ReconciliationSummary({ selectedCurrency }) {
               {children}
             </div>
             <div className="flex items-end">
-              <button
-                type="button"
-                className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+
+              <Link
+                href={{
+                  pathname: `/${business_unit}/accounts`,
+                  query: { action: 'new' },
+                }}
+                className="text-indigo-600 hover:text-indigo-900"
               >
-                Add account
-              </button>
+                <button className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  Add account
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -200,7 +206,7 @@ function ReconciliationSummary({ selectedCurrency }) {
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-2 text-right text-sm font-semibold">
                         <Link
-                            href={{
+                          href={{
                             pathname: `/${business_unit}/accounts`,
                             query: { action: 'edit', edit: item.code },
                           }}

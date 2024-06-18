@@ -1,11 +1,10 @@
-import { Fragment, useState } from 'react'
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
-export function SlideOver({ isSlideOverOpen, setIsSlideOverOpen, children, panelTitle }) {
+export function SlideOver({ open, setOpen, children, panelTitle }) {
   return (
-    <Transition show={isSlideOverOpen}>
-      <Dialog className="relative z-10" onClose={setIsSlideOverOpen}>
+    <Transition show={open}>
+      <Dialog className="relative z-10" onClose={setOpen}>
         <TransitionChild
           enter="ease-in-out duration-500"
           enterFrom="opacity-0"
@@ -39,7 +38,7 @@ export function SlideOver({ isSlideOverOpen, setIsSlideOverOpen, children, panel
                           <button
                             type="button"
                             className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            onClick={() => setIsSlideOverOpen(false)}
+                            onClick={setOpen}
                           >
                             <span className="absolute -inset-2.5" />
                             <span className="sr-only">Close panel</span>
