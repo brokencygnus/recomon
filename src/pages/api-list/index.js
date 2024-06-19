@@ -12,10 +12,6 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-// TODO Move API Details to a new page where the user can see connected accounts
-// TODO Dynamically set "See more" threshold based on screen width (or even better, detect truncation)
-// TODO Implement last successful data retrieval, currently it doesn't fit. Will add after API Details gets its own page.
-
 export default function APIPage() {
   const breadcrumbPages = [
     { name: 'Manage APIs', href: '#', current: true },
@@ -27,18 +23,20 @@ export default function APIPage() {
   }
 
   return (
-      <Layout>
-        <main className="py-10 px-12 2xl:px-16">
+      <Layout currentTab="api">
+        <main className="pt-10 px-12 2xl:px-16">
           <Breadcrumbs breadcrumbPages={breadcrumbPages} />
           <APIHeader/>
           <APIFIlter
             handleSearchChange={null}
             handleResetFilters={handleResetFilters}
           />
+        </main>
+        <div className="flex-grow overflow-y-auto mt-8 px-12 2xl:px-16">
           <APITable
             data={APIs}
           />
-        </main>
+        </div>
       </Layout>
     )
   }

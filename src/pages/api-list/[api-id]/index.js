@@ -13,13 +13,13 @@ export default function APIPage() {
   const [isEdit, setIsEdit] = useState(false);
 
   return (
-    <Layout>
+    <Layout currentTab="api">
       <main className="relative flex flex-rows">
         <div
           style={{ scrollbarGutter: "stable" }}
           className="h-screen w-full overflow-y-auto -mt-16 pt-[6.5rem] py-10"
         >
-          <div className="w-3/5 px-12 2xl:px-16">
+          <div className="w-3/5 pb-16 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <APIDetailsHeader
               isEdit={isEdit}

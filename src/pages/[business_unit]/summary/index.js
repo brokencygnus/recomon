@@ -60,7 +60,7 @@ export default function SummaryPage() {
   ]
   
   return (
-    <Layout>
+    <Layout currentTab="bu">
       <main className="py-10 px-12 2xl:px-16">
         <Breadcrumbs breadcrumbPages={breadcrumbPages} />
         <CurrencyHeader selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} />
@@ -99,7 +99,7 @@ function ReconciliationSummary({ selectedCurrency }) {
                     Total liabilities
                   </th>
                   <th scope="col" className="pr-3 text-left text-sm font-medium leading-6 text-gray-500">
-                    Discrepancy
+                    Gap
                   </th>
                 </tr>
               </thead>

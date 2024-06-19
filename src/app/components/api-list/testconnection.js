@@ -49,7 +49,7 @@ export function TestConnectionList({ item }) {
       <div
         style={{ display: requestState === "done" ? "" : "none" }}
         className={classNames(
-          'transition-all ease-out', expanded ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-0 h-0')}>
+          'overflow-hidden transition-all ease-out', expanded ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-0 h-0')}>
         <ResponsePreview
           item={item}
         />
@@ -113,7 +113,7 @@ export function TestConnectionDetails({ item }) {
       </div>
       <div
         className={classNames(
-          'transition-all ease-out', requestState === "done" ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-50 h-0')}>
+          'overflow-hidden transition-all ease-out', requestState === "done" ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-50 h-0')}>
           <ResponsePreview
           item={item}
         />

@@ -19,9 +19,9 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { businessUnits } from "@/app/constants/mockdata";
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true, submenus: []},
-  { name: 'Business Units', href: '#', icon: CodeBracketIcon, current: false, submenus: businessUnits},
-  { name: 'Manage APIs', href: '/api-list', icon: Square3Stack3DIcon, current: false, submenus: []},
+  { slug: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
+  { slug: 'bu', name: 'Business Units', href: '#', icon: Square3Stack3DIcon, submenus: businessUnits},
+  { slug: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
 ]
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -32,7 +32,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function Layout({ children }) {
+export default function Layout({ children, currentTab }) {
   const [expanded, setExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
 
@@ -56,6 +56,9 @@ export function Layout({ children }) {
   return (
     <>
       <div>
+        <div className={classNames(
+          'transition-opacity ease-in-out', expanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
+          "fixed inset-0 max-w-screen h-screen z-[45] bg-gray-500")}/>
         <div
           onMouseEnter={handleMouseEnterSidebar}
           onMouseLeave={handleMouseLeaveSidebar}
@@ -83,14 +86,14 @@ export function Layout({ children }) {
                       <a
                         href={item.href}
                         className={classNames(
-                          item.current ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
+                          item.slug == currentTab ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
                           'transition-all ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
                         <item.icon
                           className={classNames(
-                            item.current ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
+                            item.slug == currentTab ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
                             'h-6 w-6 shrink-0'
                           )}
                           aria-hidden="true"
@@ -160,7 +163,7 @@ export function Layout({ children }) {
           </div>
         </div>
 
-        <div className="pl-20 h-screen">
+        <div className="flex flex-col pl-20 h-screen">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
@@ -248,12 +251,12 @@ export function Layout({ children }) {
 }
 
 
-export default function RootLayout({ children }) {
-  return (
-    //  <html lang="en">
-    //    <body>
-            <Layout>{children}</Layout>
-    //    </body>
-    //  </html>
-  );
-}
+// export default function RootLayout({ children }) {
+//   return (
+//     <html lang="en">
+//       <body>
+//         <Layout>{children}</Layout>
+//       </body>
+//     </html>
+//   );
+// }

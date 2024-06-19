@@ -31,17 +31,6 @@ const businessUnit = {name: "Exchange", slug: "exchange"}
 // mock data end
 
 export default function AccountPage() {
-  return (
-    <Layout>
-      <main className="py-10 px-12 2xl:px-16">
-        <AccountContent />
-      </main>
-    </Layout>
-  )
-}
-
-
-function AccountContent() {
   const router = useRouter()
   const { pathname } = router;
   const query = { ...router.query };
@@ -123,33 +112,38 @@ function AccountContent() {
   }
 
   return (
-    <>
-      <Breadcrumbs breadcrumbPages={breadcrumbPages} />
-      <AccountHeader />
-      <AccountFilter
-        accountFilters={accountFilters}
-        handleCurrencyFilter={handleCurrencyFilter}
-        handleTypeFilter={handleTypeFilter}
-        handleDataSourceFilter={handleDataSourceFilter}
-        handleSearchChange={null}
-        handleResetFilters={handleResetFilters}
-        openModal={openModal}
-      />
-      <AccountGrid 
-        accounts={filteredAccounts}
-        openModal={openModal}
-      />
-      <Modal
-        open={isModalOpen}
-        setOpen={closeModal}
-        panelTitle={modalAction === "edit" ? "Edit Account" : "New Account"}
-      >
-        <EditAccount
-          accountData={modalData}
-          modalAction={modalAction}
+    
+    <Layout currentTab="bu">
+      <main className="py-10 px-12 2xl:px-16">
+        <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+        <AccountHeader />
+        <AccountFilter
+          accountFilters={accountFilters}
+          handleCurrencyFilter={handleCurrencyFilter}
+          handleTypeFilter={handleTypeFilter}
+          handleDataSourceFilter={handleDataSourceFilter}
+          handleSearchChange={null}
+          handleResetFilters={handleResetFilters}
+          openModal={openModal}
         />
-      </Modal>
-    </>
+        <Modal
+          open={isModalOpen}
+          setOpen={closeModal}
+          panelTitle={modalAction === "edit" ? "Edit Account" : "New Account"}
+        >
+          <EditAccount
+            accountData={modalData}
+            modalAction={modalAction}
+          />
+        </Modal>
+      </main>
+      <div className="flex-grow bg-gray-100 overflow-y-auto px-12 2xl:px-16">
+        <AccountGrid 
+          accounts={filteredAccounts}
+          openModal={openModal}
+        />
+      </div>
+    </Layout>
   )
 }
 
@@ -172,7 +166,7 @@ function AccountHeader() {
 
 export function AccountGrid({ accounts, openModal }) {
   return (
-    <ul role="list" className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
+    <ul role="list" className="min-h-full grid grid-cols-1 gap-6 py-8 border-1 border-gray-200 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
       {accounts.map((account) => (
         <li key={account.code} className="relative z-0 flex flex-row rounded-lg shadow">
           <div className="relative grow w-0 z-0 col-span-1 rounded-lg bg-white">
@@ -365,7 +359,7 @@ function EditAccount({ accountData, modalAction }) {
                   </div>
                 </div>
 
-                <div className="grow col-span-2">
+                <div className="grow-x col-span-2">
                   <label htmlFor="account-name" className="block text-sm font-medium leading-6 text-gray-900">
                     Account name
                   </label>

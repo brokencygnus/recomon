@@ -27,8 +27,8 @@ export const APIs = [
 export const currencies = [
   { name: 'Bitcoin', symbol: 'BTC', href: '#', discrepancy:"81234.12345678", is_blockchain: true,  networks: ["Bitcoin"], current: true },
   { name: 'Ethereum', symbol: 'ETH', href: '#', discrepancy:"0", is_blockchain: true, networks: ["ERC20"], current: false },
-  { name: 'USD Tether', symbol: 'USDT', href: '#', discrepancy:"62.85267819928", current: false },
-  { name: 'Solana', symbol: 'SOL', href: '#', discrepancy:"-354.12345678", is_blockchain: true, networks: ["ERC20", "TRC20"], current: false },
+  { name: 'USD Tether', symbol: 'USDT', href: '#', discrepancy:"62.85267819928", is_blockchain: true, networks: ["ERC20", "TRC20"], current: false },
+  { name: 'Solana', symbol: 'SOL', href: '#', discrepancy:"-354.12345678", is_blockchain: true, networks: ["Solana"], current: false },
   { name: 'Indonesian Rupiah', symbol: 'IDR', href: '#', discrepancy:"0.12345678",  is_blockchain: false, networks: [], current: false },
   { name: 'United States Dollar', symbol: 'USD', href: '#', discrepancy:"225.12345678",  is_blockchain: false, networks: [], current: false },
 ]
