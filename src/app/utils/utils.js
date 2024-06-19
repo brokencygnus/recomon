@@ -42,9 +42,9 @@ export const convertMsToTime = (ms) => {
 export const convertAgeMsToDateTime = (ms) => {
   const formatDateTime = (dateTime) => {
     return dateTime.toLocaleString('en-GB', {
-      weekday: 'long',
+      weekday: 'short',
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',

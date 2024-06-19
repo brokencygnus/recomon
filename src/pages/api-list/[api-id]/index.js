@@ -3,6 +3,7 @@ import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { APIs, accountsUsingAPI } from '@/app/constants/mockdata';
 import { TestConnectionDetails } from '@/app/components/api-list/testconnection';
+import { NumberInput } from '@/app/components/numberinput';
 
 export default function APIPage() {
   const breadcrumbPages = [
@@ -85,6 +86,26 @@ function APIDetailsHeader({ isEdit, setIsEdit }) {
 
 
 function APIDetailsContent({ APIData, isEdit }) {
+
+  return (
+    <div>
+      <EditEndpoint
+        APIData={APIData}
+        isEdit={isEdit}
+      />
+      <div className="border-b border-gray-900/10 py-12">
+        <TestConnectionDetails item={APIs[0]}/>
+      </div>
+      <div className="py-12">
+        <RetrievalFreq />
+      </div>
+      {/* debug */}
+      {/* {JSON.stringify(formState)} */}
+    </div>
+  )
+}
+
+function EditEndpoint({ APIData, isEdit }) {
   const [formState, setFormState] = useState({
     "code": APIData?.code ?? '',
     "api-name": APIData?.name ?? '',
@@ -118,122 +139,141 @@ function APIDetailsContent({ APIData, isEdit }) {
   };
 
   return (
-    <div>
-      <form id="edit-account-form">
-        <div className="space-y-12">
-          <div className="border-b border-gray-900/10 pb-12">
-            {/* <h2 className="text-base font-semibold leading-7 text-gray-900">API Details</h2>
-            <p className="mt-1 mb-10 text-sm leading-6 text-gray-600">
-              Description for API Details.
-            </p> */}
+    <form id="edit-endpoint-form">
+      <div className="space-y-12">
+        <div className="border-b border-gray-900/10 pb-12">
+          {/* <h2 className="text-base font-semibold leading-7 text-gray-900">API Details</h2>
+          <p className="mt-1 mb-10 text-sm leading-6 text-gray-600">
+            Description for API Details.
+          </p> */}
 
-            <div className="grid grid-cols-4 gap-x-4 gap-y-6">
-              <div className="flex grid grid-cols-5 col-span-4 gap-x-6 ">
-                <div className="col-span-1">
-                  <p className="block text-sm font-medium leading-6 text-gray-900">
-                    Code
-                  </p>
-                  {isEdit ? (
-                    <div className="mt-2">
-                      <input
-                        type="text"
-                        name="code"
-                        value={formState["code"]}
-                        onChange={handleFormChange}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
-                        placeholder="A001"
-                      />
-                    </div>
-                  ) : (
-                    <p className="mt-2 py-1.5 text-gray-500">{APIData?.code}</p>
-                  )}
-                </div>
-
-                <div className="col-span-4">
-                  <p className="block text-sm font-medium leading-6 text-gray-900">
-                    API name
-                  </p>
-                  {isEdit ? (
-                    <div className="mt-2">
-                      <input
-                        type="text"
-                        name="api-name"
-                        value={formState["api-name"]}
-                        onChange={handleFormChange}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
-                        placeholder="My API"
-                      />
-                    </div>
-                  ) : (
-                    <p className="mt-2 py-1.5 text-gray-500">{APIData?.name}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="col-span-full">
+          <div className="grid grid-cols-4 gap-x-4 gap-y-6">
+            <div className="flex grid grid-cols-5 col-span-4 gap-x-6 ">
+              <div className="col-span-1">
                 <p className="block text-sm font-medium leading-6 text-gray-900">
-                  URL
-                </p>
-                  {isEdit ? (
-                    <div className="mt-2">
-                      <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                        <span className="flex select-none items-center pl-3 text-gray-500">https://</span>
-                        <input
-                          type="text"
-                          name="url"
-                          value={formState["url"]}
-                          onChange={handleFormChange}
-                          autoComplete="url"
-                          className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 leading-6"
-                        />
-                      </div>
-                  </div>
-                  ) : (
-                    <p className="mt-2 py-1.5 text-wrap break-all text-gray-500">{APIData?.url}</p>
-                  )}
-              </div>
-
-              <div className="col-span-full">
-                <p className="block text-sm font-medium leading-6 text-gray-900">
-                  Custom headers &#40;optional&#41;
+                  Code
                 </p>
                 {isEdit ? (
-                  <>
-                    <div className="mt-2 font-mono text-wrap break-all max-h-[8.5rem]">
-                      <textarea
-                        name="custom-headers"
-                        value={formState["custom-headers"]}
-                        onChange={handleHeaderChange}
-                        style={{ maxHeight: "136px", resize: "none" }}
-                        rows={6}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6"
-                        placeholder={`{
-  "Authorization": "Bearer token",
-  "Content-Type": "application/json"
-}` /* Please don't "fix" the indentation, this is a template literal */}
-                        />
-                    </div>
-                  </>
-                ) : (
-                  <div className="mt-2 rounded-md bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300">
-                    <p 
-                      className="px-3 py-1.5 text-sm font-mono text-wrap break-all text-gray-900 max-h-[8.5rem] leading-6 overflow-y-auto" 
-                      dangerouslySetInnerHTML={{ __html:
-                        JSON.stringify(JSON.parse(APIData?.custom_headers), null, 2)
-                        .replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;') }} 
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      name="code"
+                      value={formState["code"]}
+                      onChange={handleFormChange}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+                      placeholder="A001"
                     />
                   </div>
+                ) : (
+                  <p className="mt-2 py-1.5 text-gray-500">{APIData?.code}</p>
+                )}
+              </div>
+
+              <div className="col-span-4">
+                <p className="block text-sm font-medium leading-6 text-gray-900">
+                  API name
+                </p>
+                {isEdit ? (
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      name="api-name"
+                      value={formState["api-name"]}
+                      onChange={handleFormChange}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+                      placeholder="My API"
+                    />
+                  </div>
+                ) : (
+                  <p className="mt-2 py-1.5 text-gray-500">{APIData?.name}</p>
                 )}
               </div>
             </div>
+
+            <div className="col-span-full">
+              <p className="block text-sm font-medium leading-6 text-gray-900">
+                URL
+              </p>
+                {isEdit ? (
+                  <div className="mt-2">
+                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                      <span className="flex select-none items-center pl-3 text-gray-500">https://</span>
+                      <input
+                        type="text"
+                        name="url"
+                        value={formState["url"]}
+                        onChange={handleFormChange}
+                        autoComplete="url"
+                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 leading-6"
+                      />
+                    </div>
+                </div>
+                ) : (
+                  <p className="mt-2 py-1.5 text-wrap break-all text-gray-500">{APIData?.url}</p>
+                )}
+            </div>
+
+            <div className="col-span-full">
+              <p className="block text-sm font-medium leading-6 text-gray-900">
+                Custom headers &#40;optional&#41;
+              </p>
+              {isEdit ? (
+                <>
+                  <div className="mt-2 font-mono text-wrap break-all max-h-[8.5rem]">
+                    <textarea
+                      name="custom-headers"
+                      value={formState["custom-headers"]}
+                      onChange={handleHeaderChange}
+                      style={{ maxHeight: "136px", resize: "none" }}
+                      rows={6}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6"
+                      placeholder={`{
+"Authorization": "Bearer token",
+"Content-Type": "application/json"
+}` /* Please don't "fix" the indentation, this is a template literal */}
+                      />
+                  </div>
+                </>
+              ) : (
+                <div className="mt-2 rounded-md bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300">
+                  <p 
+                    className="px-3 py-1.5 text-sm font-mono text-wrap break-all text-gray-900 max-h-[8.5rem] leading-6 overflow-y-auto" 
+                    dangerouslySetInnerHTML={{ __html:
+                      JSON.stringify(JSON.parse(APIData?.custom_headers), null, 2)
+                      .replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;') }} 
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </form>
-      <div className="pt-12">
-          <TestConnectionDetails item={APIs[0]}/>
       </div>
-      {/* debug */}
-      {/* {JSON.stringify(formState)} */}
+    </form>
+  )
+}
+
+
+function RetrievalFreq({}) {
+  return (
+    <div className="flex block flex-col">
+      <h3 className="text-base font-semibold leading-6 text-gray-900">Retrieval Frequency</h3>
+      <div className="mt-2 text-sm text-gray-500">
+        <p>
+          Adjust how often we should retrieve data from your API.
+        </p>
+      </div>
+      <div className="flex grow items-center pt-6">
+        <div className="w-20 mt-2">
+          <NumberInput
+            type="text"
+            name="code"
+            value={"aaa"}
+            maximum={24}
+            onChange={null}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+          />
+        </div>
+      </div>
     </div>
   )
 }

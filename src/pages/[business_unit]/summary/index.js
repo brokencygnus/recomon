@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Layout from '@/app/components/layout';
 import { Dropdown } from '@/app/components/dropdown';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { convertMsToTime, convertAgeMsToDateTime } from '@/app/utils';
+import { convertMsToTime, convertAgeMsToDateTime } from '@/app/utils/utils';
 import { PopoverComp } from '@/app/components/popover';
 import { accounts, currencies } from '@/app/constants/mockdata'
 import { dataSources } from '@/app/constants/types'

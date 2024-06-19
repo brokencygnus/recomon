@@ -6,7 +6,7 @@ import { FiatIconSmall } from '@/app/components/fiaticons';
 import { Dropdown } from '@/app/components/dropdown';
 import { Modal } from '@/app/components/modal';
 import { NumberInput } from '@/app/components/numberinput';
-import { SymbolDictionary } from '@/app/utils';
+import { SymbolDictionary } from '@/app/utils/utils';
 import { PencilSquareIcon } from '@heroicons/react/20/solid'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { APIs, accounts, currencies } from '@/app/constants/mockdata'
@@ -166,7 +166,7 @@ function AccountHeader() {
 
 export function AccountGrid({ accounts, openModal }) {
   return (
-    <ul role="list" className="min-h-full grid grid-cols-1 gap-6 py-8 border-1 border-gray-200 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
+    <ul role="list" className="grid grid-cols-1 gap-6 py-8 border-1 border-gray-200 md:grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3">
       {accounts.map((account) => (
         <li key={account.code} className="relative z-0 flex flex-row rounded-lg shadow">
           <div className="relative grow w-0 z-0 col-span-1 rounded-lg bg-white">

@@ -100,7 +100,7 @@ export function TestConnectionDetails({ item }) {
           <TestButton handleRequest={handleRequest}/>
         </div>
       </div>
-      <div className="flex grow items-center pt-6">
+      <div className={`flex grow items-center ${requestState === "unstarted" ? "" : "pt-6"}`}>
         <p 
           style={{ display: requestState === "done" ? "" : "none" }}
           className="text-gray-900 font-medium text-sm">

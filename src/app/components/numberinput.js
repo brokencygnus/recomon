@@ -7,7 +7,7 @@ const formatNumber = (numberString) => {
   return parts.join('.');
 };
 
-export function NumberInput({ value, onChange, ...rest }) {
+export function NumberInput({ value, onChange, maximum, ...rest }) {
   const [formattedValue, setFormattedValue] = useState(formatNumber(value));
 
   const handleInputChange = (event) => {
@@ -22,6 +22,13 @@ export function NumberInput({ value, onChange, ...rest }) {
 
     // Replace additional (.)s
     inputValue = inputValue.replace(/(\..*)\./g, '$1');
+
+    // Ceiling the value if maximum is defined
+    if (maximum) {
+      if (inputValue) {
+        inputValue = Math.min(maximum, inputValue)
+      }
+    }
 
     // Format number with comma separators
     const formatted = formatNumber(inputValue);
