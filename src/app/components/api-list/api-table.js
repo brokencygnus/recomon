@@ -21,7 +21,7 @@ export default function APITable({ data }) {
                   URL
                 </th>
                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700 border-b border-gray-300">
-                  Last retrieval
+                  Last successful retrieval
                 </th>
                 {/* <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700 border-b border-gray-300">
                   Custom headers

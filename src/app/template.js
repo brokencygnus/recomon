@@ -1,6 +1,10 @@
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
 export default function APIPage() {
   const breadcrumbPages = [
     { name: 'Previous Page', href: '#', current: true },
@@ -9,7 +13,7 @@ export default function APIPage() {
 
   return (
       <Layout>
-        <main>
+        <main className="py-10 px-12 2xl:px-16">
           <Breadcrumbs breadcrumbPages={breadcrumbPages} />
           <YourPageHeader />
           {/* Content */}
@@ -25,7 +29,7 @@ function YourPageHeader() {
         <div className="py-4">
           <header>
             <div className="max-w-7xl">
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Title</h1>
+              <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Title</h1>
               <p className="mt-2 text-sm text-gray-700">This is 404, by the way</p>
             </div>
           </header>

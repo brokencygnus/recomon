@@ -1,9 +1,23 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import dynamic from 'next/dynamic';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { APIs, accountsUsingAPI } from '@/app/constants/mockdata';
 import { TestConnectionDetails } from '@/app/components/api-list/testconnection';
+import { apiRetrievalSettings } from '@/app/constants/mockdata';
 import { NumberInput } from '@/app/components/numberinput';
+import { Dropdown } from '@/app/components/dropdown';
+import { checkDataEdited } from '@/app/utils/utils';
+import { RecursiveFutureNextInterval } from '@/app/utils/api-list/interval'
+import { convertShortDate } from '@/app/utils/utils'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ToastContext } from '@/app/components/toast';
+
+const LastConnectionDetails = dynamic(() => import('@/app/components/api-list/testconnection').then(mod => mod.LastConnectionDetails), { ssr: false });
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
 
 export default function APIPage() {
   const breadcrumbPages = [
@@ -33,6 +47,7 @@ export default function APIPage() {
           </div>
         </div>
         <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-[6.5rem] pb-16 xl:px-8">
+          <LastRetrievalCard APIData={APIs[0]} />
           <AccountListCard />
         </aside>
       </main>
@@ -41,6 +56,17 @@ export default function APIPage() {
 }
   
 function APIDetailsHeader({ isEdit, setIsEdit }) {
+  const { addToast } = useContext(ToastContext)
+  const launchToast = () => {
+    addToast({ color: "green", message: "Endpoint details edited!" })
+  }
+  
+  const handleSave = () => {
+    launchToast()
+    setIsEdit(false)
+    // Enter save logic here
+  }
+
   return (
     <div className="flex items-center mb-4">
       <div className="flex-auto">
@@ -64,7 +90,7 @@ function APIDetailsHeader({ isEdit, setIsEdit }) {
               </button>
               <button
                 type="submit"
-                onClick={() => setIsEdit(false)}
+                onClick={handleSave}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Save
@@ -97,7 +123,7 @@ function APIDetailsContent({ APIData, isEdit }) {
         <TestConnectionDetails item={APIs[0]}/>
       </div>
       <div className="py-12">
-        <RetrievalFreq />
+        <RetrievalFreq retrievalSettings={apiRetrievalSettings}/>
       </div>
       {/* debug */}
       {/* {JSON.stringify(formState)} */}
@@ -199,7 +225,7 @@ function EditEndpoint({ APIData, isEdit }) {
                     <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                       <span className="flex select-none items-center pl-3 text-gray-500">https://</span>
                       <input
-                        type="text"
+                        type="url"
                         name="url"
                         value={formState["url"]}
                         onChange={handleFormChange}
@@ -253,39 +279,358 @@ function EditEndpoint({ APIData, isEdit }) {
 }
 
 
-function RetrievalFreq({}) {
+function RetrievalFreq({ retrievalSettings }) {
+  const getDefaultDOW = () => {
+    const emptyWeekArray = Array(7).fill(false)
+
+      const dayOfWeek = ((new Date(retrievalSettings?.startingDate)).getDay() - 1) % 7 ?? 0
+      emptyWeekArray[dayOfWeek] = true
+
+    return emptyWeekArray
+  }
+
+  const initialState = {
+    startingDate: new Date(retrievalSettings?.startingDate?? undefined), // Will be mutated
+    referenceDate: new Date(retrievalSettings?.startingDate?? undefined), // Will not be mutated
+    intervalType: retrievalSettings?.intervalType?? { name: "", value: undefined},
+    intervalOption: retrievalSettings?.intervalOption?? { name: "", value: undefined},
+    primaryInterval: retrievalSettings?.primaryInterval?? 1,
+    secondaryInterval: retrievalSettings?.secondaryInterval?? 0, 
+    weekArray: retrievalSettings?.weekArray?? getDefaultDOW(),
+  }
+
+  const [formState, setFormState] = useState(initialState);
+
+  const intervalTypes = [
+    { name: "months", value: "month" },
+    { name: "weeks", value: "week" },
+    { name: "days", value: "day" },
+    { name: "hours", value: "hour" },
+  ]
+
+  const monthOptions = [
+    { name: "On the same date of the month", value: "month-same-date"},
+    { name: "On the same day of the week", value: "month-same-day-of-week"},
+  ]
+
+  const timeOptions = [
+    { name: "Starting at the same time every day", value: "time-same-time-every-day"},
+    { name: "Continuously, ignoring day changes", value: "time-continuous"},
+  ]
+
+  const weeks = [
+    { name: "Mon" },
+    { name: "Tue" },
+    { name: "Wed" },
+    { name: "Thu" },
+    { name: "Fri" },
+    { name: "Sat" },
+    { name: "Sun" }
+  ];
+
+  const [isDataEdited, setIsDataEdited] = useState(false)
+  const [selectedMonthOption, setSelectedMonthOption] = useState({ name: "On the same date of the month", value: "month-same-date"})
+  const [selectedTimeOption, setSelectedTimeOption] = useState({ name: "Starting at the same time every day", value: "time-same-time-every-day"})
+
+  const maximum = () => {
+    switch(formState.intervalType.value) {
+      case "month": return 12;
+      case "week": return 56;
+      case "day": return 30;
+      case "hour": return 23;
+      default: return 100;
+    }
+  }
+
+  // Time zone shenanigans
+  const correctTimezone = (date) => {
+    var tzoffset = (new Date(date)).getTimezoneOffset() * 60000;
+    return (new Date(date - tzoffset)).toISOString().slice(0, -8)
+  }
+
+  const handleFormChange = ({ name, value }) => {
+    const updatedState = {
+      ...formState,
+      [name]: value,
+    };
+    
+    setFormState(updatedState)
+    checkDataEdited(initialState, updatedState, setIsDataEdited)
+  }
+
+  const handleDefaultFormChange = (event) => {
+    handleFormChange(event.target)
+  }
+
+  const handleIntervalTypeChange = (event) => {
+    const { value } = event.target
+    formState.primaryInterval = formState.primaryInterval // Re-run validation
+    var intervalOption = ""
+
+    if (value.value == "month") { // Update intervalOption based on selection if applicable
+      intervalOption = selectedMonthOption
+    } else if (value.value == "hour") { // Expanded to prevent race condition
+      intervalOption = selectedTimeOption
+    } else {
+      intervalOption = ""
+    }
+
+    const updatedState = {
+      ...formState,
+      ["intervalType"]: value,
+      ["intervalOption"]: intervalOption,
+    };
+    
+    setFormState(updatedState)
+    checkDataEdited(initialState, updatedState. setIsDataEdited)
+  }
+
+  const handleMonthOption = (event) => {
+    const { value } = event.target
+    handleFormChange(event.target)
+    setSelectedMonthOption(value)
+  }
+
+  const handleTimeOption = (event) => {
+    const { value } = event.target
+    handleFormChange(event.target)
+    setSelectedTimeOption(value)
+  }
+
+  const handleDayOfWeek = (event) => {
+    const { value } = event.target;
+    
+    const newArray = [...formState.weekArray];
+    newArray[value] = !newArray[value];
+
+    handleFormChange({ name: "weekArray", value: newArray })
+  }
+
+  const handleStartingDate = (event) => {
+    const { value } = event.target
+
+    const updatedState = {
+      ...formState,
+      ["startingDate"]: new Date(value),
+      ["referenceDate"]: new Date(value),
+    };
+    
+    setFormState(updatedState)
+    checkDataEdited(initialState, updatedState, setIsDataEdited)
+  }
+
+  const { addToast } = useContext(ToastContext)
+  const launchToast = () => {
+    addToast({ color: "green", message: "Retrieval configuration saved!" })
+  }
+
+  const handleCancel = () => {
+    setFormState(initialState)
+  }
+
+  const handleSave = () => {
+    launchToast()
+    setIsDataEdited(false)
+  }
+
   return (
     <div className="flex block flex-col">
-      <h3 className="text-base font-semibold leading-6 text-gray-900">Retrieval Frequency</h3>
-      <div className="mt-2 text-sm text-gray-500">
-        <p>
-          Adjust how often we should retrieve data from your API.
-        </p>
+      <div className="flex block flex-row justify-between">
+        <div>
+          <h3 className="text-base font-semibold leading-6 text-gray-900">Retrieval Frequency</h3>
+            <div className="mt-2 text-sm text-gray-500">
+              <p>
+                Adjust how often to retrieve data from your API.
+              </p>
+            </div>
+        </div>
+        <div>
+          { isDataEdited ? 
+            <button
+              type="button" 
+              onClick={handleCancel}
+              className="text-sm font-semibold leading-6 text-gray-900"
+            >
+              Cancel
+            </button>
+          : null}
+          <button
+            type="button"
+            onClick={handleSave}
+            className={classNames(
+              isDataEdited ? "bg-indigo-600 hover:bg-indigo-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              : "bg-gray-300 text-gray-500 pointer-events-none",
+              "ml-4 rounded-md px-2.5 py-1.5 text-sm font-semibold shadow-sm"
+            )}
+            >
+            Save
+          </button>
+        </div>
       </div>
-      <div className="flex grow items-center pt-6">
-        <div className="w-20 mt-2">
-          <NumberInput
-            type="text"
-            name="code"
-            value={"aaa"}
-            maximum={24}
-            onChange={null}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+
+      <div className="flex flex-col 3xl:flex-row">
+        <div className="flex flex-row grow items-center pt-8">
+          <p className="text-sm text-gray-600">
+            Repeat every
+          </p>
+          <div className="w-24 pl-3">
+            <NumberInput
+              type="text"
+              name="primaryInterval"
+              value={formState.primaryInterval}
+              maximum={maximum()}
+              onChange={handleDefaultFormChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+            />
+          </div>
+          <div className="px-3">
+            <Dropdown
+              name='intervalType'
+              options={intervalTypes}
+              selectedOption={formState.intervalType.name}
+              onSelect={handleIntervalTypeChange}
+              className="w-24 rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            />
+          </div>
+          {formState.intervalType.value == "hour" ?
+            <>
+              <p className="text-sm text-gray-600">
+                and
+              </p>
+              <div className="w-24 pl-3">
+                <NumberInput
+                  type="text"
+                  name="secondaryInterval"
+                  value={formState.secondaryInterval}
+                  maximum={59}
+                  onChange={handleDefaultFormChange}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+                />
+              </div>
+              <p className="mx-3 text-sm text-gray-600">
+                minutes
+              </p>
+            </>
+          : null}
+        </div>
+        {formState.intervalType.value == "month" ?
+          <div className="flex mt-8 items-center">
+            <p className="mr-3 text-sm text-gray-600">
+              Repeat
+            </p>
+            <div>
+            <Dropdown
+              name='intervalOption'
+              options={monthOptions}
+              selectedOption={selectedMonthOption.name}
+              onSelect={handleMonthOption}
+              className="w-72 rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            />
+            </div>
+          </div>
+        : null}
+        {formState.intervalType.value == "hour" ?
+          <div className="flex mt-8 items-center">
+            <p className="mr-3 text-sm text-gray-600">
+              Repeat
+            </p>
+            <div>
+              <Dropdown
+                name='intervalOption'
+                options={timeOptions}
+                selectedOption={selectedTimeOption.name}
+                onSelect={handleTimeOption}
+                className="w-72 rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              />
+            </div>
+          </div>
+        : null} 
+        {formState.intervalType.value == "week" ?
+          <div className="flex mt-8 items-center">
+            <p className="mr-3 text-sm text-gray-600">
+              Repeat on the following days:
+            </p>
+            <div className="flex gap-x-2">
+              {weeks.map((dayofweek, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  value={index}
+                  onClick={handleDayOfWeek}
+                  className={classNames(
+                    "ring-inset", formState.weekArray[index] ? "ring-1 ring-indigo-600 text-indigo-600" : "ring-1 ring-gray-300 text-gray-900",
+                    "w-12 rounded-full bg-white px-2.5 py-1.5 text-sm font-semibold shadow-sm hover:bg-gray-50"
+                  )}
+                    >
+                  {dayofweek.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        : null}
+
+      </div>
+      <div className="flex items-center mt-8">
+        <p className="text-sm text-gray-600 pr-3">
+          Starting from
+        </p>
+        <div className="relative rounded-md shadow-sm">
+          {/* When you implement custom datepicker for this, uncomment the icon and change the <input/> to pl-10
+              TODO add max and min dates because changing the year causes it to freeze due to recursive calculations */}
+          {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div> */}
+          <input
+            type="datetime-local"
+            name="startingDate"
+            id="startingDate"
+            defaultValue={correctTimezone(formState.referenceDate)}
+            onBlur={handleStartingDate}
+            className="block w-64 rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="YYYY/MM/DD HH:MM"
           />
         </div>
+      </div>
+
+      <div className="flex items-start mt-8">
+        <p className="text-sm text-nowrap text-gray-600">
+          Next retrievals:
+        </p>
+        <div className="flex flex-wrap text-sm text-gray-400 pr-3">
+          {formState.intervalType.value === "week" && !formState.weekArray.some(w => w) ?
+          <p className="text-nowrap pl-3 text-red-400">Please select at least one day of the week.</p>
+          : (RecursiveFutureNextInterval(6, formState)).map((nextDate, index) => (
+            <p className="text-nowrap pl-3">
+              {convertShortDate(nextDate)}
+              {index == 5 ? "" : ","}
+            </p>
+          ))
+          }
+        </div>
+      </div>
+
+{/* debug */}
+{/* {JSON.stringify(formState)} */}
+    </div>
+  )
+}
+
+function Card({ children }) {
+  return (
+    <div className="rounded-lg bg-white shadow-md">
+      <div className="px-8 py-8">
+        {children}
       </div>
     </div>
   )
 }
 
 
-function Card({ children }) {
+function LastRetrievalCard({ APIData }) {
   return (
-    <div className="rounded-lg bg-white shadow">
-      <div className="px-4 py-5 sm:p-6">
-        {children}
-      </div>
-    </div>
+    <Card>
+      <LastConnectionDetails item={APIData}/>
+    </Card>
   )
 }
 
@@ -299,6 +644,14 @@ function AccountListCard() {
           A list of accounts that are currently using this endpoint as their data source.
         </p>
       </div>
+      {accountsUsingAPI.some((businessUnit) => (businessUnit.accounts.some(account => !account.detected))) ? 
+        <div className="flex items-center bg-red-100 rounded-md mt-8 ring-1 ring-inset ring-red-300">
+          <ExclamationTriangleIcon className="text-red-600 p-3 h-14 w-14"/>
+          <p className="text-red-700 text-sm py-3 pr-3">
+            Some of your accounts were assigned to this endpoint, but their account codes were not detected. Check your configurations.
+          </p>
+        </div>
+      : null}
       {accountsUsingAPI.map((businessUnit) => (
         <div key={businessUnit.business_unit}>
           <div className="mt-8 mb-4">
@@ -314,7 +667,7 @@ function AccountListCard() {
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
                     <tr>
-                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-700 sm:pl-0">
+                      <th scope="col" className="py-3.5 pl-2 pr-3 text-left text-sm font-semibold text-gray-700">
                         Code
                       </th>
                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
@@ -326,11 +679,26 @@ function AccountListCard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {businessUnit.accounts.map((item) => (
-                      <tr key={item.code} className="bg-white hover:bg-gray-50">
-                        <td className="whitespace-nowrap py-4 pl-1 pr-3 text-sm text-gray-500">{item.code}</td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600">{item.name}</td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.currency}</td>
+                    {businessUnit.accounts.map((account) => (
+                      <tr key={account.code} className="bg-white hover:bg-gray-50">
+                        <td
+                          className={classNames((account.detected ? "text-gray-500" : "font-medium text-red-500"),
+                            "whitespace-nowrap py-4 pl-1 pr-3 text-sm")}
+                        >
+                          {account.code}
+                        </td>
+                        <td
+                          className={classNames((account.detected ? "text-gray-600" : "text-red-500"),
+                            "whitespace-nowrap px-3 py-4 text-sm font-medium")}
+                        >
+                          {account.name}
+                          </td>
+                        <td
+                          className={classNames((account.detected ? "text-gray-500" : "font-medium text-red-500"),
+                            "whitespace-nowrap px-3 py-4 text-sm")}
+                        >
+                          {account.currency}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

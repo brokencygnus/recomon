@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Transition } from '@headlessui/react';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
+import { convertAgeMsToDateTime, convertMsToTime } from '@/app/utils/utils'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -51,6 +51,7 @@ export function TestConnectionList({ item }) {
         className={classNames(
           'overflow-hidden transition-all ease-out', expanded ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-0 h-0')}>
         <ResponsePreview
+          className={"text-sm text-gray-900 mt-3 overflow-y-auto max-h-20 rounded-md px-2.5 py-1.5"}
           item={item}
         />
       </div>
@@ -100,7 +101,7 @@ export function TestConnectionDetails({ item }) {
           <TestButton handleRequest={handleRequest}/>
         </div>
       </div>
-      <div className={`flex grow items-center ${requestState === "unstarted" ? "" : "pt-6"}`}>
+      <div className={`flex grow items-center ${requestState === "unstarted" ? "" : "pt-8"}`}>
         <p 
           style={{ display: requestState === "done" ? "" : "none" }}
           className="text-gray-900 font-medium text-sm">
@@ -114,15 +115,70 @@ export function TestConnectionDetails({ item }) {
       <div
         className={classNames(
           'overflow-hidden transition-all ease-out', requestState === "done" ? 'opacity-100 translate-y-0 duration-200 h-full' : 'opacity-0 -translate-y-2 duration-50 h-0')}>
-          <ResponsePreview
+        <ResponsePreview
+          className={"text-sm text-gray-900 mt-3 overflow-y-auto max-h-[8.5rem] rounded-md px-2.5 py-1.5"}
           item={item}
         />
-        <div className="flex flex-col grow items-start pt-6">
+        <div className="flex flex-col grow items-start pt-8">
           <p className="text-gray-900 font-medium text-sm">Detected account codes:</p>
           <p className="text-gray-600 mt-3 text-sm">{detectCodes(item.testResponse) ?? "No account codes detected"}</p>
         </div>
       </div>
     </div>
+  )
+}
+
+
+export function LastConnectionDetails({ item }) {
+  return (
+    
+  <div>
+    <h3 className="text-base font-semibold leading-6 text-gray-900">Last Retrieved</h3>
+    <p className="mt-2 text-sm text-gray-500">
+      The status of the last request you've sent to retrieve data from this API.
+    </p>
+
+    <div className="mt-6 border-t border-gray-100">
+      <dl className="divide-y divide-gray-100">
+        <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt className="text-sm font-medium leading-6 text-gray-900">Latest attempt:</dt>
+          <dd className="col-span-2 flex flex-col">
+            <div className="flex items-center">
+              <p className="text-sm font-normal text-gray-600">
+                Status:
+              </p>
+              <StatusIndicator
+                item={item}
+                requestState={"done"}
+              />
+            </div>
+            <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
+              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
+              <p className="text-sm font-normal text-gray-500"> &#40;{convertMsToTime(item.ageMS)} ago&#41;</p>
+            </div>
+          </dd>
+        </div>
+        <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt className="text-sm font-medium leading-6 text-gray-900">Last successful retrieval:</dt>
+          <dd className="col-span-2 flex flex-col">
+            <div className="flex items-center">
+              <p className="text-sm font-normal text-gray-600">
+                Status:
+              </p>
+              <StatusIndicator
+                item={item}
+                requestState={"done"}
+              />
+            </div>
+            <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
+              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
+              <p className="text-sm font-normal text-gray-500"> &#40;{convertMsToTime(item.ageMS)} ago&#41;</p>
+            </div>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
   )
 }
 
@@ -193,7 +249,7 @@ function ViewResButton({ toggleExpand, requestState, expanded }) {
 }
 
 
-function ResponsePreview({ item }) {
+function ResponsePreview({ item, className }) {
   const response = () => {
     if (!item.testResponse) {
       console.log("test")
@@ -214,7 +270,7 @@ function ResponsePreview({ item }) {
   return (
     <div>
       <div className={classNames(
-        "text-sm text-gray-900 mt-3 overflow-y-auto max-h-20 rounded-md px-2.5 py-1.5",
+        className,
         item?.testResponse ? "font-mono text-wrap break-all bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300" : "text-pretty")}>
         <p
           dangerouslySetInnerHTML={{ __html:

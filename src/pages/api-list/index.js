@@ -51,7 +51,7 @@ function APIHeader() {
             <div className="max-w-7xl">
               <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Manage APIs</h1>
               <p className="mt-2 text-sm text-gray-700">Manage your data source APIs to keep your balances up to date.&nbsp;
-                <a href='#' className="font-semibold text-blue-600">How do I set up APIs?</a>
+                <a href='#' className="font-semibold text-indigo-600">How do I set up APIs?</a>
               </p>
             </div>
           </header>
@@ -87,7 +87,7 @@ function APIFIlter({ handleSearchChange, handleResetFilters }) {
             className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600"
             onClick={handleResetFilters}
           >
-            Reset
+            Reset search
           </button>
         </div>
       </div>

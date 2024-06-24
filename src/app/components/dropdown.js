@@ -6,28 +6,34 @@ function classNames(...classes) {
 }
 
 // options: [{name: a, value: aaa}, {name: b, value: bbb}, ...]
-// size: small | medium | large
-export function Dropdown({ labelText, options, selectedOption, onSelect, width }) {
-  const dropdownWidth = (width) => {
-    switch (width) {
-      case "small": return "w-24";
-      case "medium": return "w-40";
-      case "large": return "w-56";
-      default: return "w-40";
-    }
+// size: sm | md | lg | xl
+// nullOption: { name: Aaa, value: aaa, dropdownName: Aaa aa }
+export function Dropdown({ name, labelText, options, nullOption, selectedOption, onSelect, className }) {
+  const handleOptionSelect = (option) => {
+    const syntheticEvent = {
+      target: {
+        name,
+        value: option
+      }
+    };
+    onSelect(syntheticEvent);
   }
 
   return (
-    <Menu as="div" className="relative inline-block w-full text-left">
-      <p className="mb-1 block text-sm font-medium text-gray-900">
-        {labelText}
-      </p>
-      <MenuButton className={classNames(
-        dropdownWidth(width),
-        "place-content-between flex grid-row-1 gap-x-1.5 rounded-md bg-white px-3 py-2 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-      )}>
-        <p className="truncate text-sm font-semibold text-gray-900 ">{selectedOption}</p>
-        <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+    <Menu as="div" className="relative text-left">
+      {labelText ?
+        <p className="mb-1 block text-sm font-medium text-gray-900">
+          {labelText}
+        </p>
+      : null }
+      <MenuButton className={className}>
+        <div className="place-content-between flex grid-row-1 gap-x-1.5 px-3 py-2">
+          <p className={selectedOption == nullOption?.name ?
+          "truncate text-sm font-normal text-gray-400" : "truncate text-sm font-medium text-gray-900" }
+          >
+            {selectedOption}</p>
+          <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
       </MenuButton>
 
       <Transition
@@ -38,16 +44,32 @@ export function Dropdown({ labelText, options, selectedOption, onSelect, width }
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className={classNames(
-          dropdownWidth(width),
-          "absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-        )}>
+        <MenuItems className="absolute w-full right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            {options.map((option) => (
-              <MenuItem key={option.value}>
+            {nullOption ?
+              <MenuItem
+                name={name}
+                key={nullOption?.value}>
                 {({ focus }) => (
                   <p
-                    onClick={() => (onSelect(option))}
+                    onClick={() => handleOptionSelect(nullOption)}
+                    className={classNames(
+                      focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                      'block px-4 py-2 text-sm hover:cursor-pointer'
+                    )}
+                  >
+                    {nullOption?.dropdownName}
+                  </p>
+                )}
+              </MenuItem>
+              : null}
+            {options.map((option) => (
+              <MenuItem
+                name={name}
+                key={option.value}>
+                {({ focus }) => (
+                  <p
+                    onClick={() => handleOptionSelect(option)}
                     className={classNames(
                       focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                       'block px-4 py-2 text-sm hover:cursor-pointer'

@@ -1,6 +1,6 @@
 'use client'
 import "../globals.css";
-import { Fragment, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import {
   Menu,
   MenuButton,
@@ -15,12 +15,18 @@ import {
   HomeIcon,
   CodeBracketIcon,
 } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { businessUnits } from "@/app/constants/mockdata";
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { businessUnits, currencies } from "@/app/constants/mockdata";
+import { formatNumber, convertCurrency } from '@/app/utils/utils';
+import { ToastProvider, ToastGroup } from '@/app/components/toast'
+import { Dropdown } from "./dropdown";
+
+const businessUnitNav = structuredClone(businessUnits)
+  .concat({ id: 0, name: 'View All', href: '/business-units' })
 
 const navigation = [
   { slug: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
-  { slug: 'bu', name: 'Business Units', href: '#', icon: Square3Stack3DIcon, submenus: businessUnits},
+  { slug: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
   { slug: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
 ]
 const userNavigation = [
@@ -32,9 +38,38 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+// Context to configure reference currency on the sticky header
+export const RefCurContext = React.createContext({ name:"None", value:"self", dropdownName:"None"});
+
+// Import this if you want to use RefCurContext
+export const convertedCurrency = (amount, currency, referenceCurrency, signed=false) => {
+  let convertedAmount = ""
+  let currencySymbol = ""
+  let approxSymbol = ""
+  let sign = ""
+
+  if (signed && amount > 0) {
+    sign = "+"
+  }
+
+  if (referenceCurrency?.value !== 'self' && currency !== referenceCurrency?.symbol) {
+    convertedAmount = formatNumber(convertCurrency(amount, currency, referenceCurrency?.symbol))
+    currencySymbol = referenceCurrency?.symbol
+    approxSymbol = "≈ "
+  } else {
+    let amountRounded = +parseFloat(amount).toFixed(8)
+    convertedAmount = formatNumber(amountRounded)
+    currencySymbol = currency
+  }
+  return approxSymbol + sign + convertedAmount + " " + currencySymbol
+}
+
 export default function Layout({ children, currentTab }) {
   const [expanded, setExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
+  const [referenceCurrency, setReferenceCurrency] = useState({ name:"None", value:"self", dropdownName:"None"})
+
+  const nullRefCur = { name:"None", value:"self", dropdownName:"None"}
 
   const handleMouseEnterSidebar = () => {
     setExpanded(true);
@@ -52,6 +87,11 @@ export default function Layout({ children, currentTab }) {
   const handleMouseLeaveMenu = () => {
     setHoveredMenu(null);
   };
+
+  const handleReferenceCurrency = (event) => {
+    const { value } = event.target
+    setReferenceCurrency(value)
+  }
 
   return (
     <>
@@ -121,7 +161,7 @@ export default function Layout({ children, currentTab }) {
                               { item.submenus.map((item) => (
                                 <a
                                   key={item.id}
-                                  href={item.href}
+                                  href={"/business-unit/" + item.slug}
                                   className="group flex items-center pl-6 pr-20 py-3 hover:bg-gray-100"
                                 >
                                   <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">{item.name}</dt>
@@ -163,7 +203,7 @@ export default function Layout({ children, currentTab }) {
           </div>
         </div>
 
-        <div className="flex flex-col pl-20 h-screen">
+        <div className="relative flex flex-col pl-20 h-screen">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
@@ -171,7 +211,7 @@ export default function Layout({ children, currentTab }) {
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form className="relative flex flex-1" action="#" method="GET">
-                <label htmlFor="search-field" className="sr-only">
+                {/* <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
                 <MagnifyingGlassIcon
@@ -184,9 +224,25 @@ export default function Layout({ children, currentTab }) {
                   placeholder="Search..."
                   type="search"
                   name="search"
-                />
+                /> */}
               </form>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
+
+                <div className="flex flex-row items-center">
+                  <p className="text-sm text-gray-400 pr-3">Reference currency:</p>
+                  <Dropdown
+                    name='intervalType'
+                    options={currencies}
+                    nullOption={nullRefCur}
+                    selectedOption={referenceCurrency.name}
+                    onSelect={handleReferenceCurrency}
+                    className="w-40 rounded-md bg-white hover:bg-gray-50"
+                  />
+                </div>
+
+                {/* Separator */}
+                <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
+
                 <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -224,7 +280,7 @@ export default function Layout({ children, currentTab }) {
                         <MenuItem key={item.name}>
                           {({ focus }) => (
                             <a
-                              href={item.href}
+                              href={item.slug}
                               className={classNames(
                                 focus ? 'bg-gray-50' : '',
                                 'block px-3 py-1 text-sm leading-6 text-gray-900'
@@ -241,8 +297,12 @@ export default function Layout({ children, currentTab }) {
               </div>
             </div>
           </div>
-
-          {children}
+            <RefCurContext.Provider value={{ referenceCurrency }}>
+              <ToastProvider>
+                {children}
+                <ToastGroup />
+              </ToastProvider>
+            </RefCurContext.Provider>
 
         </div>
       </div>
