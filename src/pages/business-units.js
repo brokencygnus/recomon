@@ -7,6 +7,7 @@ import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } fro
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { businessUnits } from '@/app/constants/mockdata'
 import { checkDataEdited } from '@/app/utils/utils'
+import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
 import { ToastContext } from '@/app/components/toast';
@@ -69,21 +70,41 @@ export default function APIPage() {
     }
   }, [router.query.action])
 
-  const [businessUnitFilters, setBusinessUnitFilters] = useState();
+  const [filteredBusinessUnits, setFilteredBusinessUnits] = useState(businessUnits);
+  const [searchTerm, setSearchTerm] = useState([]);
+
+  const handleSearchChange = (event) => {
+    const { value } = event.target
+
+    const searchArray = value.split(" ")
+
+    setSearchTerm(searchArray)
+  }
 
   const handleResetFilters = () => {
+    setSearchTerm([])
   }
+
+  useEffect(() => {
+    const tempFilteredBusinessUnits = businessUnits.filter(bu =>
+      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == '' || SearchFilter(bu.name, searchTerm))
+    )
+    
+    setFilteredBusinessUnits(tempFilteredBusinessUnits)
+  }, [businessUnits, searchTerm])
 
   return (
     <Layout currentTab="bu">
       <ModalContext.Provider value={{ modalData, modalAction }}>
-        <main className="relative bg-gray-100 h-full">
+        <main className="flex-grow relative bg-gray-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <BusinessUnitsHeader />
           </div>
           <div className="sticky top-16 bg-white px-12 2xl:px-16 z-[2]">
             <BusinessAccountFilter
+              searchTerm={searchTerm}
+              handleSearchChange={handleSearchChange}
               handleResetFilters={handleResetFilters}
               openModal={openModal}
             />
@@ -96,9 +117,14 @@ export default function APIPage() {
           >
             <EditBusinessUnit setClose={closeModal}/>
           </Modal>
+          <DeleteDialog
+            setClose={closeModal}
+          />
           <div className="relative flex-grow px-12 2xl:px-16">
             <BusinessUnitGrid
+              businessUnits={filteredBusinessUnits}
               openModal={openModal}
+              searchTerm={searchTerm}
             />
             <div className="h-16 sticky bottom-0 z-10 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
           </div>
@@ -128,19 +154,18 @@ function BusinessUnitsHeader() {
   );
 }
 
-function BusinessAccountFilter({ handleResetFilters, handleSearchChange, openModal }) {
+function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchChange, openModal }) {
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
         <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-          <label htmlFor="search-field" className="sr-only">
-            Search
-          </label>
           <input
-            id="search-accounts"
+            id="search-business-units"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
             placeholder="Search business unit"
-            type="search"
+            value={searchTerm.join(" ")}
+            onChange={handleSearchChange}
+            type="text"
             name="search"
           />
           <MagnifyingGlassIcon
@@ -179,7 +204,7 @@ function BusinessAccountFilter({ handleResetFilters, handleSearchChange, openMod
 }
 
 
-export function BusinessUnitGrid() {
+export function BusinessUnitGrid({ businessUnits, searchTerm }) {
   const { referenceCurrency } = useContext(RefCurContext)
 
   // Somehow passing openModal here causes errors, idk
@@ -243,7 +268,7 @@ export function BusinessUnitGrid() {
             >
               <div className="bg-gray-50 hover:bg-gray-100 p-6">
                 <div className="flex items-baseline gap-x-4">
-                  <h3 className="text-lg font-semibold leading-6 truncate text-gray-900">{businessUnit.name}</h3>
+                  <h3 className="text-lg font-semibold leading-6 truncate text-gray-900">{HighlightSearch(businessUnit.name, searchTerm, { base:'', highlight:'bg-indigo-300' })}</h3>
                   <p className="text-sm leading-6 text-gray-400">{businessUnit.code}</p>
                   <Menu as="div" className="relative ml-auto">
                     <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">

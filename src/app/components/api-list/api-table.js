@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { SeeMore } from '@/app/components/seemore';
 import { convertMsToTime, convertAgeMsToDateTime } from '@/app/utils/utils';
 import { TestConnectionList } from './testconnection';
+import { HighlightSearch } from '@/app/utils/highlight_search';
 
-export default function APITable({ data }) {
+export default function APITable({ data, searchTerm }) {
   return (
     <div className="relative mb-8 flow-root">
       <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
@@ -39,12 +40,12 @@ export default function APITable({ data }) {
                     {item.code}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600 border-b border-gray-300">
-                    <span className="text-wrap">{item.name}</span>
+                    <span className="text-wrap">{HighlightSearch(item.name, searchTerm, {base: '', highlight: 'bg-indigo-300'})}</span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">
                     <div className="flex justify-between items-center">
                       <SeeMore
-                        content={item.url}
+                        content={HighlightSearch(item.url, searchTerm, {base: '', highlight: 'bg-indigo-300'})}
                       />
                     </div>
                   </td>

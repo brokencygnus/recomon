@@ -252,7 +252,6 @@ function ViewResButton({ toggleExpand, requestState, expanded }) {
 function ResponsePreview({ item, className }) {
   const response = () => {
     if (!item.testResponse) {
-      console.log("test")
       return ""
     }
 

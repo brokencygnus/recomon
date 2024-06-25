@@ -83,6 +83,14 @@ export const convertDateOnly = (date) => {
   });
 };
 
+export const convertTimeOnly = (date) => {
+  return date.toLocaleString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
 // Checks if FormState has been edited, i.e. different from initial state
 export const checkDataEdited = ( initialState, currentState, setIsDataEdited ) => {
   if (_.isEqual(initialState, currentState)) {

@@ -5,9 +5,6 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-// Config
-const toastTimeout = 10000
-
 export const ToastContext = React.createContext({});
 
 export function ToastProvider({ children }) {
@@ -36,14 +33,14 @@ export function ToastProvider({ children }) {
 
   useEffect(() => {
     if (toastArray.some(toast => !toast.timeoutId)) {
-      // Set toasts to disappear after toastSeconds
+      // Set toasts to disappear after 10s
       const timers = toastArray.map((toast) => {
         if (!toast.timeoutId) {
           // Create a new timer for each toast that doesn't have a timeoutId
           const timeoutId = setTimeout(() => {
             // Remove the current toast
             deleteToast(toast.id)
-          }, toastTimeout)
+          }, 10000)
 
           // Return an updated toast with the timeoutId
           return { ...toast, timeoutId };
@@ -97,7 +94,7 @@ export function ToastGroup() {
           >
             <div className={classNames(
               "absolute w-full h-full", colorProgress(toast.color),
-              "transition-all ease-linear", toast.visible ? `translate-x-0 duration-[${toastTimeout}ms]` : "-translate-x-full",
+              "transition-all ease-linear", toast.visible ? `translate-x-0 duration-[10000ms]` : "-translate-x-full",
               )}>
             </div>
             <div className="flex items-center justify-between py-2 px-4">

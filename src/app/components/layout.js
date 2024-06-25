@@ -14,6 +14,7 @@ import {
   Square3Stack3DIcon,
   HomeIcon,
   CodeBracketIcon,
+  CameraIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { businessUnits, currencies } from "@/app/constants/mockdata";
@@ -27,6 +28,7 @@ const businessUnitNav = structuredClone(businessUnits)
 const navigation = [
   { slug: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
   { slug: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
+  { slug: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
   { slug: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
 ]
 const userNavigation = [
@@ -203,7 +205,7 @@ export default function Layout({ children, currentTab }) {
           </div>
         </div>
 
-        <div className="relative flex flex-col pl-20 h-screen">
+        <div className="relative flex flex-col pl-20 min-h-screen">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}

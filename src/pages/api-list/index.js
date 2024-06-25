@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { APIs } from '@/app/constants/mockdata';
+import { SearchFilter } from '@/app/utils/highlight_search'
 
 const APITable = dynamic(() => import('@/app/components/api-list/api-table'), { ssr: false });
 
@@ -17,24 +17,46 @@ export default function APIPage() {
     { name: 'Manage APIs', href: '#', current: true },
   ]
 
-  const [APIFilters, setAPIFilters] = useState();
+  const [filteredAPIs, setFilteredAPIs] = useState(APIs);
+  const [searchTerm, setSearchTerm] = useState([]);
+
+  const handleSearchChange = (event) => {
+    const { value } = event.target
+
+    const searchArray = value.split(" ")
+
+    setSearchTerm(searchArray)
+  }
 
   const handleResetFilters = () => {
+    setSearchTerm([])
   }
+
+  useEffect(() => {
+    const tempFilteredAPIs = APIs.filter(api =>
+      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == ''
+      || SearchFilter(api.name, searchTerm)
+      || SearchFilter(api.url, searchTerm))
+    )
+    
+    setFilteredAPIs(tempFilteredAPIs)
+  }, [APIs, searchTerm])
 
   return (
       <Layout currentTab="api">
         <main className="pt-10 px-12 2xl:px-16">
           <Breadcrumbs breadcrumbPages={breadcrumbPages} />
           <APIHeader/>
-          <APIFIlter
-            handleSearchChange={null}
+          <APIFilter
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
             handleResetFilters={handleResetFilters}
           />
         </main>
         <div className="flex-grow overflow-y-auto mt-8 px-12 2xl:px-16">
           <APITable
-            data={APIs}
+            data={filteredAPIs}
+            searchTerm={searchTerm}
           />
         </div>
       </Layout>
@@ -44,7 +66,7 @@ export default function APIPage() {
 function APIHeader() {
 
   return (
-    <div className="flex items-center mb-4">
+    <div className="flex items-center">
       <div className="flex-auto">
         <div className="py-4">
           <header>
@@ -62,7 +84,7 @@ function APIHeader() {
     </div>
   );
 }
-function APIFIlter({ handleSearchChange, handleResetFilters }) {
+function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
@@ -74,7 +96,9 @@ function APIFIlter({ handleSearchChange, handleResetFilters }) {
             id="search-accounts"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
             placeholder="Search API"
-            type="search"
+            value={searchTerm.join(" ")}
+            onChange={handleSearchChange}
+            type="text"
             name="search"
           />
           <MagnifyingGlassIcon

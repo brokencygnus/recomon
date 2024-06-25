@@ -2,17 +2,17 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext } from 'react'
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { FiatIconSmall } from '@/app/components/fiaticons';
 import { Dropdown } from '@/app/components/dropdown';
 import { Modal } from '@/app/components/modal';
+import { FiatIconSmall } from '@/app/components/fiaticons';
 import { NumberInput } from '@/app/components/numberinput';
-import { ToastGroup } from '@/app/components/toast'
-import { formatNumber, convertCurrency, SymbolDictionary, checkDataEdited } from '@/app/utils/utils';
-import { PencilSquareIcon } from '@heroicons/react/20/solid'
+import { SymbolDictionary, checkDataEdited } from '@/app/utils/utils';
+import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { businessUnits, APIs, accounts, currencies } from '@/app/constants/mockdata'
 import { accountTypes, dataSources } from '@/app/constants/types'
 import { ToastContext } from '@/app/components/toast';
+import { PencilSquareIcon } from '@heroicons/react/20/solid';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -42,9 +42,15 @@ export default function AccountPage() {
   ]
 
   //filters
-  const defaultFilters = {currency:{name: "Filter currency", value:null}, type:{name: "Filter type", value:null}, dataSource:{name: "Filter data source", value:null}}
+  const defaultFilters = {
+    currency: {name: "Filter currency", value:null},
+    type: {name: "Filter type", value:null},
+    dataSource: {name: "Filter data source", value:null}
+  }
+
   const [filteredAccounts, setFilteredAccounts] = useState(accounts);
   const [accountFilters, setAccountFilters] = useState(defaultFilters);
+  const [searchTerm, setSearchTerm] = useState([]);
 
   const handleCurrencyFilter = (event) => {
     const { value } = event.target
@@ -70,23 +76,29 @@ export default function AccountPage() {
     setAccountFilters(tempAccountFilters)
   };
 
+  const handleSearchChange = (event) => {
+    const { value } = event.target
+
+    const searchArray = value.split(" ")
+
+    setSearchTerm(searchArray)
+  }
+
   const handleResetFilters = () => {
     setAccountFilters(defaultFilters)
+    setSearchTerm([])
   }
 
   useEffect(() => {
-    let tempFilteredAccounts = []
-    for (let i in accounts) {
-      if (accountFilters.currency.value == null || accounts[i].currency == accountFilters.currency.value){
-        if (accountFilters.type.value == null || accounts[i].type == accountFilters.type.value){
-          if (accountFilters.dataSource.value == null || accounts[i].dataSource == accountFilters.dataSource.value){
-            tempFilteredAccounts.push(accounts[i])
-          }
-        }
-      }
-    }
+    const tempFilteredAccounts = accounts.filter(account => 
+      (accountFilters.currency.value == null || account.currency === accountFilters.currency.value) &&
+      (accountFilters.type.value == null || account.type === accountFilters.type.value) &&
+      (accountFilters.dataSource.value == null || account.dataSource === accountFilters.dataSource.value) &&
+      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == '' || SearchFilter(account.name, searchTerm))
+    )
+    
     setFilteredAccounts(tempFilteredAccounts)
-  }, [accountFilters])
+  }, [accounts, accountFilters, searchTerm])
 
   // modal
   var isModalOpen = (router.query.action ? true : false)
@@ -129,7 +141,7 @@ export default function AccountPage() {
   return (
     <Layout currentTab="bu">
       <ModalContext.Provider value={{ modalData, modalAction }}>
-        <main className="relative bg-gray-100 h-full">
+        <main className="flex-grow relative bg-gray-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <AccountHeader />
@@ -141,7 +153,8 @@ export default function AccountPage() {
               handleCurrencyFilter={handleCurrencyFilter}
               handleTypeFilter={handleTypeFilter}
               handleDataSourceFilter={handleDataSourceFilter}
-              handleSearchChange={null}
+              searchTerm={searchTerm}
+              handleSearchChange={handleSearchChange}
               handleResetFilters={handleResetFilters}
               openModal={openModal}
             />
@@ -157,6 +170,7 @@ export default function AccountPage() {
           <div className="relative flex-grow px-12 2xl:px-16">
             <AccountGrid 
               accounts={filteredAccounts}
+              searchTerm={searchTerm}
               openModal={openModal}
             />
             <div className="h-16 sticky bottom-0 z-10 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
@@ -184,57 +198,7 @@ function AccountHeader() {
   );
 }
 
-export function AccountGrid({ accounts, openModal }) {
-  const { referenceCurrency } = useContext(RefCurContext)
-
-  const convert = (amount, currency) => convertedCurrency(amount, currency, referenceCurrency)
-
-  return (
-    <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 2xl:gap-x-8 py-8 xl:grid-cols-2 3xl:grid-cols-3">
-      {accounts.map((account) => (
-        <li key={account.code} className="relative z-0 flex flex-row rounded-lg shadow-md ring-1 ring-gray-900/5">
-          <div className="relative grow w-0 z-0 col-span-1 rounded-lg bg-white">
-            <div className="flex w-full items-center justify-between p-6">
-              <div className="flex items-center">
-                <FiatIconSmall>{SymbolDictionary(account.currency)}</FiatIconSmall>
-                <div className="flex flex-col justify-end pl-6 gap-x-3">
-                  <p className="truncate mt-1 text-sm font-medium text-gray-900">{account.name}</p>
-                  <div className="mt-1 text-right text-xs text-gray-500 flex flex-cols-3 items-center">
-                    <p className="mr-2">{accountTypes.find((data) => data.value == account.type).name}</p>
-                    <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
-                      <circle cx={1} cy={1} r={1} />
-                    </svg>
-                    <p className="ml-2">{dataSources.find((data) => data.value == account.dataSource).name}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid justify-items-end">
-                <div className="flex items-center">  
-                  <p className="text-xs font-medium text-gray-500 pr-2">{account.code}</p>
-                  <p className="inline-flex flex-shrink-0 items-center rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                    {account.currency}
-                  </p>
-                </div>
-                <p className="mt-1 truncate text-xs text-gray-500">{convert(account.balance, account.currency)}</p>
-              </div>
-            </div>
-          </div>
-          <div className="w-8 -z-10"></div>
-          <div
-            onClick={() => {openModal(account, "edit")}}
-            className="absolute inset-y-0 right-0 w-12 -z-[1] grid items-center justify-items-end rounded-lg bg-indigo-100 hover:bg-indigo-400 hover:cursor-pointer"
-          >
-            <div className="w-8 grid items-center justify-items-center">
-              <PencilSquareIcon className="h-5 w-5 text-white"></PencilSquareIcon>
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter, handleSearchChange, handleResetFilters, openModal }) {
+function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, handleTypeFilter, handleDataSourceFilter, searchTerm, handleSearchChange, handleResetFilters, openModal }) {
   const filterCurrencies = currencies.map(currency => ({
     name: currency.name,
     value: currency.symbol
@@ -255,7 +219,9 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
             id="search-accounts"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
             placeholder="Search account"
-            type="search"
+            value={searchTerm.join(" ")}
+            onChange={handleSearchChange}
+            type="text"
             name="search"
           />
           <MagnifyingGlassIcon
@@ -318,6 +284,57 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
     </div>
   )
 }
+
+export function AccountGrid({ accounts, openModal, searchTerm }) {
+  const { referenceCurrency } = useContext(RefCurContext);
+
+  const convert = (amount, currency) => convertedCurrency(amount, currency, referenceCurrency);
+
+  return (
+    <ul role="list" className="grid grid-cols-1 gap-x-6 gap-y-8 2xl:gap-x-8 py-8 xl:grid-cols-2 3xl:grid-cols-3">
+      {accounts.map((account) => (
+        <li key={account.code} className="relative z-0 flex flex-row rounded-lg shadow-md ring-1 ring-gray-900/5">
+          <div className="relative grow w-0 z-0 col-span-1 rounded-lg bg-white">
+            <div className="flex w-full items-center justify-between p-6">
+              <div className="flex items-center">
+                <FiatIconSmall>{SymbolDictionary(account.currency)}</FiatIconSmall>
+                <div className="flex flex-col justify-end pl-6 gap-x-3">
+                  <p className="truncate mt-1 text-sm font-medium text-gray-900">{HighlightSearch(account.name, searchTerm, { base:'', highlight:'bg-indigo-300' })}</p>
+                  <div className="mt-1 text-right text-xs text-gray-500 flex flex-cols-3 items-center">
+                    <p className="mr-2">{accountTypes.find((data) => data.value == account.type).name}</p>
+                    <svg viewBox="0 0 2 2" className="h-0.5 w-0.5 fill-current">
+                      <circle cx={1} cy={1} r={1} />
+                    </svg>
+                    <p className="ml-2">{dataSources.find((data) => data.value == account.dataSource).name}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="grid justify-items-end">
+                <div className="flex items-center">
+                  <p className="text-xs font-medium text-gray-500 pr-2">{account.code}</p>
+                  <p className="inline-flex flex-shrink-0 items-center rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                    {account.currency}
+                  </p>
+                </div>
+                <p className="mt-1 truncate text-xs text-gray-500">{convert(account.balance, account.currency)}</p>
+              </div>
+            </div>
+          </div>
+          <div className="w-8 -z-10"></div>
+          <div
+            onClick={() => { openModal(account, "edit"); }}
+            className="absolute inset-y-0 right-0 w-12 -z-[1] grid items-center justify-items-end rounded-lg bg-indigo-100 hover:bg-indigo-400 hover:cursor-pointer"
+          >
+            <div className="w-8 grid items-center justify-items-center">
+              <PencilSquareIcon className="h-5 w-5 text-white"></PencilSquareIcon>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 
 // modalData = accounts[index]
 // mode = "edit" | "new"
