@@ -78,9 +78,7 @@ export default function AccountPage() {
 
   const handleSearchChange = (event) => {
     const { value } = event.target
-
     const searchArray = value.split(" ")
-
     setSearchTerm(searchArray)
   }
 
@@ -94,7 +92,7 @@ export default function AccountPage() {
       (accountFilters.currency.value == null || account.currency === accountFilters.currency.value) &&
       (accountFilters.type.value == null || account.type === accountFilters.type.value) &&
       (accountFilters.dataSource.value == null || account.dataSource === accountFilters.dataSource.value) &&
-      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == '' || SearchFilter(account.name, searchTerm))
+      (SearchFilter(account.name, searchTerm))
     )
     
     setFilteredAccounts(tempFilteredAccounts)
@@ -204,9 +202,9 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
     value: currency.symbol
   }))
   
-  const nullCurrency = { name: "Filter currency", value: null, dropdownName: "All" }
-  const nullType = { name: "Filter type", value: null, dropdownName: "All" }
-  const nullDataSource = { name: "Filter data source", value: null, dropdownName: "All" }
+  const nullCurrency = { noSelectionLabel: "Filter currency", name: "All", value: null }
+  const nullType = { noSelectionLabel: "Filter type", name: "All", value: null }
+  const nullDataSource = { noSelectionLabel: "Filter data source", name: "All", value: null }
   
   return (
     <div className="flex justify-between">

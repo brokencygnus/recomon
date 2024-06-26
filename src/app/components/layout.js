@@ -69,7 +69,7 @@ export const convertedCurrency = (amount, currency, referenceCurrency, signed=fa
 export default function Layout({ children, currentTab }) {
   const [expanded, setExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
-  const [referenceCurrency, setReferenceCurrency] = useState({ name:"None", value:"self", dropdownName:"None"})
+  const [referenceCurrency, setReferenceCurrency] = useState({ noSelectionLabel:"None", name:"None", value:"self" })
 
   const nullRefCur = { name:"None", value:"self", dropdownName:"None"}
 

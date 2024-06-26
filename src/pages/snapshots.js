@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext } from 'react';
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
@@ -15,6 +16,10 @@ function classNames(...classes) {
 const SnapshotContext = React.createContext({});
 
 export default function SnapshotPage() {
+  const router = useRouter()
+  const { pathname } = router;
+  const query = { ...router.query };
+
   const breadcrumbPages = [
     { name: 'Snapshots', href: '#', current: true },
   ]
@@ -22,25 +27,59 @@ export default function SnapshotPage() {
   const [filteredSnapshots, setFilteredSnapshots] = useState(snapshotBusinessUnits);
   const [searchTerm, setSearchTerm] = useState([]);
 
+  const resetRouter = () => {
+    router.replace({
+      pathname: '/snapshots',
+    }, 
+      undefined,
+      { shallow: true }
+    );
+  }
+
   const handleSearchChange = (event) => {
+    resetRouter()
+
     const { value } = event.target
-
     const searchArray = value.split(" ")
-
     setSearchTerm(searchArray)
   }
 
   const handleResetFilters = () => {
+    resetRouter()
     setSearchTerm([])
   }
 
-  useEffect(() => {
-    const tempFilteredSnapshots = snapshotBusinessUnits.filter(bu =>
-      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == '' || SearchFilter(bu.name, searchTerm))
-    )
+  const doFilter = () => {
+    const tempFilteredSnapshots = snapshotBusinessUnits.filter(bu => SearchFilter(bu.name, searchTerm))
     
     setFilteredSnapshots(tempFilteredSnapshots)
+  }
+
+  useEffect(() => {
+    if (!query["business-unit"]) {
+      doFilter()
+    }
   }, [snapshotBusinessUnits, searchTerm])
+
+  // Prevent race condition when page is loaded but router query is still undefined
+  useEffect(() => {
+    if (query["business-unit"]) {
+      if (searchTerm[0] !== query["business-unit"]) {
+        setSearchTerm([query["business-unit"]])
+        setFilteredSnapshots(() => {
+          let data = [snapshotBusinessUnits.find(bu => bu.slug == query["business-unit"])]
+      
+          if (!data) {
+            data = snapshotBusinessUnits
+          }
+      
+          return data
+        })
+      }
+    } else {
+      doFilter()
+    }
+  }, [router.query["business-unit"]])
 
   const [translate, setTranslate] = useState(0)
 
@@ -48,8 +87,8 @@ export default function SnapshotPage() {
 
   const allTimes = () => {
     const allTimesResult = []
-    filteredSnapshots.forEach(unit => {
-      unit.snapshots.forEach(snapshot => {
+    filteredSnapshots.forEach(bu => {
+      bu?.snapshots.forEach(snapshot => {
         const time = new Date(snapshot.date)
         allTimesResult.push(time)
       })
@@ -77,8 +116,11 @@ export default function SnapshotPage() {
               />
             </div>
             <div className="sticky top-[5.5rem] bg-white z-[1] w-full h-10"></div>
-            <div className="sticky top-[8rem] bg-white px-12 2xl:px-16 z-[2] overflow-hidden">
-              <SnapshotCarousel />
+            <div className="sticky top-[8rem] bg-white z-[2]">
+              <div className="px-12 2xl:px-16 ">
+                <SnapshotCarousel />
+              </div>
+              <div className="w-full h-4 bg-white border-b border-1 z-10 shadow-sm"></div>
             </div>
             {/* <div className="sticky top-[5.5rem] w-full h-10 bg-white z-[1] shadow-md"></div> */}
             <div className="px-12 2xl:px-16 overflow-hidden">
@@ -92,11 +134,6 @@ export default function SnapshotPage() {
   }
   
 function SnapshotHeader() {
-  const [index, setIndex] = useState(1)
-
-  const changeIndex = () => {
-    setIndex (index + 1)
-  }
   return (
     <div className="flex items-center">
       <div className="flex-auto">
@@ -162,45 +199,57 @@ function SnapshotFilter({ handleSearchChange, handleResetFilters }) {
 
 function SnapshotCarousel() {
   const { filteredSnapshots, sizeFactor, translate, setTranslate } = useContext(SnapshotContext)
-
-  const canTranslateLeft = () => {
-    if (translate < 0) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  const translateLeft = () => {
-    if (canTranslateLeft()) {
-      setTranslate(translate + 1)
-    }
-  }
-
+  
   // 3 is the number of business units displayed at the same time
+  const minTranslate = 0
+  const maxTranslate = filteredSnapshots.length - Math.min(filteredSnapshots.length, 3)
 
-  const canTranslateRight = () => {
-    if (translate > 0 - filteredSnapshots.length + 3) {
+  const canTranslateLeft = (amount = 1) => {
+    if (translate > minTranslate + (amount - 1)) {
       return true
     } else {
       return false
     }
   }
 
-  const translateRight = () => {
-    if (canTranslateRight()) {
-      setTranslate(translate - 1)
+  const translateLeft = (amount = 1) => {
+    if (canTranslateLeft(amount)) {
+      setTranslate(translate - amount)
     }
   }
+
+  const canTranslateRight = (amount = 1) => {
+    if (translate < maxTranslate - (amount - 1)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const translateRight = (amount = 1) => {
+    if (canTranslateRight(amount)) {
+      setTranslate(translate + amount)
+    }
+  }
+
+  // If the amount of data changes, make sure that the current translate value is still valid
+  useEffect(() => {
+    if (translate < minTranslate) {
+      translateRight(minTranslate - translate)
+    }
+    if (translate > maxTranslate) {
+      translateLeft(translate - maxTranslate)
+    }
+  }, [sizeFactor])
 
   return (
-  <div className="relative border-y-2 border-gray-200 -mx-40 2xl:-mx-24">  
+  <div className="relative border-y-2 border-gray-100 bg-gray-50 -mx-40 2xl:-mx-24">  
     <div
       style={{
         gridTemplateColumns: `repeat(${sizeFactor}, minmax(0, 1fr))`,
         width: sizeFactor*20+"%",
-        transition: 'all 0.3s ease-in-out',
-        translate: translate*100/sizeFactor + "%"
+        transition: 'translate 0.3s ease-in-out',
+        translate: -translate*100/sizeFactor + "%"
         }}
       className="grid divide-x divide-gray-100 transition-all"
     >
@@ -208,8 +257,8 @@ function SnapshotCarousel() {
       {filteredSnapshots.map((bu) => {
         return (
           <div className="py-3 px-8">
-            <div className="bg-white rounded-xl p-3 ring-1 ring-inset ring-gray-200 shadow-md">
-              <p className="text-center font-semibold text-gray-900">{bu.name}</p>
+            <div className="bg-white rounded-xl p-3 ring-1 ring-inset ring-gray-200 shadow">
+              <p className="text-center font-semibold text-gray-900">{bu?.name}</p>
             </div>
           </div>
         )
@@ -217,7 +266,7 @@ function SnapshotCarousel() {
       <div>{/* Empty column */}</div>
     </div>
     <div className="absolute inset-y-0 w-full h-full grid grid-cols-5">
-      <div className="flex col-start-1 size-full justify-center items-center bg-gradient-to-r from-white via-20% via-white/40 via-80% via-white/60 to-transparent">
+      <div className="flex col-start-1 size-full justify-center items-center bg-gradient-to-r from-gray-100 via-70% via-gray-50/70 to-transparent">
         <div className="flex justify-end w-2/3">
           <button onClick={() => translateLeft()} className="group p-5">
             <div className={classNames(
@@ -232,7 +281,7 @@ function SnapshotCarousel() {
           </button>
         </div>
       </div>
-      <div className="flex col-start-5 size-full justify-center items-center bg-gradient-to-l from-white via-20% via-white/40 via-80% via-white/60 to-transparent">
+      <div className="flex col-start-5 size-full justify-center items-center bg-gradient-to-l from-gray-100 via-70% via-gray-50/70 to-transparent">
         <div className="flex justify-start w-2/3">
           <button onClick={() => translateRight()} className="group p-5">
             <div className={classNames(
@@ -280,7 +329,7 @@ function SnapshotTable() {
   const slicedDataInDay = (data) => {
     const dayData = dataInDay(data)
 
-    return dayData.slice(0 - translate, 3 - translate)
+    return dayData.slice(0 + translate, 3 + translate)
   }
 
   const isSnapshotExistInSlice = (day) => {
@@ -293,7 +342,7 @@ function SnapshotTable() {
     <>
       {allTimes().map(day => { 
         return (
-          <div className={classNames(isSnapshotExistInSlice(day) ? '' : 'hidden',
+          <div key={day} className={classNames(isSnapshotExistInSlice(day) ? '' : 'hidden',
               "grid grid-cols-5 divide-x divide-gray-100 hover:bg-indigo-50 -mx-40 2xl:-mx-24"
             )}>
             <div className="flex justify-end col-start-1 border-r-4 border-gray-200 translate-x-[2px]">

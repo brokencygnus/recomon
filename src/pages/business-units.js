@@ -30,7 +30,7 @@ export default function APIPage() {
   // modal
   var isModalOpen = (["new", "edit"].includes(router.query.action) ? true : false)
   var [modalAction, setModalAction] = useState(router.query.action)
-  var modalData = businessUnits.find((bu) => 
+  var modalData = businessUnits.find((bu) =>
     bu.slug == router.query.edit || bu.slug == router.query.delete
   )
 
@@ -86,9 +86,7 @@ export default function APIPage() {
   }
 
   useEffect(() => {
-    const tempFilteredBusinessUnits = businessUnits.filter(bu =>
-      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == '' || SearchFilter(bu.name, searchTerm))
-    )
+    const tempFilteredBusinessUnits = businessUnits.filter(bu => SearchFilter(bu.name, searchTerm))
     
     setFilteredBusinessUnits(tempFilteredBusinessUnits)
   }, [businessUnits, searchTerm])
@@ -229,6 +227,12 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
 
   const convert = (amount, currency) => convertedCurrency(amount, currency, referenceCurrency)
 
+
+  const goToSnapshots = (slug) => {
+    query["business-unit"] = slug
+    router.replace({ pathname:"/snapshots", query }, undefined, { shallow: true });
+  }
+
   // I don't think this is how you use OOP but OOK
   const menuOptions = {
     view: { 
@@ -243,7 +247,7 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
     },
     snapshots: { 
       name: "Snapshots", 
-      onClick: (bu) => router.push(`snapshots/${bu.slug}`), 
+      onClick: (bu) => goToSnapshots(bu.slug), 
       className: "block px-3 py-1 text-sm leading-6 text-gray-900" 
     },
     edit: { 

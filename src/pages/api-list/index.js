@@ -22,9 +22,7 @@ export default function APIPage() {
 
   const handleSearchChange = (event) => {
     const { value } = event.target
-
     const searchArray = value.split(" ")
-
     setSearchTerm(searchArray)
   }
 
@@ -34,8 +32,7 @@ export default function APIPage() {
 
   useEffect(() => {
     const tempFilteredAPIs = APIs.filter(api =>
-      (searchTerm.length == 0 || searchTerm.length == 1 && searchTerm[0] == ''
-      || SearchFilter(api.name, searchTerm)
+      (SearchFilter(api.name, searchTerm)
       || SearchFilter(api.url, searchTerm))
     )
     

@@ -1,5 +1,5 @@
 export const snapshotBusinessUnits = [
-  { name: "Exchange", currency: "USD", snapshots: [ // every three days, 11:00 
+  { name: "Exchange", slug: "exchange", currency: "USD", snapshots: [ // every three days, 11:00 
     { id: 1, date: "2024-06-01T11:00Z", value: "8346218.28297614" },
     { id: 2, date: "2024-06-04T11:00Z", value: "8345125.94617116" },
     { id: 3, date: "2024-06-07T11:00Z", value: "8924074.60612944" },
@@ -11,14 +11,14 @@ export const snapshotBusinessUnits = [
     { id: 9, date: "2024-06-25T11:00Z", value: "8623456.78901234" },
     { id: 10, date: "2024-06-28T11:00Z", value: "8345123.45678901" },
   ]},
-  { name: "Fixed Deposit", currency: "BTC", snapshots: [ // every week, 12:00
+  { name: "Fixed Deposit", slug: "fixed-deposit", currency: "BTC", snapshots: [ // every week, 12:00
     { id: 11, date: "2024-06-01T12:00Z", value: "2.8346218" },
     { id: 12, date: "2024-06-08T12:00Z", value: "2.94617116" },
     { id: 13, date: "2024-06-15T12:00Z", value: "3.60612944" },
     { id: 14, date: "2024-06-22T12:00Z", value: "2.78451234" },
     { id: 15, date: "2024-06-29T12:00Z", value: "2.12345678" },
   ]},
-  { name: "Staking", currency: "ETH", snapshots: [ // every two days, 09:00
+  { name: "Staking", slug: "staking", currency: "ETH", snapshots: [ // every two days, 09:00
     { id: 16, date: "2024-06-01T09:00Z", value: "10.12345678" },
     { id: 17, date: "2024-06-03T09:00Z", value: "10.22345678" },
     { id: 18, date: "2024-06-05T09:00Z", value: "10.32345678" },
@@ -35,7 +35,7 @@ export const snapshotBusinessUnits = [
     { id: 29, date: "2024-06-27T09:00Z", value: "11.42345678" },
     { id: 30, date: "2024-06-29T09:00Z", value: "11.52345678" },
   ]},
-  { name: "Market Maker Bot", currency: "USDT", snapshots: [ // every five days, 14:00
+  { name: "Market Maker Bot", slug: "market-maker-bot", currency: "USDT", snapshots: [ // every five days, 14:00
     { id: 31, date: "2024-06-01T14:00Z", value: "1000000.00" },
     { id: 32, date: "2024-06-06T14:00Z", value: "1005000.00" },
     { id: 33, date: "2024-06-11T14:00Z", value: "1010000.00" },
@@ -43,14 +43,14 @@ export const snapshotBusinessUnits = [
     { id: 35, date: "2024-06-21T14:00Z", value: "1020000.00" },
     { id: 36, date: "2024-06-26T14:00Z", value: "1025000.00" },
   ]},
-  { name: "SaaS", currency: "INR", snapshots: [ // every week, 10:00
+  { name: "SaaS", slug: "saas", currency: "INR", snapshots: [ // every week, 10:00
     { id: 37, date: "2024-06-01T10:00Z", value: "7500000.00" },
     { id: 38, date: "2024-06-08T10:00Z", value: "7600000.00" },
     { id: 39, date: "2024-06-15T10:00Z", value: "7700000.00" },
     { id: 40, date: "2024-06-22T10:00Z", value: "7800000.00" },
     { id: 41, date: "2024-06-29T10:00Z", value: "7900000.00" },
   ]},
-  { name: "Makan Siang Gratis", currency: "IDR", snapshots: [ // every twelve hours, 08:00 and 20:00
+  { name: "Makan Siang Gratis", slug: "makan-siang-gratis", currency: "IDR", snapshots: [ // every twelve hours, 08:00 and 20:00
     { id: 42, date: "2024-06-01T08:00Z", value: "1200000.00" },
     { id: 43, date: "2024-06-01T20:00Z", value: "1250000.00" },
     { id: 44, date: "2024-06-02T08:00Z", value: "1300000.00" },
@@ -112,14 +112,14 @@ export const snapshotBusinessUnits = [
     { id: 100, date: "2024-06-30T08:00Z", value: "4100000.00" },
     { id: 101, date: "2024-06-30T20:00Z", value: "4150000.00" },
   ]},
-  { id: 102, name: "Kuli Metaverse", currency: "ETH", snapshots: [ // every six days, 15:00
+  { id: 102, name: "Kuli Metaverse", slug: "kuli-metaverse", currency: "ETH", snapshots: [ // every six days, 15:00
     { id: 103, date: "2024-06-01T15:00Z", value: "8.12345678" },
     { id: 104, date: "2024-06-07T15:00Z", value: "8.22345678" },
     { id: 105, date: "2024-06-13T15:00Z", value: "8.32345678" },
     { id: 106, date: "2024-06-19T15:00Z", value: "8.42345678" },
     { id: 107, date: "2024-06-25T15:00Z", value: "8.52345678" },
   ]},
-  { name: "NFT Trading", currency: "ETH", snapshots: [ // every four days, 16:00
+  { name: "NFT Trading", currency: "ETH", slug: "nft-trading", snapshots: [ // every four days, 16:00
     { id: 108, date: "2024-06-01T16:00Z", value: "15.12345678" },
     { id: 109, date: "2024-06-05T16:00Z", value: "15.22345678" },
     { id: 110, date: "2024-06-09T16:00Z", value: "15.32345678" },
@@ -129,7 +129,7 @@ export const snapshotBusinessUnits = [
     { id: 114, date: "2024-06-25T16:00Z", value: "15.72345678" },
     { id: 115, date: "2024-06-29T16:00Z", value: "15.82345678" },
   ]},
-  { name: "Jualan Bean Bag", currency: "IDR", snapshots: [ // every five days, 18:00
+  { name: "Jualan Bean Bag", slug: "jualan-bean-bag", currency: "IDR", snapshots: [ // every five days, 18:00
     { id: 116, date: "2024-06-01T18:00Z", value: "2100000.00" },
     { id: 117, date: "2024-06-06T18:00Z", value: "2200000.00" },
     { id: 118, date: "2024-06-11T18:00Z", value: "2300000.00" },

@@ -50,5 +50,9 @@ export function HighlightSearch(string, searchTerms, { base = 'font-normal', hig
 
 
 export const SearchFilter = (string, searchTerms) => {
-  return searchTerms.every(term => term = '' || string.toLowerCase().includes(term.toLowerCase()))
+  return (
+    searchTerms.length == 0
+    || searchTerms.every(term => !term)
+    || searchTerms.every(term => string.toLowerCase().includes(term.toLowerCase()))
+  ) 
 }

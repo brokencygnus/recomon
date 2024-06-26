@@ -102,7 +102,7 @@ export default function SummaryPage() {
               changeCurrency={changeCurrency}
             />
           </div>
-          <div className="flex-grow rounded-lg border border-gray-300">
+          <div className="flex-grow rounded-lg overflow-hidden border border-gray-300">
             <ReconciliationSummary
               currentCurrency={currentCurrency}
               businessUnit={businessUnit()}
