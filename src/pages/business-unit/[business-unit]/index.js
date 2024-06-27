@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link';
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { formatNumber, convertCurrency, convertMsToTime, convertAgeMsToDateTime } from '@/app/utils/utils';
+import { discrepancyColor, formatNumber, convertCurrency, convertMsToTime, convertAgeMsToDateTime } from '@/app/utils/utils';
 import { PopoverComp } from '@/app/components/popover';
 import { businessUnits, currencies, accounts, exchangeData, discrAlertConf } from '@/app/constants/mockdata'
 import { dataSources } from '@/app/constants/types'
@@ -34,20 +34,6 @@ const totalLiabilities = getTotal(liabilities)
 const gap = totalCapital - totalAssets + totalLiabilities
 
 // Mock data end
-
-const discrepancyColor = (isHighlight, discrepancyUSD) => {
-  let color = ""
-  if (isHighlight) {
-    if (parseFloat(discrepancyUSD) > discrAlertConf.critHigh || parseFloat(discrepancyUSD) < discrAlertConf.critLow) {color = "text-red-500"}
-    else if (parseFloat(discrepancyUSD) > discrAlertConf.acctbleHigh || parseFloat(discrepancyUSD) < discrAlertConf.acctbleLow) {color = "text-amber-500"}
-    else {color = "text-gray-500"}
-  } else {
-    if (parseFloat(discrepancyUSD) > discrAlertConf.critHigh || parseFloat(discrepancyUSD) < discrAlertConf.critLow) {color = "text-red-400"}
-    else if (parseFloat(discrepancyUSD) > discrAlertConf.acctbleHigh || parseFloat(discrepancyUSD) < discrAlertConf.acctbleLow) {color = "text-amber-400"}
-    else {color = "text-gray-400"}
-  }
-  return color
-}
 
 export default function SummaryPage() {
   const router = useRouter();
@@ -148,7 +134,7 @@ function ReconciliationSummary({ businessUnit, currentCurrency }) {
                 <p scope="col" className="pr-3 text-left text-sm font-medium leading-6 text-gray-500">
                   Gap
                 </p>
-                <p className={classNames(discrepancyColor(false, 12345678.12345678),
+                <p className={classNames(discrepancyColor(false, 12345678.12345678, discrAlertConf),
                   "whitespace-nowrap text-md font-medium text-gray-700")}>
                   {convertSigned(gap)}
                 </p>
@@ -341,7 +327,10 @@ function AssetPicker({ changeCurrency, currentCurrency }) {
                 "flex rounded-md pl-4 text-xs font-semibold leading-6"
               )}
             >Gap:&nbsp;
-            <span className={discrepancyColor(currency.current || currency.symbol === hoveredItem ? true : false, convertCurrency(currency.discrepancy, currency.symbol, "USD"))}>
+            <span className={discrepancyColor(
+                currency.symbol === currentCurrency || currency.symbol === hoveredItem ? true : false,
+                convertCurrency(currency.discrepancy, currency.symbol, "USD"),
+                discrAlertConf)}>
               {convertSigned(currency.discrepancy, currency.symbol)}
             </span>
             </a>

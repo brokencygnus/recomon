@@ -66,7 +66,7 @@ export default function APITable({ data, searchTerm }) {
                       <TestConnectionList item={item} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap py-4 pl-3 pr-2 py-4 text-right text-sm font-semibold text-indigo-600 hover:text-indigo-900 border-b border-gray-300">
+                  <td className="whitespace-nowrap pl-3 pr-2 text-right text-sm font-semibold text-indigo-600 hover:text-indigo-900 border-b border-gray-300">
                     <Link
                       href={{
                         pathname: `/api-list/api-001`,

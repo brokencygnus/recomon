@@ -1,7 +1,7 @@
 import { currencies } from '../constants/mockdata';
 import _ from 'lodash';
 
-// temporary for non-fiat since I don't have the SVGs yet
+// temporary icons for non-fiat since I don't have the SVGs yet
 export const SymbolDictionary = (symbol) => {
   switch (symbol) {
     case "BTC": return '₿';
@@ -10,6 +10,7 @@ export const SymbolDictionary = (symbol) => {
     case "SOL": return 'S';
     case "IDR": return 'Rp';
     case "USD": return '$';
+    case "INR": return '₹';
     default : return '$';
   }
 }
@@ -110,6 +111,20 @@ export const formatNumber = ( numberString ) => {
     return ''
   }
 };
+
+export const discrepancyColor = (isHighlight, discrepancyUSD, discrAlertConf) => {
+  let color = ""
+  if (isHighlight) {
+    if (parseFloat(discrepancyUSD) > discrAlertConf.critHigh || parseFloat(discrepancyUSD) < discrAlertConf.critLow) {color = "text-red-500"}
+    else if (parseFloat(discrepancyUSD) > discrAlertConf.acctbleHigh || parseFloat(discrepancyUSD) < discrAlertConf.acctbleLow) {color = "text-amber-500"}
+    else {color = "text-gray-500"}
+  } else {
+    if (parseFloat(discrepancyUSD) > discrAlertConf.critHigh || parseFloat(discrepancyUSD) < discrAlertConf.critLow) {color = "text-red-400"}
+    else if (parseFloat(discrepancyUSD) > discrAlertConf.acctbleHigh || parseFloat(discrepancyUSD) < discrAlertConf.acctbleLow) {color = "text-amber-400"}
+    else {color = "text-gray-400"}
+  }
+  return color
+}
 
 export const convertCurrency = ( amount, currency1, currency2 ) => {
   const convertUSD1 = currencies.find((currency) => currency.symbol == currency1)?.convertUSD

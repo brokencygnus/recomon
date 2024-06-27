@@ -8,6 +8,7 @@ import { convertDateOnly, convertTimeOnly } from '@/app/utils/utils'
 import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { CameraIcon } from '@heroicons/react/16/solid';
+import { config } from '@/app/constants/config'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -373,7 +374,7 @@ function SnapshotTable() {
                         </div>
                         <p className="text-xs text-gray-500">{convertTimeOnly(new Date(snapshot.date))}</p>
                       </div>
-                      <p className="text-sm font-semibold break-all text-gray-700">{convertedCurrency(snapshot.value, bu.currency, referenceCurrency)}</p>
+                      <p className="text-sm font-semibold break-all text-gray-700">{convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency)}</p>
                     </a>
                   )})}
               </div>

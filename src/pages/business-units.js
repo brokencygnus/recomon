@@ -75,9 +75,7 @@ export default function APIPage() {
 
   const handleSearchChange = (event) => {
     const { value } = event.target
-
     const searchArray = value.split(" ")
-
     setSearchTerm(searchArray)
   }
 
@@ -389,7 +387,7 @@ function EditBusinessUnit({ setClose }) {
           <div className="border-b border-gray-900/10 pb-12">
 
             <div className="grid grid-cols-4 gap-x-6 gap-y-8">
-              <div className="flex grid grid-cols-3 col-span-4 gap-x-6 ">
+              <div className="grid grid-cols-3 col-span-4 gap-x-6 ">
                 <div className="">
                   <label htmlFor="code" className="block text-sm font-medium leading-6 text-gray-900">
                     Code
