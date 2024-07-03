@@ -432,7 +432,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{dataSources.find((data) => data.value == account.dataSource).name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <ClientOnly>
-                          <PopoverComp>
+                          <PopoverComp position="top">
                             {/* TODO when converting to API-consumed data, please implement snapshot time instead of new Date() for snapshots */}
                             <p className="hover:text-indigo-600">{convertMsToTimeAgo(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
                             <p className="text-sm text-gray-900">{convertAgeMsToDateTime(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds())).toString()}</p>

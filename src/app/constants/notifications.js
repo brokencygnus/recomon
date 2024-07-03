@@ -60,5 +60,26 @@ export const notificationTypes = {
     body: "A retrieval attempt to one of your APIs has failed. Your balance data might be outdated.",
     link: "Review",
     href: `/api-list/${apiID}`
-  })
+  }),
+
+  // TODO change link to currency configuration if it exists
+  // If not fallback to accounts
+  "blockchain_connection_failed": ({ buSlug, networkName, currencyName }) => ({
+    icon: "exclamationTriangle",
+    color: "amber",
+    header: "Blockchain connection failed",
+    body: `A retrieval attempt to the ${networkName} network has failed. Your ${currencyName} balance data might be outdated.`,
+    link: "Review",
+    href: `/business-unit/${buSlug}`
+  }),
+
+  // TODO change link to account page if it exists
+  "too_long_since_last_update": ({ buName, buSlug, accountName, daysSinceLastUpdate }) => ({
+    icon: "info",
+    color: "gray",
+    header: `Data age more than ${daysSinceLastUpdate} days`,
+    body: `Your ${accountName} account in ${buName} has not been updated for ${daysSinceLastUpdate} days. Consider updating its data or mark it as updated.`,
+    link: "Review",
+    href: `/business-unit/${buSlug}`
+  }),
 }

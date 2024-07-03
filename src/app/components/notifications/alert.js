@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react"
-import { CheckCircleIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon, ExclamationCircleIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { config } from "@/app/constants/config";
 
@@ -82,6 +82,7 @@ export const alertIcons = [
   {name: "exclamationTriangle", value: ExclamationTriangleIcon},
   {name: "exclamationCircle", value: ExclamationCircleIcon},
   {name: "check", value: CheckCircleIcon},
+  {name: "info", value: InformationCircleIcon}
 ]
 
 export const alertColors = [

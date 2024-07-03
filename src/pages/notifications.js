@@ -11,7 +11,7 @@ function classNames(...classes) {
 export default function NotificationsPage() {
   return (
       <Layout>
-        <div className="bg-zinc-50 min-h-full">
+        <div className="bg-zinc-50 min-h-full pb-16">
           <main className="container max-w-3xl mx-auto py-10 px-12 2xl:px-16">
             <NotificationHeader />
             <NotificationsList notifications={notifications}/>

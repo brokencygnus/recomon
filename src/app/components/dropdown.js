@@ -8,7 +8,7 @@ function classNames(...classes) {
 // options: [{name: a, value: aaa}, {name: b, value: bbb}, ...]
 // size: sm | md | lg | xl
 // nullOption: { noSelectionLabel: Aaa aa, name: Aaa, value: aaa }
-export function Dropdown({ name, labelText, options, nullOption, selectedOption, onSelect, className }) {
+export function Dropdown({ name, labelText, options, nullOption={}, selectedOption, onSelect, className }) {
   var allOptions = options
   if (nullOption) {
     allOptions = [ ...options, nullOption]

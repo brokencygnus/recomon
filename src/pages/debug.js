@@ -216,7 +216,21 @@ function AlertModule() {
             onClick={() => addAlert(notificationTypes["api_request_failed"]({ apiID: "14045" }))}
             className="rounded-md text-nowrap bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
-            Stale data
+            Stale API data
+          </button>
+          <button
+            type="button"
+            onClick={() => addAlert(notificationTypes["blockchain_connection_failed"]({ buSlug: "staking", networkName: "ERC-20", currencyName: "ETH" }))}
+            className="rounded-md text-nowrap bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+            Blockchain
+          </button>
+          <button
+            type="button"
+            onClick={() => addAlert(notificationTypes["too_long_since_last_update"]({ buName: "Contract Market", buSlug: "contract-market", accountName: "Hedging Cold Wallet in Fireblocks", daysSinceLastUpdate: "60" }))}
+            className="rounded-md text-nowrap bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+            High data age
           </button>
         </div>
       </div>

@@ -459,8 +459,8 @@ function RetrievalFreq({ retrievalSettings }) {
   }
 
   return (
-    <div className="flex block flex-col">
-      <div className="flex block flex-row justify-between">
+    <div className="flex flex-col">
+      <div className="flex flex-row justify-between">
         <div>
           <h3 className="text-base font-semibold leading-6 text-gray-900">Retrieval Frequency</h3>
             <div className="mt-2 text-sm text-gray-500">
@@ -621,7 +621,7 @@ function RetrievalFreq({ retrievalSettings }) {
             id="startingTime"
             value={correctTimezone(formState.referenceDate).slice(11, 16)}
             onChange={handleStartingTime}
-            className="block w-28 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="block w-36 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         </div>
       </div>

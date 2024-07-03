@@ -7,8 +7,10 @@ import { quantizeDates } from '@/app/utils/dates'
 import { convertDateOnly, convertTimeOnly } from '@/app/utils/dates'
 import { discrepancyColor } from '@/app/utils/business-units/discrepancy-color'
 import { DateRangePickerComp } from '@/app/components/datepicker'
+import { NotificationBadges } from '@/app/components/notifications/notification_badges'
 import { SearchFilter } from '@/app/utils/highlight_search';
 import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { CalendarIcon } from '@heroicons/react/24/outline';
 import { CameraIcon } from '@heroicons/react/16/solid';
 import { config } from '@/app/constants/config'
 
@@ -200,12 +202,16 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
             aria-hidden="true"
           />
         </form>
-
-          <DateRangePickerComp
-            className="block w-64 rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            value={dateRange}
-            onChange={handleDateRangeChange}
-          />
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            </div>
+            <DateRangePickerComp
+              className="block w-72 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              value={dateRange}
+              onChange={handleDateRangeChange}
+            />
+          </div>
         <div>
           <button
             type="button"
@@ -274,7 +280,7 @@ function SnapshotCarousel() {
   }, [sizeFactor])
 
   return (
-  <div className="relative border-y border-gray-200 bg-gray-50 -mx-40 2xl:-mx-24">  
+  <div className="relative border-y border-gray-200 bg-gray-50 -mx-40 2xl:-mx-32 2.5xl:-mx-24">  
     <div
       style={{
         gridTemplateColumns: `repeat(${sizeFactor}, minmax(0, 1fr))`,
@@ -412,18 +418,20 @@ function SnapshotTable() {
               height: (16 + getHeight(day) * 76) + 'px',
               transition: "all 0.2s ease-in",
             }}
-            className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-indigo-50 -mx-40 2xl:-mx-24 overflow-hidden"
+            className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-indigo-50 -mx-40 2xl:-mx-32 2.5xl:-mx-24"
           >
-            <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
-              <div className="flex justify-end items-center h-[5.5rem] z-[1] translate-x-2">
-                <p className="text-sm text-gray-400 pr-3">
-                  {convertDateOnly(new Date(day))}
-                </p>
-                <svg viewBox="0 0 2 2" className="h-4 w-4 rounded-full fill-white stroke-1 stroke-gray-300 translate-x-[2px]">
-                  <circle cx={1} cy={1} r={1} />
-                </svg>
+            {isSnapshotExistInSlice(day) &&
+              <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
+                <div className="flex justify-end items-center h-[5.5rem] z-[1] translate-x-2">
+                  <p className="text-sm text-gray-400 pr-3">
+                    {convertDateOnly(new Date(day))}
+                  </p>
+                  <svg viewBox="0 0 2 2" className="h-4 w-4 rounded-full fill-white stroke-1 stroke-gray-300 translate-x-[2px]">
+                    <circle cx={1} cy={1} r={1} />
+                  </svg>
+                </div>
               </div>
-            </div>
+            }
             {slicedDataInDay(day).map((bu, index) => (
               <div
                 key={index}
@@ -431,7 +439,7 @@ function SnapshotTable() {
               >
                 {bu.snapshots.map(snapshot => {
                   return (
-                    <a
+                    <div
                       href={`business-unit/${bu.slug}/snapshot/${snapshot.id}`}
                       className="h-16 relative group flex flex-col items-start justify-center w-full bg-white hover:bg-gray-50 rounded-xl p-3 px-6 ring-1 ring-inset ring-gray-200 shadow-md"
                     >
@@ -442,21 +450,28 @@ function SnapshotTable() {
                         </div>
                         <p className="text-xs text-gray-500">{convertTimeOnly(new Date(snapshot.date))}</p>
                       </div>
-                      <p className={classNames(
-                          discrepancyColor(snapshot.value, discrAlertConf[bu.slug], colors),
-                          "text-sm font-semibold break-all"
-                        )}
-                      >
-                        {convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency)}
-                      </p>
-                    </a>
+                      <div className="flex w-full justify-between items-center">
+                        <p className={classNames(
+                            discrepancyColor(snapshot.value, discrAlertConf[bu.slug], colors),
+                            "text-sm font-semibold break-all"
+                          )}
+                        >
+                          {convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency, true)}
+                        </p>
+                        <div className="flex items-center gap-x-1 h-4">
+                          <NotificationBadges size="sm" alerts={snapshot.alerts}/>
+                        </div>
+                      </div>
+                    </div>
                   )})}
               </div>
             ))}
             <div>{/* Empty column */}</div>
-            <div className="col-start-1 col-span-5 h-px bg-gray-300 w-full px-36 2xl:px-20">
-              <div className=""></div>
-            </div>
+            {isSnapshotExistInSlice(day) &&
+              <div className="col-start-1 col-span-5 h-px bg-gray-300 w-full px-36 2xl:px-20">
+                <div className=""></div>
+              </div>
+            }
           </div>
       ))}
     </>
