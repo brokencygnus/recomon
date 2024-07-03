@@ -9,7 +9,10 @@ function classNames(...classes) {
 // size: sm | md | lg | xl
 // nullOption: { noSelectionLabel: Aaa aa, name: Aaa, value: aaa }
 export function Dropdown({ name, labelText, options, nullOption, selectedOption, onSelect, className }) {
-  const allOptions = [ ...options, nullOption]
+  var allOptions = options
+  if (nullOption) {
+    allOptions = [ ...options, nullOption]
+  } 
 
   const handleOptionSelect = (option) => {
     const syntheticEvent = {
@@ -30,10 +33,10 @@ export function Dropdown({ name, labelText, options, nullOption, selectedOption,
       : null }
       <MenuButton className={className}>
         <div className="place-content-between flex grid-row-1 gap-x-1.5 px-3 py-2">
-          <p className={selectedOption == nullOption?.noSelectionLabel ?
-          "truncate text-sm font-normal text-gray-400" : "truncate text-sm font-medium text-gray-900" }
+          <p className={selectedOption == nullOption?.name ?
+          "truncate text-sm font-normal text-gray-400" : "truncate text-sm font-normal text-gray-900" }
           >
-            {selectedOption}</p>
+            {selectedOption == nullOption?.name ? nullOption.noSelectionLabel : selectedOption}</p>
           <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
       </MenuButton>
@@ -46,7 +49,7 @@ export function Dropdown({ name, labelText, options, nullOption, selectedOption,
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute w-full right-0 z-10 mt-2 py-1 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <MenuItems className="absolute w-full right-0 z-40 mt-2 py-1 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             {allOptions.map((option) => (
               <MenuItem
                 key={option.value}>

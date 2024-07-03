@@ -3,9 +3,9 @@ import React, { useState, useEffect, useContext } from 'react'
 import Layout, {RefCurContext, convertedCurrency} from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { Modal } from '@/app/components/modal';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/components/dialog';
+import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/app/components/dialog';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { businessUnits } from '@/app/constants/mockdata'
+import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { checkDataEdited } from '@/app/utils/utils'
 import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
@@ -18,7 +18,7 @@ function classNames(...classes) {
 
 const ModalContext = React.createContext(null);
 
-export default function APIPage() {
+export default function BusinessUnitPage() {
   const router = useRouter()
   const { pathname } = router;
   const query = { ...router.query };
@@ -92,12 +92,12 @@ export default function APIPage() {
   return (
     <Layout currentTab="bu">
       <ModalContext.Provider value={{ modalData, modalAction }}>
-        <main className="flex-grow relative bg-gray-100">
+        <main className="min-h-full relative bg-gray-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <BusinessUnitsHeader />
           </div>
-          <div className="sticky top-16 bg-white px-12 2xl:px-16 z-[2]">
+          <div className="sticky top-0 bg-white px-12 2xl:px-16 z-[2]">
             <BusinessAccountFilter
               searchTerm={searchTerm}
               handleSearchChange={handleSearchChange}
@@ -105,7 +105,7 @@ export default function APIPage() {
               openModal={openModal}
             />
           </div>
-          <div className="sticky top-[5.5rem] w-full h-10 bg-white z-[1] shadow-md"></div>
+          <div className="sticky top-6 w-full h-10 bg-white z-[1] shadow-md"></div>
           <Modal
             open={isModalOpen}
             setClose={closeModal}
@@ -122,7 +122,7 @@ export default function APIPage() {
               openModal={openModal}
               searchTerm={searchTerm}
             />
-            <div className="h-16 sticky bottom-0 z-10 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
+            <div className="h-16 sticky bottom-0 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
           </div>
         </main>
       </ModalContext.Provider>
@@ -181,12 +181,6 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
         </div>
       </div>
         <div className="flex items-end">
-          {/* <a
-            href='#'
-            className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-indigo-600"
-          >
-            View snapshots
-          </a> */}
           <button
             type="button"
             onClick={() => openModal({}, "new")}
@@ -225,7 +219,6 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
 
   const convert = (amount, currency) => convertedCurrency(amount, currency, referenceCurrency)
 
-
   const goToSnapshots = (slug) => {
     query["business-unit"] = slug
     router.replace({ pathname:"/snapshots", query }, undefined, { shallow: true });
@@ -263,76 +256,76 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
   return (
     <ul role="list" className="relative grid grid-cols-2 py-8 gap-x-6 gap-y-8 2xl:gap-x-8 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5">
       {businessUnits.map((businessUnit) => (
-          <li key={businessUnit.id} className="overflow-hidden rounded-xl shadow-lg ring-1 ring-gray-900/5">
-            <a 
-              // href={menuOptions.view.href(businessUnit.slug)}
-              className="block"
-            >
-              <div className="bg-gray-50 hover:bg-gray-100 p-6">
-                <div className="flex items-baseline gap-x-4">
-                  <h3 className="text-lg font-semibold leading-6 truncate text-gray-900">{HighlightSearch(businessUnit.name, searchTerm, { base:'', highlight:'bg-indigo-300' })}</h3>
-                  <p className="text-sm leading-6 text-gray-400">{businessUnit.code}</p>
-                  <Menu as="div" className="relative ml-auto">
-                    <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
-                      <span className="sr-only">Open options</span>
-                      <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-                    </MenuButton>
-                    <Transition
-                      enter="transition ease-out duration-100"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <MenuItems className="pointer-events-none absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                        {Object.keys(menuOptions).map((option) => (
-                          <MenuItem>
-                            {({ focus }) => (
-                              <button
-                                // href={menuOptions[option]?.href(businessUnit.slug)}
-                                onClick={() => menuOptions[option].onClick(businessUnit)}
-                                className={classNames(
-                                  focus ? 'bg-gray-50' : '',
-                                  "text-left pointer-events-auto w-full",
-                                  menuOptions[option].className,
-                                )}
-                              >
-                                {menuOptions[option].name}
-                              </button>
-                            )}
-                          </MenuItem>
-                        ))}
-                      </MenuItems>
-                    </Transition>
-                  </Menu>
-                </div>
-                <p className="text-sm text-gray-400 h-24 line-clamp-4 pt-4">
-                  {businessUnit.description}
-                </p>
+        <li key={businessUnit.id} className="overflow-hidden rounded-xl shadow-lg ring-1 ring-gray-900/5">
+          <a 
+            // href={menuOptions.view.href(businessUnit.slug)}
+            className="block"
+          >
+            <div className="bg-gray-50 hover:bg-gray-100 p-6">
+              <div className="flex items-baseline gap-x-4">
+                <h3 className="text-lg font-semibold leading-6 truncate text-gray-900">{HighlightSearch(businessUnit.name, searchTerm, { base:'', highlight:'bg-indigo-300' })}</h3>
+                <p className="text-sm leading-6 text-gray-400">{businessUnit.code}</p>
+                <Menu as="div" className="relative ml-auto">
+                  <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
+                    <span className="sr-only">Open options</span>
+                    <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+                  </MenuButton>
+                  <Transition
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <MenuItems className="pointer-events-none absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                      {Object.keys(menuOptions).map((option) => (
+                        <MenuItem>
+                          {({ focus }) => (
+                            <button
+                              // href={menuOptions[option]?.href(businessUnit.slug)}
+                              onClick={() => menuOptions[option].onClick(businessUnit)}
+                              className={classNames(
+                                focus ? 'bg-gray-50' : '',
+                                "text-left pointer-events-auto w-full",
+                                menuOptions[option].className,
+                              )}
+                            >
+                              {menuOptions[option].name}
+                            </button>
+                          )}
+                        </MenuItem>
+                      ))}
+                    </MenuItems>
+                  </Transition>
+                </Menu>
               </div>
-            </a>
-            <dl className="flex flex-col pb-3 -my-1 bg-white border-t border-gray-900/5 divide-y divide-gray-100 px-6 text-sm leading-6">
-              <div className="flex justify-between gap-x-4 py-3">
-                <dt className="text-gray-500">Accounts</dt>
-                <dd className="text-gray-400">
-                  {businessUnit.accounts}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-x-4 py-3">
-                <dt className="text-gray-500">Currencies</dt>
-                <dd className="text-gray-400">
-                  {businessUnit.currencies}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-x-4 py-3">
-                <dt className="text-gray-500">Total capital</dt>
-                <dd className="text-gray-400">
-                  {convert(businessUnit.balance, "USD")}
-                </dd>
-              </div>
-            </dl>
-          </li>
+              <p className="text-sm text-gray-400 h-24 line-clamp-4 pt-4">
+                {businessUnit.description}
+              </p>
+            </div>
+          </a>
+          <dl className="flex flex-col pb-3 -my-1 bg-white border-t border-gray-900/5 divide-y divide-gray-100 px-6 text-sm leading-6">
+            <div className="flex justify-between gap-x-4 py-3">
+              <dt className="text-gray-500">Accounts</dt>
+              <dd className="text-gray-400">
+                {businessUnit.accounts}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-x-4 py-3">
+              <dt className="text-gray-500">Currencies</dt>
+              <dd className="text-gray-400">
+                {businessUnit.currencies}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-x-4 py-3">
+              <dt className="text-gray-500">Total capital</dt>
+              <dd className="text-gray-400">
+                {convert(businessUnit.balance, "USD")}
+              </dd>
+            </div>
+          </dl>
+        </li>
       ))}
     </ul>
   )
@@ -387,7 +380,7 @@ function EditBusinessUnit({ setClose }) {
           <div className="border-b border-gray-900/10 pb-12">
 
             <div className="grid grid-cols-4 gap-x-6 gap-y-8">
-              <div className="grid grid-cols-3 col-span-4 gap-x-6 ">
+              <div className="flex grid grid-cols-3 col-span-4 gap-x-6 ">
                 <div className="">
                   <label htmlFor="code" className="block text-sm font-medium leading-6 text-gray-900">
                     Code
@@ -483,7 +476,7 @@ function DeleteDialog({ setClose }) {
 
   const { addToast } = useContext(ToastContext)
   const launchToast = () => {
-    addToast({ color: "red", message: "Business unit deleted!" })
+    addToast({ color: "rose", message: "Business unit deleted!" })
   }
 
   const handleDelete = () => {

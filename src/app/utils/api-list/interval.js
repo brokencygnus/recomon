@@ -4,7 +4,7 @@
 // For time, use primaryInterval and secondaryInterval for hours and minutes
 // Pass an object with params startingDate, intervalType, intervalOption, primaryInterval, weekArray, secondaryInterval
 export const NextInterval = (paramObj) => {
-  var nextDate = new Date(paramObj.startingDate)
+  var nextDate = new Date(limitYear(paramObj.startingDate))
 
   switch (paramObj.intervalType.value) {
     case "month":
@@ -114,10 +114,8 @@ export const RecursiveFutureNextInterval = (i, paramObj, currentData = []) => {
   }
 
   const now = new Date()
-  let nextDate = NextInterval(paramObj)
-
-  let newParamObj = { ...paramObj }
-  newParamObj = {
+  let nextDate = new Date(limitYear(paramObj.startingDate))
+  let newParamObj = {
     ...paramObj,
     ["startingDate"]: nextDate,
   }
@@ -133,4 +131,15 @@ export const RecursiveFutureNextInterval = (i, paramObj, currentData = []) => {
   currentData.push(nextDate)
 
   return RecursiveNextInterval(i - 1, newParamObj, currentData)
+}
+
+// Apparently Adobe didn't bother to set a minimum and maximum on the Date Input, only the Calendar
+// So here we go writing a limit function by ourselves
+const limitYear = (dateString) => {
+  if (!dateString) {return dateString}
+  const date = new Date(dateString)
+
+  date.setUTCFullYear(Math.min(2100, date.getUTCFullYear()))
+  date.setUTCFullYear(Math.max(1999, date.getUTCFullYear()))
+  return date
 }

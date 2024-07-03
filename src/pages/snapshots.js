@@ -2,10 +2,12 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext } from 'react';
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { snapshotBusinessUnits } from '@/app/constants/snapshot_mockdata';
-import { quantizeDates } from '@/app/utils/snapshot/dates'
-import { convertDateOnly, convertTimeOnly } from '@/app/utils/utils'
-import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
+import { snapshotBusinessUnits, discrAlertConf } from '@/app/constants/mockdata/snapshot_mockdata';
+import { quantizeDates } from '@/app/utils/dates'
+import { convertDateOnly, convertTimeOnly } from '@/app/utils/dates'
+import { discrepancyColor } from '@/app/utils/business-units/discrepancy-color'
+import { DateRangePickerComp } from '@/app/components/datepicker'
+import { SearchFilter } from '@/app/utils/highlight_search';
 import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { CameraIcon } from '@heroicons/react/16/solid';
 import { config } from '@/app/constants/config'
@@ -27,6 +29,7 @@ export default function SnapshotPage() {
 
   const [filteredSnapshots, setFilteredSnapshots] = useState(snapshotBusinessUnits);
   const [searchTerm, setSearchTerm] = useState([]);
+  const [dateRange, setDateRange] = useState(null);
 
   const resetRouter = () => {
     router.replace({
@@ -45,14 +48,38 @@ export default function SnapshotPage() {
     setSearchTerm(searchArray)
   }
 
+  const handleDateRangeChange = (value) => {
+    setDateRange(value)
+    console.log(value)
+  }
+
   const handleResetFilters = () => {
     resetRouter()
+    // TODO set default date range based on API later
+    setDateRange(null)
     setSearchTerm([])
   }
 
   const doFilter = () => {
-    const tempFilteredSnapshots = snapshotBusinessUnits.filter(bu => SearchFilter(bu.name, searchTerm))
-    
+    let tempFilteredSnapshots = snapshotBusinessUnits.filter(bu => SearchFilter(bu.name, searchTerm))
+
+    if (dateRange) {
+      const startDate = new Date(dateRange.start.year, dateRange.start.month - 1, dateRange.start.day)
+      // End date should be included (e.g. when filtering for day 21, include snapshots on day 21)
+      const endDate = new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day + 1)
+      
+      tempFilteredSnapshots = tempFilteredSnapshots.map(bu => {
+        const filteredSnapshots = bu.snapshots.filter(snapshot => {
+          const date = new Date(snapshot.date)
+          return date < endDate && date > startDate
+        })
+        return {
+          ...bu,
+          snapshots: filteredSnapshots
+        }
+      })
+    }
+
     setFilteredSnapshots(tempFilteredSnapshots)
   }
 
@@ -60,7 +87,7 @@ export default function SnapshotPage() {
     if (!query["business-unit"]) {
       doFilter()
     }
-  }, [snapshotBusinessUnits, searchTerm])
+  }, [snapshotBusinessUnits, searchTerm, dateRange])
 
   // Prevent race condition when page is loaded but router query is still undefined
   useEffect(() => {
@@ -100,34 +127,32 @@ export default function SnapshotPage() {
 
   return (
       <Layout currentTab="snap">
-        <SnapshotContext.Provider value={{ allTimes, filteredSnapshots, sizeFactor, translate, setTranslate, searchTerm }}>
-          <main className="flex-1 relative bg-white h-full">
-            <div className="bg-white pt-10 px-12 2xl:px-16">
+        <SnapshotContext.Provider value={{ allTimes, filteredSnapshots, sizeFactor, translate, setTranslate, searchTerm, dateRange}}>
+          <main className="relative min-h-full">
+            <div className="pt-10 px-12 2xl:px-16">
               <Breadcrumbs breadcrumbPages={breadcrumbPages} />
-              <SnapshotHeader
-                handleSearchChange={handleSearchChange}
-                handleResetFilters={handleResetFilters}
-              />
+              <SnapshotHeader />
             </div>
             
-            <div className="sticky top-16 bg-white px-12 2xl:px-16 z-[2]">
+            <div className="sticky top-0 bg-white px-12 2xl:px-16 z-[2]">
               <SnapshotFilter 
                 handleSearchChange={handleSearchChange}
+                handleDateRangeChange={handleDateRangeChange}
                 handleResetFilters={handleResetFilters}
               />
             </div>
-            <div className="sticky top-[5.5rem] bg-white z-[1] w-full h-10"></div>
-            <div className="sticky top-[8rem] bg-white z-[2]">
-              <div className="px-12 2xl:px-16 ">
+            <div className="sticky top-6 bg-white z-[1] w-full h-10"></div>
+            <div className="sticky top-16 bg-white z-[2]">
+              <div className="px-12 2xl:px-16 overflow-hidden">
                 <SnapshotCarousel />
               </div>
-              <div className="w-full h-4 bg-white border-b border-1 z-10 shadow-sm"></div>
+              <div className="w-full h-4 bg-white border-b border-1 z-10 shadow-md"></div>
             </div>
             {/* <div className="sticky top-[5.5rem] w-full h-10 bg-white z-[1] shadow-md"></div> */}
-            <div className="px-12 2xl:px-16 overflow-hidden">
+            <div className="px-12 2xl:px-16 bg-gray-100 overflow-hidden">
               <SnapshotTable />
             </div>
-            <div className="h-16 sticky bottom-0 z-10 pointer-events-none bg-gradient-to-t from-white to-transparent"></div>
+            <div className="h-16 sticky bottom-0 pointer-events-none bg-gradient-to-t from-white to-transparent"></div>
           </main>
         </SnapshotContext.Provider>
       </Layout>
@@ -154,8 +179,8 @@ function SnapshotHeader() {
   );
 }
 
-function SnapshotFilter({ handleSearchChange, handleResetFilters }) {
-  const { searchTerm } = useContext(SnapshotContext)
+function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleResetFilters }) {
+  const { searchTerm, dateRange } = useContext(SnapshotContext)
 
   return (
     <div className="flex justify-between">
@@ -176,13 +201,18 @@ function SnapshotFilter({ handleSearchChange, handleResetFilters }) {
           />
         </form>
 
+          <DateRangePickerComp
+            className="block w-64 rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            value={dateRange}
+            onChange={handleDateRangeChange}
+          />
         <div>
           <button
             type="button"
             className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600"
             onClick={handleResetFilters}
           >
-            Reset search
+            Reset filters
           </button>
         </div>
       </div>
@@ -244,7 +274,7 @@ function SnapshotCarousel() {
   }, [sizeFactor])
 
   return (
-  <div className="relative border-y-2 border-gray-100 bg-gray-50 -mx-40 2xl:-mx-24">  
+  <div className="relative border-y border-gray-200 bg-gray-50 -mx-40 2xl:-mx-24">  
     <div
       style={{
         gridTemplateColumns: `repeat(${sizeFactor}, minmax(0, 1fr))`,
@@ -252,18 +282,17 @@ function SnapshotCarousel() {
         transition: 'translate 0.3s ease-in-out',
         translate: -translate*100/sizeFactor + "%"
         }}
-      className="grid divide-x divide-gray-100 transition-all"
+      className="grid divide-x divide-gray-200"
     >
       <div>{/* Empty column */}</div>
-      {filteredSnapshots.map((bu) => {
-        return (
+      {filteredSnapshots.map((bu) => (
           <div className="py-3 px-8">
             <div className="bg-white rounded-xl p-3 ring-1 ring-inset ring-gray-200 shadow">
               <p className="text-center font-semibold text-gray-900">{bu?.name}</p>
             </div>
           </div>
         )
-      })}
+      )}
       <div>{/* Empty column */}</div>
     </div>
     <div className="absolute inset-y-0 w-full h-full grid grid-cols-5">
@@ -306,6 +335,7 @@ function SnapshotTable() {
   const { allTimes, filteredSnapshots, sizeFactor, translate } = useContext(SnapshotContext)
   const { referenceCurrency } = useContext(RefCurContext)
 
+  // Quantize snapshot data based on date grid
   const dataInDay = (day) => {
     let data = [...filteredSnapshots]
 
@@ -327,6 +357,7 @@ function SnapshotTable() {
     return data
   }
 
+  // Slice dates from displayed business units 
   const slicedDataInDay = (data) => {
     const dayData = dataInDay(data)
 
@@ -339,19 +370,56 @@ function SnapshotTable() {
     return !(slicedData.every(data => data.snapshots?.length == 0))
   }
 
+  const colors = {
+    crit: "text-red-500",
+    acctble: "text-amber-500",
+    default: "text-gray-700"
+  }
+  
+  // For animation
+  // Scroll height doesn't seem to work with grids for some reason
+  const getHeight = (day) => {
+    let maxLength = 0;
+    slicedDataInDay(day).forEach(bu => {
+      if (bu.snapshots.length > maxLength) {
+        maxLength = bu.snapshots.length
+      }
+    })
+    return maxLength
+  }
+
+  // Animate collapse when translate is changed
+  // Some data will disappear, appear, expand, or shrink
+  useEffect(() => {
+    allTimes().forEach(day => {
+      const element = document.getElementById(day)
+
+      if (isSnapshotExistInSlice(day)) {
+        element.style.height = (16 + getHeight(day) * 76) + 'px'
+      } else {
+        element.style.height = '0px'
+      }
+    })
+  }, [translate, filteredSnapshots])
+
   return (
     <>
-      {allTimes().map(day => { 
-        return (
-          <div key={day} className={classNames(isSnapshotExistInSlice(day) ? '' : 'hidden',
-              "grid grid-cols-5 divide-x divide-gray-100 hover:bg-indigo-50 -mx-40 2xl:-mx-24"
-            )}>
-            <div className="flex justify-end col-start-1 border-r-4 border-gray-200 translate-x-[2px]">
-              <div className="flex justify-end items-center h-20 z-[1] translate-x-2">
+      {allTimes().map(day => (
+          <div
+            id={day}
+            key={day}
+            style={{
+              height: (16 + getHeight(day) * 76) + 'px',
+              transition: "all 0.2s ease-in",
+            }}
+            className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-indigo-50 -mx-40 2xl:-mx-24 overflow-hidden"
+          >
+            <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
+              <div className="flex justify-end items-center h-[5.5rem] z-[1] translate-x-2">
                 <p className="text-sm text-gray-400 pr-3">
                   {convertDateOnly(new Date(day))}
                 </p>
-                <svg viewBox="0 0 2 2" className="h-4 w-4 rounded-full fill-white stroke-1 stroke-gray-200 translate-x-[2px]">
+                <svg viewBox="0 0 2 2" className="h-4 w-4 rounded-full fill-white stroke-1 stroke-gray-300 translate-x-[2px]">
                   <circle cx={1} cy={1} r={1} />
                 </svg>
               </div>
@@ -364,8 +432,8 @@ function SnapshotTable() {
                 {bu.snapshots.map(snapshot => {
                   return (
                     <a
-                      href='#'
-                      className="relative group flex flex-col items-start justify-center w-full bg-white hover:bg-gray-50 rounded-xl p-3 pl-6 ring-1 ring-inset ring-gray-200 shadow-md"
+                      href={`business-unit/${bu.slug}/snapshot/${snapshot.id}`}
+                      className="h-16 relative group flex flex-col items-start justify-center w-full bg-white hover:bg-gray-50 rounded-xl p-3 px-6 ring-1 ring-inset ring-gray-200 shadow-md"
                     >
                       <div className="flex w-full justify-between">
                         <div className="flex items-center pb-1">
@@ -374,17 +442,23 @@ function SnapshotTable() {
                         </div>
                         <p className="text-xs text-gray-500">{convertTimeOnly(new Date(snapshot.date))}</p>
                       </div>
-                      <p className="text-sm font-semibold break-all text-gray-700">{convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency)}</p>
+                      <p className={classNames(
+                          discrepancyColor(snapshot.value, discrAlertConf[bu.slug], colors),
+                          "text-sm font-semibold break-all"
+                        )}
+                      >
+                        {convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency)}
+                      </p>
                     </a>
                   )})}
               </div>
             ))}
             <div>{/* Empty column */}</div>
-            <div className="col-start-1 col-span-5 w-full px-36 2xl:px-20">
-              <div className="h-px bg-gray-200"></div>
+            <div className="col-start-1 col-span-5 h-px bg-gray-300 w-full px-36 2xl:px-20">
+              <div className=""></div>
             </div>
           </div>
-      )})}
+      ))}
     </>
   )
 }

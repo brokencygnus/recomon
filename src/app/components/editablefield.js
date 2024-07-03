@@ -50,7 +50,7 @@ export function EditableField({ defaultValue, inputClass, pClass, unit, onSave }
         <div className={classNames(pClass, "flex items-center gap-x-3")}>
           <p>{defaultValue + " " + unit}</p>
           <button
-            className="text-gray-400 hover:text-indigo-400"
+            className="text-gray-500 hover:text-indigo-600"
             onClick={() => setIsEdit(true)}
           >  
             <PencilSquareIcon 

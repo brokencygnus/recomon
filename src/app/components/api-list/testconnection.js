@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import { convertAgeMsToDateTime, convertMsToTime } from '@/app/utils/utils'
+import { convertAgeMsToDateTime, convertMsToTimeAgo } from '@/app/utils/dates'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -154,7 +154,7 @@ export function LastConnectionDetails({ item }) {
             </div>
             <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
               <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
-              <p className="text-sm font-normal text-gray-500"> &#40;{convertMsToTime(item.ageMS)} ago&#41;</p>
+              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(item.ageMS)}</p>
             </div>
           </dd>
         </div>
@@ -172,7 +172,7 @@ export function LastConnectionDetails({ item }) {
             </div>
             <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
               <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
-              <p className="text-sm font-normal text-gray-500"> &#40;{convertMsToTime(item.ageMS)} ago&#41;</p>
+              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(item.ageMS)}</p>
             </div>
           </dd>
         </div>
@@ -242,7 +242,7 @@ function ViewResButton({ toggleExpand, requestState, expanded }) {
   <button
     style={{ display: requestState === "done" ? "" : "none" }}
     onClick={() => toggleExpand()}
-    className="ml-3 mt-2 3xl:mt-0 font-medium text-sm text-indigo-500 hover:text-indigo-700">
+    className="ml-3 mt-2 3xl:mt-0 font-medium text-sm text-indigo-500 hover:text-indigo-600">
     {expanded ? "Hide response" : "View response"}
   </button>
   )

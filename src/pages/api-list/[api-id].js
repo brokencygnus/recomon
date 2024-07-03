@@ -2,18 +2,26 @@ import { useState, useContext } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { APIs, accountsUsingAPI } from '@/app/constants/mockdata';
 import { TestConnectionDetails } from '@/app/components/api-list/testconnection';
-import { apiRetrievalSettings } from '@/app/constants/mockdata';
 import { NumberInput } from '@/app/components/numberinput';
 import { Dropdown } from '@/app/components/dropdown';
 import { checkDataEdited } from '@/app/utils/utils';
+import { DatePickerComp } from '@/app/components/datepicker'
+import { TimePickerComp } from '@/app/components/timepicker'
 import { RecursiveFutureNextInterval } from '@/app/utils/api-list/interval'
-import { convertShortDate } from '@/app/utils/utils'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { convertShortDate } from '@/app/utils/dates'
+import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { ToastContext } from '@/app/components/toast';
 
 const LastConnectionDetails = dynamic(() => import('@/app/components/api-list/testconnection').then(mod => mod.LastConnectionDetails), { ssr: false });
+
+// mock data start
+
+import { APIs } from '@/app/constants/mockdata/mockdata';
+import { accountsUsingAPI, apiRetrievalSettings } from '@/app/constants/mockdata/api-list_mockdata';
+
+// mock data end
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -406,17 +414,34 @@ function RetrievalFreq({ retrievalSettings }) {
     handleFormChange({ name: "weekArray", value: newArray })
   }
 
-  const handleStartingDate = (event) => {
-    const { value } = event.target
-
+  const updateTimes = (value) => {
     const updatedState = {
       ...formState,
-      ["startingDate"]: new Date(value),
-      ["referenceDate"]: new Date(value),
+      ["startingDate"]: value,
+      ["referenceDate"]: value,
     };
     
     setFormState(updatedState)
     checkDataEdited(initialState, updatedState, setIsDataEdited)
+  }
+
+  const handleStartingDate = (value) => {
+    const hour = formState.startingDate.getHours()
+    const minute = formState.startingDate.getMinutes()
+    const newValue = new Date(value)
+
+    newValue.setHours(hour)
+    newValue.setMinutes(minute)
+
+    updateTimes(newValue)
+  }
+
+  const handleStartingTime = (value) => {
+    const date = new Date(formState.startingDate)
+    date.setHours(value.hour)
+    date.setMinutes(value.minute)
+
+    updateTimes(date)
   }
 
   const { addToast } = useContext(ToastContext)
@@ -570,24 +595,33 @@ function RetrievalFreq({ retrievalSettings }) {
         : null}
 
       </div>
-      <div className="flex items-center mt-8">
-        <p className="text-sm text-gray-600 pr-3">
+      <div className="flex items-center mt-8 gap-x-3">
+        <p className="text-sm text-gray-600">
           Starting from
         </p>
         <div className="relative rounded-md shadow-sm">
-          {/* When you implement custom datepicker for this, uncomment the icon and change the <input/> to pl-10
-              TODO add max and min dates because changing the year causes it to freeze due to recursive calculations */}
-          {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          {/* TODO add max and min dates because changing the year causes it to freeze due to recursive calculations */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-          </div> */}
-          <input
-            type="datetime-local"
+          </div>
+          <DatePickerComp
             name="startingDate"
             id="startingDate"
-            defaultValue={correctTimezone(formState.referenceDate)}
-            onBlur={handleStartingDate}
-            className="block w-64 rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="YYYY/MM/DD HH:MM"
+            value={correctTimezone(formState.referenceDate).slice(0, -6)}
+            onChange={handleStartingDate}
+            className="block w-44 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+        </div>
+        <div className="relative rounded-md shadow-sm">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <ClockIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </div>
+          <TimePickerComp
+            name="startingTime"
+            id="startingTime"
+            value={correctTimezone(formState.referenceDate).slice(11, 16)}
+            onChange={handleStartingTime}
+            className="block w-28 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         </div>
       </div>
@@ -645,9 +679,11 @@ function AccountListCard() {
         </p>
       </div>
       {accountsUsingAPI.some((businessUnit) => (businessUnit.accounts.some(account => !account.detected))) ? 
-        <div className="flex items-center bg-red-100 rounded-md mt-8 ring-1 ring-inset ring-red-300">
-          <ExclamationTriangleIcon className="text-red-600 p-3 h-14 w-14"/>
-          <p className="text-red-700 text-sm py-3 pr-3">
+        <div className="flex rounded-md bg-red-50 p-4 mt-4">
+          <div className="flex flex-shrink-0 items-center">
+            <ExclamationTriangleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+          </div>
+          <p className="ml-3 text-sm text-red-700">
             Some of your accounts were assigned to this endpoint, but their account codes were not detected. Check your configurations.
           </p>
         </div>
@@ -680,7 +716,7 @@ function AccountListCard() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {businessUnit.accounts.map((account) => (
-                      <tr key={account.code} className="bg-white hover:bg-gray-50">
+                      <tr key={account.code} className="hover:bg-gray-50">
                         <td
                           className={classNames((account.detected ? "text-gray-500" : "font-medium text-red-500"),
                             "whitespace-nowrap py-4 pl-1 pr-3 text-sm")}

@@ -5,11 +5,6 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  // safelist: [
-  //   {
-  //     pattern: /text-(rose|amber)-(500|600)/,
-  //   },
-  // ],
   theme: {
     extend: {
       backgroundImage: {
@@ -22,7 +17,7 @@ module.exports = {
         '3xl': '1920px',
       },
       transitionProperty: {
-        'all': 'width, opacity, transform, translate',
+        'all': 'width, opacity, transform, translate, rotate',
       },
       fontSize: {
         '2.5xl': '1.6875rem'

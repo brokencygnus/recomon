@@ -42,22 +42,6 @@ export const APIs = [
     custom_headers: `{"Content-Type": "application/json"}`},
 ]
 
-export const discrAlertConf = {
-  critHigh: 10000,
-  acctbleHigh: 200,
-  acctbleLow: -200,
-  critLow: -10000,
-}
-
-export const exchangeData = [
-  { name: 'Bitcoin', symbol: 'BTC', href: '#', discrepancy:"8.12345678", is_blockchain: true,  networks: ["Bitcoin"]},
-  { name: 'Ethereum', symbol: 'ETH', href: '#', discrepancy:"0", is_blockchain: true, networks: ["ERC20"]},
-  { name: 'USD Tether', symbol: 'USDT', href: '#', discrepancy:"62.85267819928", is_blockchain: true, networks: ["ERC20", "TRC20"]},
-  { name: 'Solana', symbol: 'SOL', href: '#', discrepancy:"-72.12345678", is_blockchain: true, networks: ["Solana"]},
-  { name: 'Indonesian Rupiah', symbol: 'IDR', href: '#', discrepancy:"559104934.12345678",  is_blockchain: false, networks: []},
-  { name: 'United States Dollar', symbol: 'USD', href: '#', discrepancy:"2245.12345678",  is_blockchain: false, networks: []},
-]
-
 export const currencies = [
   { name: 'Bitcoin', symbol: 'BTC', convertUSD: "64251.80", is_blockchain: true,  networks: ["Bitcoin"]},
   { name: 'Ethereum', symbol: 'ETH', convertUSD: "3493.75", is_blockchain: true, networks: ["ERC20"]},
@@ -74,39 +58,3 @@ export const businessUnits = [
   { id: 3, name: 'Staking', slug: 'staking', code: 'STKG', accounts: "11", currencies: "5", balance: "12345678.12345678", description: 'Concerns the assets required to maintain the Staking products, whether derived from user staking or internal staking. Assets are stored in staking wallets or external staking providers' },
   { id: 4, name: 'Market Maker Bot', slug: 'market-maker-bot', code: 'MMBT', accounts: "52", currencies: "19", balance: "12345678.12345678", description: 'Concerns the assets in multiple counterparties in order to arbitrage the discrepancies between their order books.' },
 ]
-
-export const accountsUsingAPI = [
-  {
-    id: 1, business_unit: 'Exchange', accounts: [
-      { code: 'BTC-A002', currency: 'BTC', name: 'Fireblocks Cold Storage', detected: true },
-      { code: 'ETH-A001', currency: 'ETH', name: 'Fireblocks Cold Storage', detected: true }
-    ]
-  },
-  {
-    id: 2, business_unit: 'Fixed Deposit',
-    accounts: [
-      { code: 'BTC-FDA006', currency: 'BTC', name: 'Fireblocks Cold Storage', detected: true },
-      { code: 'BTC-FDA007', currency: 'BTC', name: 'Fireblocks Hot Wallet', detected: true },
-      { code: 'ETH-FDA002', currency: 'ETH', name: 'Fireblocks Cold Storage', detected: false},
-      { code: 'ETH-FDA003', currency: 'BTC', name: 'Fireblocks Hot Wallet', detected: true },
-    ]
-  },
-  {
-    id: 3, business_unit: 'Staking', accounts: [
-      { code: 'ETH-A001', currency: 'ETH', name: 'Fireblocks Cold Storage', detected: false },
-      { code: 'SOL-A001', currency: 'SOL', name: 'Fireblocks Cold Storage', detected: true }
-    ]
-  },
-]
-
-// Backend should ABSOLUTELY provide startingDate and referenceDate (or frontend can copy referenceDate based on startingDate)
-// There's not a lot of guard clauses because this shit is frustrating
-export const apiRetrievalSettings = {
-  startingDate: "2024-05-20T11:00Z",
-  referenceDate: "2024-05-20T11:00Z",
-  intervalType: { name: "hours", value: "hour" },
-  intervalOption: { name: "Starting at the same time every day", value: "time-same-time-every-day"},
-  primaryInterval: 2,
-  secondaryInterval: 30,
-  weekArray: undefined,
-}

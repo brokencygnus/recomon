@@ -9,28 +9,34 @@ import {
   Transition,
 } from '@headlessui/react'
 import {
-  BellIcon,
   Cog6ToothIcon,
   Square3Stack3DIcon,
   HomeIcon,
   CodeBracketIcon,
   CameraIcon,
+  BugAntIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { businessUnits, currencies } from "@/app/constants/mockdata";
+import { businessUnits, currencies } from "@/app/constants/mockdata/mockdata";
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
+import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
+import { NotificationMenu } from '@/app/components/notifications/notification_menu'
 import { Dropdown } from "./dropdown";
+import { config } from "../constants/config";
 
 const businessUnitNav = structuredClone(businessUnits)
   .concat({ id: 0, name: 'View All', href: '/business-units' })
 
 const navigation = [
-  { slug: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
-  { slug: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
-  { slug: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
-  { slug: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
+  { code: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
+  { code: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
+  { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
+  { code: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
 ]
+
+config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: BugAntIcon, submenus: []})
+
 const userNavigation = [
   { name: 'Your profile', href: '#' },
   { name: 'Sign out', href: '#' },
@@ -41,7 +47,7 @@ function classNames(...classes) {
 }
 
 // Context to configure reference currency on the sticky header
-export const RefCurContext = React.createContext({ name:"None", value:"self", dropdownName:"None"});
+export const RefCurContext = React.createContext({});
 
 // Import this if you want to use RefCurContext
 export const convertedCurrency = (amount, currency, referenceCurrency, signed=false) => {
@@ -71,7 +77,7 @@ export default function Layout({ children, currentTab }) {
   const [hoveredMenu, setHoveredMenu] = useState(null)
   const [referenceCurrency, setReferenceCurrency] = useState({ noSelectionLabel:"None", name:"None", value:"self" })
 
-  const nullRefCur = { name:"None", value:"self", dropdownName:"None"}
+  const nullRefCur = { noSelectionLabel:"None", name:"None", value:"self"}
 
   const handleMouseEnterSidebar = () => {
     setExpanded(true);
@@ -100,13 +106,13 @@ export default function Layout({ children, currentTab }) {
       <div>
         <div className={classNames(
           'transition-opacity ease-in-out', expanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
-          "fixed inset-0 max-w-screen h-screen z-[45] bg-gray-500")}/>
+          "fixed inset-0 max-w-screen h-screen z-[60] bg-gray-500")}/>
         <div
           onMouseEnter={handleMouseEnterSidebar}
           onMouseLeave={handleMouseLeaveSidebar}
           className={classNames(
             'transition-all ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
-            "fixed inset-y-0 left-0 z-50 block w-20 overflow-visible bg-indigo-600 pb-10"
+            "fixed inset-y-0 left-0 z-[61] block w-20 overflow-visible bg-indigo-600 pb-10"
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
             <div className="flex pt-6 shrink-0 items-center justify-center">
@@ -128,14 +134,14 @@ export default function Layout({ children, currentTab }) {
                       <a
                         href={item.href}
                         className={classNames(
-                          item.slug == currentTab ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
+                          item.code == currentTab ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
                           'transition-all ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
                         <item.icon
                           className={classNames(
-                            item.slug == currentTab ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
+                            item.code == currentTab ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
                             'h-6 w-6 shrink-0'
                           )}
                           aria-hidden="true"
@@ -205,8 +211,8 @@ export default function Layout({ children, currentTab }) {
           </div>
         </div>
 
-        <div className="relative flex flex-col pl-20 min-h-screen">
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-hidden">
+          <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
             {/* <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" /> */}
@@ -245,10 +251,7 @@ export default function Layout({ children, currentTab }) {
                 {/* Separator */}
                 <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
 
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                <NotificationMenu />
 
                 {/* Separator */}
                 <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
@@ -299,12 +302,21 @@ export default function Layout({ children, currentTab }) {
               </div>
             </div>
           </div>
+
+          <div 
+            style={{ scrollbarGutter: "stable" }}
+            className="grow overflow-y-auto"
+          >
             <RefCurContext.Provider value={{ referenceCurrency }}>
               <ToastProvider>
-                {children}
-                <ToastGroup />
+                <AlertProvider>
+                  {children}
+                  <ToastGroup />
+                  <AlertGroup />
+                </AlertProvider>
               </ToastProvider>
             </RefCurContext.Provider>
+          </div>
 
         </div>
       </div>

@@ -9,7 +9,7 @@ import { NumberInput } from '@/app/components/numberinput';
 import { SymbolDictionary, checkDataEdited } from '@/app/utils/utils';
 import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { businessUnits, APIs, accounts, currencies } from '@/app/constants/mockdata'
+import { businessUnits, APIs, accounts, currencies } from '@/app/constants/mockdata/mockdata'
 import { accountTypes, dataSources } from '@/app/constants/types'
 import { ToastContext } from '@/app/components/toast';
 import { PencilSquareIcon } from '@heroicons/react/20/solid';
@@ -43,9 +43,9 @@ export default function AccountPage() {
 
   //filters
   const defaultFilters = {
-    currency: {name: "Filter currency", value:null},
-    type: {name: "Filter type", value:null},
-    dataSource: {name: "Filter data source", value:null}
+    currency: { noSelectionLabel: "Filter currency", name: "All", value: null },
+    type: { noSelectionLabel: "Filter type", name: "All", value: null },
+    dataSource: { noSelectionLabel: "Filter data source", name: "All", value: null }
   }
 
   const [filteredAccounts, setFilteredAccounts] = useState(accounts);
@@ -139,12 +139,12 @@ export default function AccountPage() {
   return (
     <Layout currentTab="bu">
       <ModalContext.Provider value={{ modalData, modalAction }}>
-        <main className="flex-grow relative bg-gray-100">
+        <main className="min-h-full relative bg-gray-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <AccountHeader />
           </div>
-          <div className="sticky top-16 px-12 bg-white 2xl:px-16 z-[2]">
+          <div className="sticky top-0 px-12 bg-white 2xl:px-16 z-[2]">
             <AccountFilter
               businessUnit={businessUnit()}
               accountFilters={accountFilters}
@@ -157,7 +157,7 @@ export default function AccountPage() {
               openModal={openModal}
             />
           </div>
-          <div className="sticky top-[5.5rem] w-full h-10 bg-white z-[1] shadow-md"></div>
+          <div className="sticky top-6 w-full h-10 bg-white z-[1] shadow-md"></div>
           <Modal
             open={isModalOpen}
             setClose={closeModal}
@@ -165,13 +165,13 @@ export default function AccountPage() {
           >
             <EditAccount setClose={closeModal}/>
           </Modal>
-          <div className="relative flex-grow px-12 2xl:px-16">
+          <div className="relative px-12 2xl:px-16">
             <AccountGrid 
               accounts={filteredAccounts}
               searchTerm={searchTerm}
               openModal={openModal}
             />
-            <div className="h-16 sticky bottom-0 z-10 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
+            <div className="h-16 sticky bottom-0 pointer-events-none bg-gradient-to-t from-gray-100 to-transparent"></div>
           </div>
         </main>
       </ModalContext.Provider>
@@ -337,13 +337,16 @@ export function AccountGrid({ accounts, openModal, searchTerm }) {
 // modalData = accounts[index]
 // mode = "edit" | "new"
 function EditAccount({ setClose }) {
+  const router = useRouter()
+  const query = router.query
+
   const { modalData, modalAction } = useContext(ModalContext)
 
   const initialState = {
     code: modalData?.code ?? '',
     accountName: modalData?.name ?? '',
-    accountType: modalData?.type ?? '',
-    currency: modalData?.currency ?? '', 
+    accountType: modalData?.type ?? query["account-type"] ?? '',
+    currency: modalData?.currency ?? query.currency ?? '', 
     description: modalData?.description ?? '', 
     dataSource: modalData?.dataSource ?? '', 
     manualBalance: modalData?.balance ?? '',
@@ -408,7 +411,7 @@ function EditAccount({ setClose }) {
             </p>
 
             <div className="grid grid-cols-4 gap-x-6 gap-y-8">
-              <div className="flex grid grid-cols-3 col-span-4 gap-x-6 ">
+              <div className="grid grid-cols-3 col-span-4 gap-x-6 ">
                 <div className="">
                   <label htmlFor="code" className="block text-sm font-medium leading-6 text-gray-900">
                     Code
