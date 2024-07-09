@@ -6,9 +6,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-// const inputClass = "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+// const inputClass = "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
 // const pClass = "mt-2 py-1.5 text-gray-500"
-export function EditableField({ defaultValue, inputClass, pClass, unit, onSave }) {
+export function EditableField({ defaultValue, inputClass, pClass, unit, onSave, children }) {
   const [isEdit, setIsEdit] = useState(false)
 
   const handleSave = (event) => {
@@ -17,7 +17,7 @@ export function EditableField({ defaultValue, inputClass, pClass, unit, onSave }
   }
 
   return (
-    <div>
+    <div className="w-fit">
       {isEdit ? (
         <div className="flex items-center gap-x-2 mr-2">
           <div className="relative">
@@ -48,9 +48,9 @@ export function EditableField({ defaultValue, inputClass, pClass, unit, onSave }
         </div>
       ) : (
         <div className={classNames(pClass, "flex items-center gap-x-3")}>
-          <p>{defaultValue + " " + unit}</p>
+          {children}
           <button
-            className="text-gray-500 hover:text-indigo-600"
+            className="text-gray-500 hover:text-sky-600"
             onClick={() => setIsEdit(true)}
           >  
             <PencilSquareIcon 

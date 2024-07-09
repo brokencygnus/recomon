@@ -141,54 +141,63 @@ export const snapshotBusinessUnits = [
 
 export const discrAlertConf = {
   "exchange": { 
+    basis: 'usd',
     critHigh: 200,
     acctbleHigh: 80,
     acctbleLow: -80,
     critLow: -200
   },
   "fixed-deposit": { 
+    basis: 'usd',
     critHigh: 250,
     acctbleHigh: 100,
     acctbleLow: -100,
     critLow: -250
   },
   "staking": { 
+    basis: 'usd',
     critHigh: 120,
     acctbleHigh: 50,
     acctbleLow: -50,
     critLow: -120
   },
   "market-maker-bot": { 
+    basis: 'usd',
     critHigh: 250,
     acctbleHigh: 100,
     acctbleLow: -100,
     critLow: -250
   },
   "saas": { 
+    basis: 'usd',
     critHigh: 25,
     acctbleHigh: 10,
     acctbleLow: -10,
     critLow: -25
   },
   "loan": { 
+    basis: 'usd',
     critHigh: 500,
     acctbleHigh: 200,
     acctbleLow: -200,
     critLow: -500
   },
   "kuli-metaverse": { 
+    basis: 'usd',
     critHigh: 250,
     acctbleHigh: 100,
     acctbleLow: -100,
     critLow: -250
   },
   "nft-trading": { 
+    basis: 'usd',
     critHigh: 120,
     acctbleHigh: 50,
     acctbleLow: -50,
     critLow: -120
   },
   "jualan-bean-bag": { 
+    basis: 'usd',
     critHigh: 120,
     acctbleHigh: 50,
     acctbleLow: -50,

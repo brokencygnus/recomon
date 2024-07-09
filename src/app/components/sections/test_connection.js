@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
 import { convertAgeMsToDateTime, convertMsToTimeAgo } from '@/app/utils/dates'
+import { Throbber } from '@/app/components/throbber'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -87,8 +88,8 @@ export function TestConnectionDetails({ item }) {
   }
 
   return (
-    <div className="flex block flex-col">
-      <div className="flex block flex-row justify-between">
+    <div className="flex flex-col">
+      <div className="flex flex-row justify-between">
         <div>
           <h3 className="text-base font-semibold leading-6 text-gray-900">Test Connection</h3>
           <div className="mt-2 text-sm text-gray-500">
@@ -129,7 +130,7 @@ export function TestConnectionDetails({ item }) {
 }
 
 
-export function LastConnectionDetails({ item }) {
+export function LastConnectionDetails({ api }) {
   return (
     
   <div>
@@ -148,13 +149,13 @@ export function LastConnectionDetails({ item }) {
                 Status:
               </p>
               <StatusIndicator
-                item={item}
+                item={api}
                 requestState={"done"}
               />
             </div>
             <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
-              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
-              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(item.ageMS)}</p>
+              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(api.ageMS).toString()}</p>
+              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(api.ageMS)}</p>
             </div>
           </dd>
         </div>
@@ -166,13 +167,13 @@ export function LastConnectionDetails({ item }) {
                 Status:
               </p>
               <StatusIndicator
-                item={item}
+                item={api}
                 requestState={"done"}
               />
             </div>
             <div className="flex flex-wrap items-center mt-3 gap-x-3 gap-y-1">
-              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(item.ageMS).toString()}</p>
-              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(item.ageMS)}</p>
+              <p className="text-sm font-medium text-gray-600">{convertAgeMsToDateTime(api.ageMS).toString()}</p>
+              <p className="text-sm font-normal text-gray-500"> {convertMsToTimeAgo(api.ageMS)}</p>
             </div>
           </dd>
         </div>
@@ -192,15 +193,6 @@ function TestButton({ handleRequest }) {
   >
     Test
   </button>
-  )
-}
-
-
-function Throbber() {
-  return (
-    <div
-      className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-gray-300 border-e-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]">
-    </div>
   )
 }
 
@@ -242,7 +234,7 @@ function ViewResButton({ toggleExpand, requestState, expanded }) {
   <button
     style={{ display: requestState === "done" ? "" : "none" }}
     onClick={() => toggleExpand()}
-    className="ml-3 mt-2 3xl:mt-0 font-medium text-sm text-indigo-500 hover:text-indigo-600">
+    className="ml-3 mt-2 3xl:mt-0 font-medium text-sm text-sky-600 hover:text-sky-900">
     {expanded ? "Hide response" : "View response"}
   </button>
   )

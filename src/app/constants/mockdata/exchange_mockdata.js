@@ -1,11 +1,19 @@
-import { accounts } from './mockdata'
+import { accounts } from './account_mockdata'
 import { config } from '../config';
 import { convertCurrency } from '@/app/utils/utils';
 
-const appendedAccountData = (accountData) => {
-  const capitals = accountData.filter(account => account.type === "capital");
-  const assets = accountData.filter(account => account.type === "asset");
-  const liabilities = accountData.filter(account => account.type === "liability");
+// Convert
+//    accounts: [ ... ]
+// to
+//    capitals: [ ... ], capitalTotal: ...,
+//    assets: [ ... ], assetTotal: ...,
+//    liabilities: [ ... ], liabilityTotal: ...,
+const appendedAccountData = (accountData, currency) => {
+  const accountsInCurrency = accountData.filter(account => account.currency === currency)
+
+  const capitals = accountsInCurrency.filter(account => account.type === "capital")
+  const assets = accountsInCurrency.filter(account => account.type === "asset")
+  const liabilities = accountsInCurrency.filter(account => account.type === "liability")
   
   // API should provide these as well but I don't have it and I'm too lazy to mock realistic data
   const getAccountsTotal = (data) => {
@@ -15,81 +23,92 @@ const appendedAccountData = (accountData) => {
     return total
   };
 
-  return {
-    capitals, capitalTotal: getAccountsTotal(capitals), test: console.log(getAccountsTotal(liabilities)),
-    assets, assetTotal: getAccountsTotal(assets),
-    liabilities, liabilityTotal: getAccountsTotal(liabilities),
-  }
-}
+  const capitalTotal = getAccountsTotal(capitals)
+  const assetTotal = getAccountsTotal(assets)
+  const liabilityTotal = getAccountsTotal(liabilities)
 
-export const discrAlertConf = {
-  critHigh: 10000,
-  acctbleHigh: 50,
-  acctbleLow: -50,
-  critLow: -10000,
+  const discrepancy = assetTotal - capitalTotal - liabilityTotal
+
+  return {
+    capitals, capitalTotal,
+    assets, assetTotal,
+    liabilities, liabilityTotal, discrepancy
+  }
 }
 
 export const exchangeCurrencies = [
   { 
     name: 'Bitcoin', 
     symbol: 'BTC', 
-    // capital: "900.12345678",
-    // assets: "982.00000000",
-    // liabilities: "90.00000000",
-    discrepancy: "8.12345678",
-    ...appendedAccountData(accounts),
-    discrAlertConf
+    ...appendedAccountData(accounts, 'BTC'),
+    discrAlertConf: {
+      basis: "currency",
+      critHigh: 0.15,
+      acctbleHigh: 0.06,
+      acctbleLow: -0.06,
+      critLow: -0.15,
+    }
   },
   { 
     name: 'Ethereum', 
-    symbol: 'ETH', 
-    // capital: "450.00000000",
-    // assets: "450.00000000",
-    // liabilities: "0.00000000",
-    discrepancy: "0.00000000",
-    ...appendedAccountData(accounts),
-    discrAlertConf
+    symbol: 'ETH',
+    ...appendedAccountData(accounts, 'ETH'),
+    discrAlertConf: {
+      basis: "usd",
+      critHigh: 15000,
+      acctbleHigh: 3000,
+      acctbleLow: -3000,
+      critLow: -15000,
+    }
   },
   { 
     name: 'USD Tether', 
-    symbol: 'USDT', 
-    // capital: "1300.85267819928",
-    // assets: "1445.70535639856",
-    // liabilities: "200.00000000",
-    discrepancy: "62.85267819928",
-    ...appendedAccountData(accounts),
-    discrAlertConf
+    symbol: 'USDT',
+    ...appendedAccountData(accounts, 'USDT'),
+    discrAlertConf: {
+      basis: "percent",
+      critHigh: 0.4,
+      acctbleHigh: 0.15,
+      acctbleLow: -0.15,
+      critLow: -0.4,
+    }
   },
-  { 
-    name: 'Solana', 
-    symbol: 'SOL', 
-    // capital: "478.87654322",
-    // assets: "740.00000000",
-    // liabilities: "190.00000000",
-    discrepancy: "-72.12345678",
-    ...appendedAccountData(accounts),
-    discrAlertConf
-  },
-  { 
-    name: 'Indonesian Rupiah', 
-    symbol: 'IDR', 
-    // capital: "615904934.12345678",
-    // assets: "750000000.00000000",
-    // liabilities: "100000000.00000000",
-    discrepancy: "559104934.12345678",
-    ...appendedAccountData(accounts),
-    discrAlertConf
-  },
-  { 
-    name: 'United States Dollar', 
-    symbol: 'USD', 
-    // capital: "1345.12345678",
-    // assets: "2500.00000000",
-    // liabilities: "900.00000000",
-    discrepancy: "2245.12345678",
-    ...appendedAccountData(accounts),
-    discrAlertConf
-  }
+  // { 
+  //   name: 'Cardano', 
+  //   symbol: 'ADA',
+  //   ...appendedAccountData(accounts, 'ADA'),
+  //   discrAlertConf: {
+  //     basis: "usd",
+  //     critHigh: 5000,
+  //     acctbleHigh: 1000,
+  //     acctbleLow: -1000,
+  //     critLow: -5000,
+  //   }
+  // },
+  // { 
+  //   name: 'Indonesian Rupiah', 
+  //   symbol: 'IDR',
+  //   ...appendedAccountData(accounts, 'IDR'),
+  //   discrAlertConf: {
+  //     basis: "usd",
+  //     critHigh: 5000,
+  //     acctbleHigh: 1000,
+  //     acctbleLow: -1000,
+  //     critLow: -5000,
+  //   }
+  // },
+  // { 
+  //   name: 'United States Dollar', 
+  //   symbol: 'USD',
+  //   ...appendedAccountData(accounts, 'USD'),
+  //   discrAlertConf: {
+  //     basis: "usd",
+  //     critHigh: 5000,
+  //     acctbleHigh: 1000,
+  //     acctbleLow: -1000,
+  //     critLow: -5000,
+  //   }
+  // }
 ]
 
 const getBuTotal = (data, key) => {
@@ -102,12 +121,18 @@ const getBuTotal = (data, key) => {
 const capitalBuTotal = getBuTotal(exchangeCurrencies, "capitalTotal")
 const assetBuTotal = getBuTotal(exchangeCurrencies, "assetTotal")
 const liabilityBuTotal = getBuTotal(exchangeCurrencies, "liabilityTotal")
-const discrepancyBuTotal = capitalBuTotal - assetBuTotal + liabilityBuTotal
+const discrepancyBuTotal = assetBuTotal - capitalBuTotal - liabilityBuTotal
 
 export const exchangeSummary = {
   capital: capitalBuTotal,
   assets: assetBuTotal,
   liabilities: liabilityBuTotal,
   discrepancy: discrepancyBuTotal,
-  discrAlertConf
+  discrAlertConf: {
+    basis: "usd",
+    critHigh: 50000,
+    acctbleHigh: 20000,
+    acctbleLow: -20000,
+    critLow: -50000,
+  }
 }

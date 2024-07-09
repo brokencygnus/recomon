@@ -1,19 +1,6 @@
 import { currencies } from '../constants/mockdata/mockdata';
 import _ from 'lodash';
 
-// temporary icons for non-fiat since I don't have the SVGs yet
-export const SymbolDictionary = (symbol) => {
-  switch (symbol) {
-    case "BTC": return '₿';
-    case "ETH": return 'ETH';
-    case "USDT": return 'T';
-    case "SOL": return 'S';
-    case "IDR": return 'Rp';
-    case "USD": return '$';
-    case "INR": return '₹';
-    default : return '$';
-  }
-}
 
 // Checks if FormState has been edited, i.e. different from initial state
 export const checkDataEdited = ( initialState, currentState, setIsDataEdited ) => {

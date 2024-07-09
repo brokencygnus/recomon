@@ -8,8 +8,9 @@ import { SearchFilter } from '@/app/utils/highlight_search'
 import ClientOnly from '@/app/components/csr'
 import { SeeMore } from '@/app/components/seemore';
 import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
-import { TestConnectionList } from '@/app/components/api-list/testconnection';
+import { TestConnectionList } from '@/app/components/sections/test_connection';
 import { HighlightSearch } from '@/app/utils/highlight_search';
+import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -55,7 +56,7 @@ export default function APIPage() {
         </main>
         <div className="flex-grow overflow-y-auto mt-8 px-12 2xl:px-16">
           <APITable
-            data={filteredAPIs}
+            apiData={filteredAPIs}
             searchTerm={searchTerm}
           />
         </div>
@@ -72,7 +73,7 @@ function APIHeader() {
             <div className="max-w-7xl">
               <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Manage APIs</h1>
               <p className="mt-2 text-sm text-gray-700">Manage your data source APIs to keep your balances up to date.&nbsp;
-                <a href='#' className="font-semibold text-indigo-600">How do I set up APIs?</a>
+                <a href='#' className="font-semibold text-sky-600">How do I set up APIs?</a>
               </p>
             </div>
           </header>
@@ -87,7 +88,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <label htmlFor="search-field" className="sr-only">
             Search
           </label>
@@ -107,7 +108,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
         <div>
           <button
             type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600"
+            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
             onClick={handleResetFilters}
           >
             Reset search
@@ -117,7 +118,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
         <div className="flex items-end">
           <button
             type="button"
-            className="ml-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="ml-4 rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
           >
             Add API
           </button>
@@ -126,7 +127,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
   )
 }
 
-export function APITable({ data, searchTerm }) {
+export function APITable({ apiData, searchTerm }) {
   return (
     <div className="relative mb-8 flow-root">
       <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
@@ -156,25 +157,32 @@ export function APITable({ data, searchTerm }) {
               </tr>
             </thead>
             <tbody>
-              {data.map((item) => (
-                <tr key={item.code} className="bg-white hover:bg-gray-50">
+              {apiData.map((api) => (
+                <tr key={api.code} className="bg-white hover:bg-gray-50">
                   <td className="whitespace-nowrap py-4 pl-2 pr-3 text-sm text-gray-500 border-b border-gray-300">
-                    {item.code}
+                    {api.code}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600 border-b border-gray-300">
-                    <span className="text-wrap">{HighlightSearch(item.name, searchTerm, {base: '', highlight: 'bg-indigo-300'})}</span>
+                    <div className="flex items-center gap-x-3">
+                      <span>{HighlightSearch(api.name, searchTerm, {base: '', highlight: 'bg-sky-300'})}</span>
+                      {api.alerts && api.alerts.length !== 0 &&
+                        <div className="flex gap-x-1">
+                          <NotificationBadges size="sm" message="api" alerts={api.alerts}/>
+                        </div>
+                      }
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">
                     <div className="flex justify-between items-center">
                       <SeeMore
-                        content={HighlightSearch(item.url, searchTerm, {base: '', highlight: 'bg-indigo-300'})}
+                        content={HighlightSearch(api.url, searchTerm, {base: '', highlight: 'bg-sky-300'})}
                       />
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600 border-b border-gray-300">
                     <ClientOnly>
-                      <p>{convertAgeMsToDateTime(item.ageMS).toString()}
-                        <span className="px-3 font-normal text-gray-500">{convertMsToTimeAgo(item.ageMS)}</span>
+                      <p>{convertAgeMsToDateTime(api.ageMS).toString()}
+                        <span className="px-3 font-normal text-gray-500">{convertMsToTimeAgo(api.ageMS)}</span>
                       </p>
                     </ClientOnly>
                   </td>
@@ -186,16 +194,16 @@ export function APITable({ data, searchTerm }) {
                     </div>
                   </td> */}
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">
-                    <div className="w-72 3xl:w-96">
-                      <TestConnectionList item={item} />
+                    <div className="w-64 3xl:w-96">
+                      <TestConnectionList item={api} />
                     </div>
                   </td>
-                  <td className="whitespace-nowrap pl-3 pr-2 text-right text-sm font-semibold text-indigo-600 hover:text-indigo-900 border-b border-gray-300">
+                  <td className="whitespace-nowrap pl-3 pr-2 text-right text-sm font-semibold text-sky-600 hover:text-sky-900 border-b border-gray-300">
                     <Link
                       href={{
                         pathname: `/api-list/api-001`,
                       }}>
-                      Details<span className="sr-only">, {item.name}</span>
+                      Details<span className="sr-only">, {api.name}</span>
                     </Link>
                   </td>
                 </tr>

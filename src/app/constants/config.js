@@ -14,4 +14,7 @@ export const config = {
   alertTimeout: 15000,
   alertTimeoutClass: 'duration-[15000ms]',
 
+  // Max and min years in date calculations
+  minYear: 1999,
+  maxYear: 2100,
 }

@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, createContext, useContext } from 'react'
 import Layout, {RefCurContext, convertedCurrency} from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { Modal } from '@/app/components/modal';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/app/components/dialog';
+import { NotificationBadges } from '@/app/components/notifications/notification_badges'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { checkDataEdited } from '@/app/utils/utils'
@@ -16,7 +17,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const ModalContext = React.createContext(null);
+const ModalContext = createContext(null);
 
 export default function BusinessUnitPage() {
   const router = useRouter()
@@ -154,7 +155,7 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
@@ -173,7 +174,7 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
         <div>
           <button
             type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600"
+            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
             onClick={handleResetFilters}
           >
             Reset search
@@ -184,7 +185,7 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
           <button
             type="button"
             onClick={() => openModal({}, "new")}
-            className="ml-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="ml-4 rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
           >
             Add business unit
           </button>
@@ -254,17 +255,26 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
   };
 
   return (
-    <ul role="list" className="relative grid grid-cols-2 py-8 gap-x-6 gap-y-8 2xl:gap-x-8 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5">
+    <ul role="list" className="relative grid py-8 gap-x-6 gap-y-8 2xl:gap-x-8 grid-cols-2 xl:grid-cols-3 2.5xl:grid-cols-4 4xl:grid-cols-5">
       {businessUnits.map((businessUnit) => (
-        <li key={businessUnit.id} className="overflow-hidden rounded-xl shadow-lg ring-1 ring-gray-900/5">
+        <li key={businessUnit.id} className="rounded-xl shadow-lg ring-1 ring-gray-900/5">
           <a 
             // href={menuOptions.view.href(businessUnit.slug)}
             className="block"
           >
-            <div className="bg-gray-50 hover:bg-gray-100 p-6">
-              <div className="flex items-baseline gap-x-4">
-                <h3 className="text-lg font-semibold leading-6 truncate text-gray-900">{HighlightSearch(businessUnit.name, searchTerm, { base:'', highlight:'bg-indigo-300' })}</h3>
-                <p className="text-sm leading-6 text-gray-400">{businessUnit.code}</p>
+            <div className="bg-gray-50 p-6 rounded-t-xl">
+              <div className="flex items-center justify-between gap-x-3">
+                <div className="flex grow items-center justify-between">
+                  <h3 className="flex items-baseline gap-x-3 text-lg font-semibold leading-6 truncate text-gray-900">
+                    <p>{HighlightSearch(businessUnit.name, searchTerm, { base:'', highlight:'bg-sky-300' })}</p>
+                    <p className="sticky font-normal left-0 text-sm text-gray-400">{businessUnit.code}</p>
+                  </h3>
+                  <div className="flex items-center justify-end gap-x-1">
+                    {businessUnit.alerts && businessUnit.alerts.length !== 0 &&
+                      <NotificationBadges size="md" alerts={businessUnit.alerts}/>
+                    }
+                  </div>
+                </div>
                 <Menu as="div" className="relative ml-auto">
                   <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
                     <span className="sr-only">Open options</span>
@@ -305,23 +315,29 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
               </p>
             </div>
           </a>
-          <dl className="flex flex-col pb-3 -my-1 bg-white border-t border-gray-900/5 divide-y divide-gray-100 px-6 text-sm leading-6">
+          <dl className="flex flex-col pb-3 -my-1 bg-white border-t rounded-b-xl border-gray-900/5 divide-y divide-gray-100 px-6 text-sm leading-6">
             <div className="flex justify-between gap-x-4 py-3">
-              <dt className="text-gray-500">Accounts</dt>
-              <dd className="text-gray-400">
+              <dt className="font-medium text-gray-500">Accounts</dt>
+              <dd className="text-gray-700">
                 {businessUnit.accounts}
               </dd>
             </div>
             <div className="flex justify-between gap-x-4 py-3">
-              <dt className="text-gray-500">Currencies</dt>
-              <dd className="text-gray-400">
+              <dt className="font-medium text-gray-500">Currencies</dt>
+              <dd className="text-gray-700">
                 {businessUnit.currencies}
               </dd>
             </div>
             <div className="flex justify-between gap-x-4 py-3">
-              <dt className="text-gray-500">Total capital</dt>
-              <dd className="text-gray-400">
+              <dt className="font-medium text-gray-500">Total capital</dt>
+              <dd className="text-gray-700">
                 {convert(businessUnit.balance, "USD")}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-x-4 py-3">
+              <dt className="font-medium text-gray-500">Current gap</dt>
+              <dd className="text-gray-700">
+                {convert(businessUnit.gap, "USD")}
               </dd>
             </div>
           </dl>
@@ -392,7 +408,7 @@ function EditBusinessUnit({ setClose }) {
                       id="code"
                       value={formState.code}
                       onChange={handleFormChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
                       placeholder="MBSU"
                     />
                   </div>
@@ -409,7 +425,7 @@ function EditBusinessUnit({ setClose }) {
                       id="name"
                       value={formState.name}
                       onChange={handleFormChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
                       placeholder="My Business Unit"
                     />
                   </div>
@@ -432,7 +448,7 @@ function EditBusinessUnit({ setClose }) {
                     value={formState.description}
                     onChange={handleFormChange}
                     rows={3}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
                   />
                 </div>
                 <p className="mt-3 text-sm leading-6 text-gray-600">Write a short description of the business unit.</p>
@@ -453,7 +469,7 @@ function EditBusinessUnit({ setClose }) {
             onClick={handleSubmit}
             type="button"
             className={classNames(
-              isDataEdited ? "bg-indigo-600 hover:bg-indigo-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              isDataEdited ? "bg-sky-600 hover:bg-sky-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
               : "bg-gray-300 text-gray-500 pointer-events-none",
               "rounded-md px-3 py-2 text-sm font-semibold shadow-sm"
             )}
@@ -476,7 +492,7 @@ function DeleteDialog({ setClose }) {
 
   const { addToast } = useContext(ToastContext)
   const launchToast = () => {
-    addToast({ color: "rose", message: "Business unit deleted!" })
+    addToast({ color: "red", message: "Business unit deleted!" })
   }
 
   const handleDelete = () => {
@@ -503,7 +519,7 @@ function DeleteDialog({ setClose }) {
         </button>
         <button
           onClick={handleDelete}
-          className="bg-rose-600 hover:bg-rose-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 rounded-md px-3 py-2 text-sm font-semibold shadow-sm">
+          className="bg-rose-600 hover:bg-rose-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 rounded-md px-3 py-2 text-sm font-semibold shadow-sm">
           Delete
         </button>
       </DialogActions>

@@ -15,6 +15,7 @@ module.exports = {
       screens: {
         '2.5xl': '1680px',
         '3xl': '1920px',
+        '4xl': '2560px',
       },
       transitionProperty: {
         'all': 'width, opacity, transform, translate, rotate',

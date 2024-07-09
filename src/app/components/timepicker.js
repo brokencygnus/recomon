@@ -8,7 +8,7 @@ function classNames(...classes) {
 export function TimePickerComp({ value, onChange, className, ...props }) {
   return (
     <TimeField
-      value={new Time(...value.split(":").map(val => parseInt(val)))}
+      value={value}
       onChange={onChange}
       {...props}
     >
@@ -18,8 +18,9 @@ export function TimePickerComp({ value, onChange, className, ...props }) {
           <DateSegment
             style={{ caretColor: "transparent"}}
             className={classNames(
-              segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-indigo-100",
-              "text-gray-900 outline-none"
+              segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-sky-100",
+              segment.isPlaceholder || segment.type == "literal" ? "text-gray-400" : "text-gray-900",
+              "outline-none"
             )}
             segment={segment}
           />

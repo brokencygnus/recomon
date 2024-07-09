@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { snapshotBusinessUnits, discrAlertConf } from '@/app/constants/mockdata/snapshot_mockdata';
@@ -18,7 +18,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const SnapshotContext = React.createContext({});
+const SnapshotContext = createContext({});
 
 export default function SnapshotPage() {
   const router = useRouter()
@@ -187,7 +187,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
@@ -207,7 +207,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
               <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </div>
             <DateRangePickerComp
-              className="block w-72 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-72 rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:text-sm sm:leading-6"
               value={dateRange}
               onChange={handleDateRangeChange}
             />
@@ -215,7 +215,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
         <div>
           <button
             type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-indigo-600"
+            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
             onClick={handleResetFilters}
           >
             Reset filters
@@ -224,8 +224,8 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
       </div>
         <div className="flex items-end">
           <a
-            href='#'
-            className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-indigo-600"
+            href='/settings?menu=snapshot-freq'
+            className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-sky-600"
           >
             Configure snapshots
           </a>
@@ -306,11 +306,11 @@ function SnapshotCarousel() {
         <div className="flex justify-end w-2/3">
           <button onClick={() => translateLeft()} className="group p-5">
             <div className={classNames(
-              "transition-all", canTranslateLeft() ? "bg-indigo-100/40 group-hover:bg-indigo-200/40 group-hover:-translate-x-4" : "bg-gray-100/40 group-hover:translate-x-0",
+              "transition-all", canTranslateLeft() ? "bg-sky-300/40 group-hover:bg-sky-400/40 group-hover:-translate-x-4" : "bg-gray-100/40 group-hover:translate-x-0",
               "flex items-center justify-center rounded-full size-8 shadow-sm"
             )}>
               <ChevronLeftIcon className={classNames(
-                canTranslateLeft() ? "text-indigo-600" : "text-gray-600",
+                canTranslateLeft() ? "text-sky-600" : "text-gray-600",
                 "size-5"
               )}/>
             </div>
@@ -321,11 +321,11 @@ function SnapshotCarousel() {
         <div className="flex justify-start w-2/3">
           <button onClick={() => translateRight()} className="group p-5">
             <div className={classNames(
-              "transition-all", canTranslateRight() ? "bg-indigo-100/40 group-hover:bg-indigo-200/40 transition-all group-hover:translate-x-4" : "bg-gray-100/40 group-hover:translate-x-0",
+              "transition-all", canTranslateRight() ? "bg-sky-300/40 group-hover:bg-sky-400/40 transition-all group-hover:translate-x-4" : "bg-gray-100/40 group-hover:translate-x-0",
               "flex items-center justify-center rounded-full size-8 shadow-sm"
             )}>
               <ChevronRightIcon className={classNames(
-                canTranslateRight() ? "text-indigo-600" : "text-gray-600",
+                canTranslateRight() ? "text-sky-600" : "text-gray-600",
                 "size-5"
               )}/>
             </div>
@@ -416,9 +416,9 @@ function SnapshotTable() {
             key={day}
             style={{
               height: (16 + getHeight(day) * 76) + 'px',
-              transition: "all 0.2s ease-in",
+              transition: "height 0.2s ease-in",
             }}
-            className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-indigo-50 -mx-40 2xl:-mx-32 2.5xl:-mx-24"
+            className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-sky-200/20 -mx-40 2xl:-mx-32 2.5xl:-mx-24"
           >
             {isSnapshotExistInSlice(day) &&
               <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
@@ -439,7 +439,7 @@ function SnapshotTable() {
               >
                 {bu.snapshots.map(snapshot => {
                   return (
-                    <div
+                    <a
                       href={`business-unit/${bu.slug}/snapshot/${snapshot.id}`}
                       className="h-16 relative group flex flex-col items-start justify-center w-full bg-white hover:bg-gray-50 rounded-xl p-3 px-6 ring-1 ring-inset ring-gray-200 shadow-md"
                     >
@@ -452,17 +452,23 @@ function SnapshotTable() {
                       </div>
                       <div className="flex w-full justify-between items-center">
                         <p className={classNames(
-                            discrepancyColor(snapshot.value, discrAlertConf[bu.slug], colors),
+                            discrepancyColor({
+                              discrepancy:snapshot.value,
+                              discrAlertConf:discrAlertConf[bu.slug],
+                              colors:colors
+                            }),
                             "text-sm font-semibold break-all"
                           )}
                         >
                           {convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency, true)}
                         </p>
-                        <div className="flex items-center gap-x-1 h-4">
-                          <NotificationBadges size="sm" alerts={snapshot.alerts}/>
-                        </div>
+                        {snapshot.alerts && snapshot.alerts.length !== 0 &&
+                          <div className="flex items-center gap-x-1 h-4">
+                              <NotificationBadges size="sm" alerts={snapshot.alerts}/>
+                          </div>
+                        }
                       </div>
-                    </div>
+                    </a>
                   )})}
               </div>
             ))}

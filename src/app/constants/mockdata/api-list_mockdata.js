@@ -22,13 +22,11 @@ export const accountsUsingAPI = [
   },
 ]
 
-// Backend should ABSOLUTELY provide startingDate and referenceDate (or frontend can copy referenceDate based on startingDate)
 // There's not a lot of guard clauses because this shit is frustrating
 export const apiRetrievalSettings = {
   startingDate: "2024-05-20T11:23Z",
-  referenceDate: "2024-05-20T11:23Z",
-  intervalType: { name: "hours", value: "hour" },
-  intervalOption: { name: "Starting at the same time every day", value: "time-same-time-every-day"},
+  intervalType: "hour",
+  intervalOption: "time-same-time-every-day",
   primaryInterval: 2,
   secondaryInterval: 30,
   weekArray: undefined,

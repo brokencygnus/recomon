@@ -7,7 +7,7 @@ const countCommas = (formattedNumber, caretPosition) => {
   return ((beforeCaret.match(/,/g) || []).length)
 }
 
-const validate = (input, maximum) => {
+const validate = (input, minimum, maximum) => {
   // Block non-numeric characters except (.)
   input = input.replace(/[^0-9.]/g, '');
 
@@ -16,48 +16,51 @@ const validate = (input, maximum) => {
 
   // Ceiling the value if maximum is defined
   if (maximum !== undefined) {
-    if (input) {
+    if (input !== undefined) {
       input = Math.min(maximum, input)
+    }
+  }
+
+  // Floor the value if minimum is defined
+  // Remember that 0 is falsy
+  if (minimum !== undefined) {
+    if (input !== undefined) {
+      input = Math.max(minimum, input)
     }
   }
 
   return input
 }
 
-export function NumberInput({ name, value, onChange, maximum, ...rest }) {
+export function NumberInput({ name, value, onChange, minimum, maximum, ...rest }) {
   const [formattedValue, setFormattedValue] = useState(formatNumber(value));
 
   // Format and update the state when value or maximum changes
   useEffect(() => {
     // Handle value change
     let formatted = ""
-
-    let inputValue = "0"
+    let inputValue = null
     
     try {
       inputValue = value.toString();
-  
-      inputValue = validate(inputValue, maximum)
+      inputValue = validate(inputValue, minimum, maximum)
 
       formatted = formatNumber(inputValue);
-    } catch (error) {
-      formatted = ""
-    }
+    } catch (error) {}
 
     // Format number with comma separators
-
     setFormattedValue(formatted);
 
     if (onChange) {
       onChange({
         target: {
           name,
-          value: inputValue,
+          value: parseFloat(inputValue),
         },
       });
     }
 
-  }, [value, maximum]);
+  }, [value, minimum, maximum]);
 
   const handleInputChange = (event) => {
     let caretPos = event.target.selectionStart;
@@ -66,7 +69,7 @@ export function NumberInput({ name, value, onChange, maximum, ...rest }) {
     // For caret position
     let commasBefore = countCommas(inputValue)
 
-    inputValue = validate(inputValue, maximum)
+    inputValue = validate(inputValue, minimum, maximum)
 
     // Format number with comma separators
     const formatted = formatNumber(inputValue);
@@ -93,7 +96,7 @@ export function NumberInput({ name, value, onChange, maximum, ...rest }) {
       onChange({
         target: {
           name,
-          value: inputValue,
+          value: parseFloat(inputValue),
         },
       });
     }

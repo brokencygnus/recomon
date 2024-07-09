@@ -14,11 +14,9 @@ function classNames(...classes) {
 export function DatePickerComp({ value, onChange, className, ...props }) {
   let [isOpen, setOpen] = useState(false)
 
-  const validatedValue = value && parseDate(value)
-
   return (
     <DatePicker
-      value={validatedValue}
+      value={value}
       onChange={onChange}
       {...props}
     >
@@ -37,7 +35,7 @@ export function DatePickerComp({ value, onChange, className, ...props }) {
               <DateSegment
                 style={{ caretColor: "transparent"}}
                 className={classNames(
-                  segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-indigo-100",
+                  segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-sky-100",
                   segment.isPlaceholder || segment.type == "literal" ? "text-gray-400" : "text-gray-900",
                   "outline-none"
                 )}
@@ -61,7 +59,7 @@ export function DatePickerComp({ value, onChange, className, ...props }) {
         <Popover style={{zIndex: 40}} isOpen={isOpen} onOpenChange={setOpen} className=" mt-2 py-1 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
           <Dialog className="outline-none">
             <Calendar
-              value={validatedValue}
+              value={value}
               onChange={onChange}
             />
           </Dialog>
@@ -73,13 +71,6 @@ export function DatePickerComp({ value, onChange, className, ...props }) {
 
 export function DateRangePickerComp({ value, onChange, className, ...props }) {
   let [isOpen, setOpen] = useState(false)
-
-  const calculateRange = (value) => {
-    const val = value && parseDate(value)
-  }
-
-  // let [range, setRange] = useState();
-  // let isInvalid = range.end.compare(range.start) > 7;
 
   return (
     <DateRangePicker
@@ -103,7 +94,7 @@ export function DateRangePickerComp({ value, onChange, className, ...props }) {
                 <DateSegment
                   style={{ caretColor: "transparent"}}
                   className={classNames(
-                    segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-indigo-100",
+                    segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-sky-100",
                     segment.isPlaceholder || segment.type == "literal" ? "text-gray-400" : "text-gray-900",
                     "outline-none"
                   )}
@@ -117,7 +108,7 @@ export function DateRangePickerComp({ value, onChange, className, ...props }) {
                 <DateSegment
                   style={{ caretColor: "transparent"}}
                   className={classNames(
-                    segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-indigo-100",
+                    segment.isEditable && "hover:cursor-text rounded-sm px-1 focus:bg-sky-100",
                     segment.isPlaceholder || segment.type == "literal" ? "text-gray-400" : "text-gray-900",
                     "outline-none"
                   )}
@@ -295,7 +286,7 @@ function CalendarCell({ state, date, x, y, weekLength }) {
           // (isSelected || isToday(date)) && 'font-semibold',
           !isSelected && !isOutsideVisibleRange && !isToday(date) && 'text-gray-900',
           !isSelected && isOutsideVisibleRange && !isToday(date) && 'text-gray-400',
-          isToday(date) && 'text-indigo-600 font-semibold',
+          isToday(date) && 'text-sky-600 font-semibold',
 
           isSelectionStart && !isSelectionEnd && 'pl-1.5',
           isSelectionEnd && !isSelectionStart && 'pr-1.5',
@@ -304,22 +295,22 @@ function CalendarCell({ state, date, x, y, weekLength }) {
       >
         <div className={classNames(
             'flex outline-none size-full',
-            isSelected && 'bg-indigo-100',
+            isSelected && 'bg-sky-100',
 
             isSelectionStart && !isSelectionEnd && 'rounded-l-full pr-1.5',
             isSelectionEnd && !isSelectionStart && 'rounded-r-full pl-1.5',
             isSelectionStart && isSelectionEnd && 'rounded-full',
             // isSelected && !isSelectionStart && !isSelectionEnd && 'h-6 w-10',
-            // isSelected && 'bg-indigo-300',
+            // isSelected && 'bg-sky-300',
             // !isSelected && !isToday(date) && 'mx-2 h-6 w-6',
-            // !isSelected && isToday(date) && 'rounded-lg mx-2 h-6 w-6 ring-1 ring-inset ring-indigo-500'
+            // !isSelected && isToday(date) && 'rounded-lg mx-2 h-6 w-6 ring-1 ring-inset ring-sky-500'
           )}
         >
         </div>
         <div className="absolute top-0 left-0 size-full pointer-events-none p-1">
           <div className={classNames(
               'flex items-center justify-center size-full rounded-full',
-              (isSelectionStart || isSelectionEnd) && 'bg-indigo-600 text-white',
+              (isSelectionStart || isSelectionEnd) && 'bg-sky-600 text-white',
             )}
           >
             {formattedDate}

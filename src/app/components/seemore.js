@@ -31,7 +31,7 @@ export function SeeMore({ content }) {
           <span ref={ref} className="break-all text-wrap line-clamp-1">{content}</span>
           {isTruncated && (
           <button
-            className="font-medium text-indigo-600 hover:text-indigo-900 ml-2 focus:outline-none"
+            className="font-medium text-sky-600 hover:text-sky-900 ml-2 focus:outline-none"
             onClick={() => toggleExpand()}
           >
             See more
@@ -52,7 +52,7 @@ export function SeeMore({ content }) {
           <span className="text-wrap break-all">{content}
             <span>
             <button
-              className="font-sans font-medium text-indigo-600 hover:text-indigo-900 hover:cursor-pointer ml-2 focus:outline-none"
+              className="font-sans font-medium text-sky-600 hover:text-sky-900 hover:cursor-pointer ml-2 focus:outline-none"
               onClick={() => toggleExpand()}
             >
               See less

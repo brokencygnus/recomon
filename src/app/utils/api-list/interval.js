@@ -1,9 +1,18 @@
+// Input and output dates are guard-claused by undefined
+//
 // For week, weekArray = [0, 1, 0, 0, 1, 0, 0] # length 7
 // For two weeks, fortnightArray = [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0] # length 14
 // Else, primaryInterval = 3
 // For time, use primaryInterval and secondaryInterval for hours and minutes
+
+import { config } from "@/app/constants/config"
+
 // Pass an object with params startingDate, intervalType, intervalOption, primaryInterval, weekArray, secondaryInterval
 export const NextInterval = (paramObj) => {
+  if (!paramObj.startingDate || !paramObj.primaryInterval){
+    return undefined
+  }
+
   var nextDate = new Date(limitYear(paramObj.startingDate))
 
   switch (paramObj.intervalType.value) {
@@ -30,13 +39,13 @@ export const NextInterval = (paramObj) => {
     case "week": // Select days of week that apply
       let daysToAdd = 0
       let weeksToAdd = 0
-      for (let i = 1; i <= 7; i++) {
-        const currentDay = (nextDate.getDay() + i - 1) % 7
+      for (let i = 0; i < 7; i++) {
+        const currentDay = (nextDate.getDay() + i) % 7
         if (paramObj.weekArray[currentDay] === true) {
           if (currentDay <= nextDate.getDay()) { // Check if the week has changed
             weeksToAdd = (paramObj.primaryInterval - 1) * 7
           }
-          daysToAdd = i + weeksToAdd
+          daysToAdd = i + 1 + weeksToAdd
           break
         }
       }
@@ -97,6 +106,11 @@ export const RecursiveNextInterval = (i, paramObj, currentData = []) => {
   }
 
   const nextDate = NextInterval(paramObj)
+
+  if (nextDate === undefined) {
+    return undefined
+  }
+
   currentData.push(nextDate)
 
   const newParamObj = {
@@ -128,6 +142,10 @@ export const RecursiveFutureNextInterval = (i, paramObj, currentData = []) => {
     }
   }
 
+  if (nextDate === undefined) {
+    return undefined
+  }
+
   currentData.push(nextDate)
 
   return RecursiveNextInterval(i - 1, newParamObj, currentData)
@@ -139,7 +157,7 @@ const limitYear = (dateString) => {
   if (!dateString) {return dateString}
   const date = new Date(dateString)
 
-  date.setUTCFullYear(Math.min(2100, date.getUTCFullYear()))
-  date.setUTCFullYear(Math.max(1999, date.getUTCFullYear()))
+  date.setUTCFullYear(Math.min(config.maxYear, date.getUTCFullYear()))
+  date.setUTCFullYear(Math.max(config.minYear, date.getUTCFullYear()))
   return date
 }

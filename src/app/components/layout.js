@@ -1,6 +1,6 @@
 'use client'
 import "../globals.css";
-import React, { Fragment, useState } from 'react'
+import { createContext, useState } from 'react'
 import {
   Menu,
   MenuButton,
@@ -15,15 +15,17 @@ import {
   CodeBracketIcon,
   CameraIcon,
   BugAntIcon,
+  NewspaperIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { businessUnits, currencies } from "@/app/constants/mockdata/mockdata";
+import { businessUnits, currencies, menusNotifications } from "@/app/constants/mockdata/mockdata";
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
 import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
 import { NotificationMenu } from '@/app/components/notifications/notification_menu'
-import { Dropdown } from "./dropdown";
-import { config } from "../constants/config";
+import { Dropdown } from "@/app/components/dropdown";
+import { config } from "@/app/constants/config";
+import { NotificationBadges } from "./notifications/notification_badges";
 
 const businessUnitNav = structuredClone(businessUnits)
   .concat({ id: 0, name: 'View All', href: '/business-units' })
@@ -33,6 +35,7 @@ const navigation = [
   { code: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
   { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
   { code: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
+  { code: 'log', name: 'Activity Log', href: '/activity-log', icon: NewspaperIcon, submenus: []},
 ]
 
 config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: BugAntIcon, submenus: []})
@@ -47,7 +50,7 @@ function classNames(...classes) {
 }
 
 // Context to configure reference currency on the sticky header
-export const RefCurContext = React.createContext({});
+export const RefCurContext = createContext({});
 
 // Import this if you want to use RefCurContext
 export const convertedCurrency = (amount, currency, referenceCurrency, signed=false) => {
@@ -112,90 +115,111 @@ export default function Layout({ children, currentTab }) {
           onMouseLeave={handleMouseLeaveSidebar}
           className={classNames(
             'transition-all ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
-            "fixed inset-y-0 left-0 z-[61] block w-20 overflow-visible bg-indigo-600 pb-10"
+            "fixed inset-y-0 left-0 z-[61] block w-20 overflow-visible bg-stone-600 pb-10"
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
             <div className="flex pt-6 shrink-0 items-center justify-center">
               <img
                 className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                src="https://tailwindui.com/img/logos/mark.svg?color=sky&shade=500"
                 alt="Your Company"
               />
             </div>
             <div className="flex flex-col flex-grow justify-between">
               <nav className="mt-8">
                 <ul role="list" className="flex flex-1 flex-col items-start gap-y-1">
-                  {navigation.map((item) => (
+                  {navigation.map((navMenu) => (
                     <li
-                      onMouseEnter={() => handleMouseEnterMenu(item.name)}
+                      onMouseEnter={() => handleMouseEnterMenu(navMenu.name)}
                       onMouseLeave={handleMouseLeaveMenu}
-                      key={item.name}
+                      key={navMenu.name}
                       className="relative w-full">
                       <a
-                        href={item.href}
+                        href={navMenu.href}
                         className={classNames(
-                          item.code == currentTab ? 'bg-indigo-700 text-white' : hoveredMenu === item.name ? 'bg-indigo-700 text-white' : 'text-indigo-200',
+                          navMenu.code == currentTab ? 'bg-stone-700 text-white' : hoveredMenu === navMenu.name ? 'bg-stone-700 text-white' : 'text-stone-200',
                           'transition-all ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
-                        <item.icon
+                        <navMenu.icon
                           className={classNames(
-                            item.code == currentTab ? 'text-white' : hoveredMenu === item.name ? 'text-white' : 'text-indigo-200',
+                            navMenu.code == currentTab ? 'text-white' : hoveredMenu === navMenu.name ? 'text-white' : 'text-stone-200',
                             'h-6 w-6 shrink-0'
                           )}
                           aria-hidden="true"
                         />
+                        {menusNotifications.find(menu => menu.code === navMenu.code).notifications && (
+                          <div className="absolute top-1.5 right-1.5">
+                            <svg viewBox="0 0 2 2" className="h-2.5 w-2.5 rounded-full fill-red-500">
+                              <circle cx={1} cy={1} r={1} />
+                            </svg>
+                          </div>
+                        )}
                         <p className={classNames(
                           'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                           'text-nowrap overflow-hidden',
                         )}>
-                          {item.name}
+                          {navMenu.name}
                         </p>
-                        <span className="sr-only">{item.name}</span>
+                        <span className="sr-only">{navMenu.name}</span>
                       </a>
-                      { item.submenus.length > 0 ? (
-                        <div className={classNames(
-                          'transition-all ease-in-out', hoveredMenu === item.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
-                          "absolute left-12 top-0"
-                          )}>{/* Hacky way to extend the hover surface */}
-                          <div
-                            hidden = {hoveredMenu !== item.name}
-                            className={classNames(
-                              "ml-8",
-                              "rounded-md bg-white shadow-sm border border-gray-200 overflow-hidden"
-                          )}>
-                            <dl className="grid grid-cols-1 divide-y-2 divide-gray-200 text-sm leading-6">
-                              { item.submenus.map((item) => (
-                                <a
-                                  key={item.id}
-                                  href={"/business-unit/" + item.slug}
-                                  className="group flex items-center pl-6 pr-20 py-3 hover:bg-gray-100"
-                                >
-                                  <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">{item.name}</dt>
-                                </a>
-                              ))}
-                            </dl>
+                      { navMenu.code === "bu" ?
+                        navMenu.submenus.length > 0 ? (
+                          <div className={classNames(
+                            'transition-all ease-in-out', hoveredMenu === navMenu.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
+                            "absolute left-12 top-0"
+                            )}>{/* Hacky way to extend the hover surface */}
+                            <div
+                              hidden = {hoveredMenu !== navMenu.name}
+                              className={classNames(
+                                "ml-8",
+                                "rounded-md bg-white shadow-sm border border-gray-200"
+                            )}>
+                              <dl className="flex flex-col divide-y-2 divide-gray-200 text-sm leading-6">
+                                { navMenu.submenus.map((submenu) => (
+                                  <a
+                                    key={submenu.id}
+                                    href={"/business-unit/" + submenu.slug}
+                                    className="group flex items-center px-6 py-3 hover:bg-gray-100"
+                                  >
+                                    <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">
+                                      <div className="flex w-48 items-center justify-between gap-x-3">
+                                        {submenu.name}
+                                        {submenu.alerts && submenu.alerts.length !== 0 &&
+                                          <div className="flex gap-x-1">
+                                            <NotificationBadges size="sm" alerts={submenu.alerts}/>
+                                          </div>
+                                        }
+                                      </div>
+                                    </dt>
+                                  </a>
+                                ))}
+                              </dl>
+                            </div>
                           </div>
-                        </div>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-              <ul role="list" className="flex h-full flex-1 flex-col items-start justify-end gap-y-3">
+                        ) : null
+                        :
+                        // If for some reason other menus other than business unit
+                        // needs their submenus, add their logic here.
+                        null}
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+                <ul role="list" className="flex h-full flex-1 flex-col items-start justify-end gap-y-3">
                   <li
                     className="mt-auto"
                   >
                     <a
-                      href="#"
+                      href="/settings"
                       className={classNames(
                         'transition-all ease-in-out', expanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
-                        'group flex gap-x-3 rounded-md p-3 text-indigo-200 hover:bg-indigo-700 hover:text-white text-sm font-semibold leading-6'
+                        'group flex gap-x-3 rounded-md p-3 text-stone-200 hover:bg-stone-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
                       <Cog6ToothIcon
-                        className="h-6 w-6 shrink-0 text-indigo-200 group-hover:text-white"
+                        className="h-6 w-6 shrink-0 text-stone-200 group-hover:text-white"
                         aria-hidden="true"
                       />
                       <p className={classNames(
@@ -215,7 +239,7 @@ export default function Layout({ children, currentTab }) {
           <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
-            {/* <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" /> */}
+            <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" />
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form className="relative flex flex-1" action="#" method="GET">

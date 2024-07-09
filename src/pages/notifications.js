@@ -11,8 +11,8 @@ function classNames(...classes) {
 export default function NotificationsPage() {
   return (
       <Layout>
-        <div className="bg-zinc-50 min-h-full pb-16">
-          <main className="container max-w-3xl mx-auto py-10 px-12 2xl:px-16">
+        <div className="bg-stone-100 min-h-full pb-16">
+          <main className="mx-auto max-w-7xl pt-16 px-8">
             <NotificationHeader />
             <NotificationsList notifications={notifications}/>
           </main>
@@ -35,13 +35,13 @@ function NotificationHeader() {
       </div>
       <div className="flex items-center">
         <button
-          className="h-10 flex text-nowrap items-center rounded px-3 text-sm font-semibold text-gray-500 hover:text-indigo-600"
+          className="h-10 flex text-nowrap items-center rounded px-3 text-sm font-semibold text-gray-500 hover:text-sky-600"
         >
           Mark all as read
         </button>
         <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" />
         <a href="/settings?tab=notifications" className="px-3">
-          <Cog6ToothIcon className="h-5 w-5 text-gray-500 hover:text-indigo-600" />
+          <Cog6ToothIcon className="h-5 w-5 text-gray-500 hover:text-sky-600" />
         </a>
       </div>
     </div>

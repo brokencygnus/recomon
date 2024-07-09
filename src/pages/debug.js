@@ -7,6 +7,7 @@ import { ToastContext, toastColors } from '@/app/components/toast'
 import { AlertContext } from '@/app/components/notifications/alert'
 import { Dropdown } from '@/app/components/dropdown'
 import { notificationTypes } from '@/app/constants/notifications'
+import { stringToColor } from '@/app/components/currency_icon';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -43,11 +44,18 @@ export default function APIPage() {
             <div className="col-span-1 h-96">
               <Card>
                 <ToastModule />
+              </Card>
+            </div>
+            <div>
+              <Card>
                 <AlertModule />
               </Card>
             </div>
-            <div className="col-span-1 h-96"><Slot>Slot 2</Slot></div>
-            <div className="col-span-1 h-96"><Slot>Slot 3</Slot></div>
+            <div>
+              <Card>
+                <ColorModule />
+              </Card>
+            </div>
             <div className="col-span-1 h-96"><Slot>Slot 4</Slot></div>
             <div className="col-span-1 h-96"><Slot>Slot 5</Slot></div>
             <div className="col-span-1 h-96"><Slot>Slot 6</Slot></div>
@@ -137,7 +145,7 @@ function ToastModule() {
     <div>
       <div className="flex justify-between gap-x-3">
         <div className="flex flex-col">
-          <p className="text-md font-medium text-gray-700">New toast</p>
+          <p className="text-md font-medium text-gray-700">Toast Launcher</p>
           <p className="text-sm text-gray-500">Launch a new toast based on the parameters below.</p>
         </div>
         <div>
@@ -157,7 +165,7 @@ function ToastModule() {
             type="text"
             value={toastContents}
             onChange={handleToastContent}
-            className="block w-full rounded-md border-0 py-1.5 text-sm text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 leading-6"
+            className="block w-full rounded-md border-0 py-1.5 text-sm text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
           />
         </div>
         <Dropdown
@@ -180,9 +188,9 @@ function AlertModule() {
   return (
     <div>
       <div className="flex flex-col">
-        <p className="text-md font-medium text-gray-700">New alert</p>
+        <p className="text-md font-medium text-gray-700">Alert Launcher</p>
         <p className="text-sm text-gray-500">Launch a new preset alert.</p>
-        <div className="grid grid-cols-3 gap-x-3 gap-y-2 mt-4">
+        <div className="grid grid-cols-2 3xl:grid-cols-3 gap-x-3 gap-y-2 mt-4">
           <button
             type="button"
             onClick={() => addAlert(notificationTypes["gap_critical_entireBU"]({ buName: "Exchange", buSlug: "exchange" }))}
@@ -235,5 +243,40 @@ function AlertModule() {
         </div>
       </div>
     </div>
+  )
+}
+
+
+function ColorModule() {
+  const [text, setText] = useState(null)
+
+  const handleTextChange = (event) => {
+    const { value } = event.target
+    setText(value)
+  }
+
+  return (
+    <div>
+      <div className="flex flex-col">
+        <p className="text-md font-medium text-gray-700">Color Generator</p>
+        <p className="text-sm text-gray-500">Generate a color from an arbitrary string. This color generation method is used as fallback if a currency has no icons, as it's chaotic &#40;but deterministic!&#41;.</p>
+        <div className="grid grid-cols-3 gap-x-3 gap-y-2 mt-4"></div>
+        <div className="flex mt-2 gap-x-3">
+          <div className="flex grow flex-col">
+            <p className="mb-1 block text-sm font-medium text-gray-900">Arbitrary string</p>
+            <input
+              type="text"
+              value={text}
+              onChange={handleTextChange}
+              className="block w-full rounded-md border-0 py-1.5 text-sm text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
+              placeholder="Enter absolutely anything"
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-center mt-8">
+          <div style={{ backgroundColor:stringToColor(text) }} className="size-24 rounded-xl ring-4 ring-offset-4 ring-gray-300"/>
+        </div>
+      </div>
+      </div>
   )
 }

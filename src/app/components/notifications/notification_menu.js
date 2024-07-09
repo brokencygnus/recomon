@@ -32,7 +32,7 @@ export function NotificationMenu() {
             <NotificationCard data={notification} displayedIn="popover"/>
           ))}
           <div className="sticky bottom-0 flex bg-white z-40 border-t border-gray-200 hover:bg-gray-50 shadow-sm">
-            <a href="/notifications" className="grow font-semibold text-center text-sm text-gray-500 hover:text-indigo-700 p-4 pt-3">View all</a>
+            <a href="/notifications" className="grow font-semibold text-center text-sm text-gray-500 hover:text-sky-600 p-4 pt-3">View all</a>
           </div>
         </MenuItems>
       </Transition>

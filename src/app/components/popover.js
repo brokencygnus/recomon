@@ -11,8 +11,8 @@ const positions = {
 };
 
 const margins = {
-  top: "-translate-y-2",
-  bottom: "translate-y-2"
+  top: "-translate-y-4",
+  bottom: "translate-y-4"
 };
 
 const childPositions = {
@@ -75,7 +75,7 @@ export function PopoverComp({ children, position="top" }) {
           >
             <PopoverPanel className={classNames(positions[position], "size-0 absolute left-1/2 top-1/2 flex items-center z-40")}>
               <div className={classNames(childPositions[position], "w-0 absolute -translate-x-1/2")}>
-                <div className={classNames(margins[position],"w-max max-w-72 text-center rounded-md break-words bg-white px-3 py-2 shadow-sm ring-1 ring-inset ring-gray-300 -translate-x-1/2")}>
+                <div className={classNames(margins[position],"w-max max-w-72 text-center rounded-md whitespace-normal break-words bg-white px-2 py-1 shadow-sm ring-1 ring-inset ring-gray-300 -translate-x-1/2")}>
                   {childrenArray[1]}
                 </div>
               </div>
