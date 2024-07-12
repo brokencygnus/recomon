@@ -6,59 +6,70 @@ import { convertShortDate } from '@/app/utils/dates'
 // "Grant Sanderson set the description of CCLC Calculus Class to ..."
 // "Nigel Braun set the currency of CHEV-091 Petroleum Industry Takeover to USD"
 export const activity = {
-  "business_unit": {
+  "businessUnit": {
     "create": ({ buCode, buName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the business unit {buCode} {buName}</p>
+      <p className="font-normal"><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</p>
     ),
-    "update": ({ buCode, buName, oldData, newData }) => ( // data: { code, name, description }
+    "update": ({ buCode, buName, oldData, newData }) => ( // data: { buCode, buName, description }
       <Compare of={`${buCode} ${buName}`} fromObj={oldData} toObj={newData}/>
     ),
     "delete": ({ buCode, buName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}</p>
+      <p className="font-normal"><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</p>
     ),
   },
   "account": {
     "create": ({ accountCode, accountName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the account {accountCode} {accountName}</p>
+      <p className="font-normal"><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</p>
     ),
-    "update_metadata": ({ accountCode, accountName, oldData, newData }) => ( // data: { code, name, description, currency, accountType }
+    "updateMetadata": ({ accountCode, accountName, oldData, newData }) => ( // data: { accountCode, accountName, description, currency, accountType }
       <Compare of={`${accountCode} ${accountName}`} fromObj={oldData} toObj={newData}/>
     ),
-    "update_balance": ({ accountCode, accountName, oldBalance, newBalance }) => ( // balance: string
-      <Compare of={`${accountCode} ${accountName}`} fromObj={{balance:oldBalance}} toObj={{balance:newBalance}}/>
+    "updateBalance": ({ accountCode, accountName, currency, oldBalance, newBalance }) => ( // balance: string
+      <Compare of={`${accountCode} ${accountName}`} fromObj={{balance:`${oldBalance} ${currency}`}} toObj={{balance:`${newBalance} ${currency}`}}/>
     ), 
-    "update_data_source": ({ accountCode, accountName, oldData, newData }) => ( // data: { dataSourceType, apiID, network, blockchainAddress }
+    "updateDataSource": ({ accountCode, accountName, oldData, newData }) => ( // data: { dataSourceType, api = `{code} {name}`, network, blockchainAddress }
       <Compare of={`${accountCode} ${accountName}`} fromObj={oldData} toObj={newData}/>
     ),
     "delete": ({ accountCode, accountName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}</p>
+      <p className="font-normal"><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</p>
+    ),
+  },
+  "api": {
+    "create": ({ apiCode, apiName }) => (
+      <p className="font-normal"><span className="font-semibold">Created </span> the business unit {apiCode} {apiName}.</p>
+    ),
+    "update": ({ apiCode, apiName, oldData, newData }) => ( // data: { apiCode, apiName, url, customHeaders }
+      <Compare of={`${apiCode} ${apiName}`} fromObj={oldData} toObj={newData}/>
+    ),
+    "delete": ({ apiCode, apiName }) => (
+      <p className="font-normal"><span className="font-semibold">Deleted </span> the business unit {apiCode} {apiName}.</p>
     ),
   },
   "config": {
     "organization": null, // TBD
     "currency": null, // TBD 
-    "default_snapshot": ({ oldConfig, newConfig }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
+    "defaultSnapshot": ({ oldConfig, newConfig }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
       <CompareFreqConfig configName={"default snapshot frequency settings"} of={null} fromObj={oldConfig} toObj={newConfig}/>
     ), 
-    "bu_snapshot": ({ buCode, buName, oldConfig, newConfig }) => (
+    "buSnapshot": ({ buName, oldConfig, newConfig }) => (
       <CompareFreqConfig configName={"snapshot frequency settings"} of={`${buName}`} fromObj={oldConfig} toObj={newConfig}/>
     ), 
-    "default_api_retrieval": ({ oldConfig, newConfig }) => (
+    "defaultApiRetrieval": ({ oldConfig, newConfig }) => (
       <CompareFreqConfig configName={"default API retrieval settings"} of={null} fromObj={oldConfig} toObj={newConfig}/>
     ), 
-    "specific_api_retrieval": ({ apiCode, apiName, oldConfig, newConfig }) => (
+    "specificApiRetrieval": ({ apiCode, apiName, oldConfig, newConfig }) => (
       <CompareFreqConfig configName={"API retrieval settings"} of={`${apiCode} ${apiName}`} fromObj={oldConfig} toObj={newConfig}/>
     ), 
     // I think we should skip this one, it needs a bespoke function for it
     // and it's not even worth the time for something that probably shouldn't be in activity log anyway
     //
-    // "bu_notifications": ({ buCode, buName, oldConfig, newConfig }) => ( // config: { buIsSendPush, buIsSendEmail, currencyIsSendPush, currencyIsSendEmail, IsRemindUpdate, remindUpdateDays, isNotifyApiFailed, isNotifyApiError, repeatNotif }
+    // "buNotifications": ({ buCode, buName, oldConfig, newConfig }) => ( // config: { buIsSendPush, buIsSendEmail, currencyIsSendPush, currencyIsSendEmail, IsRemindUpdate, remindUpdateDays, isNotifyApiFailed, isNotifyApiError, repeatNotif }
     //   <Compare of={`${buName} notification settings`} fromObj={oldConfig} toObj={newConfig}/>
     // ), 
-    "bu_discrepancy": ({ buCode, buName, oldConfig, newConfig }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
+    "buDiscrepancy": ({ buName, oldConfig, newConfig }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
       <Compare of={`${buName} discrepancy settings`} fromObj={oldConfig} toObj={newConfig}/>
     ),
-    "currency_discrepancy": ({ currencySymbol, oldConfig, newConfig }) => (
+    "currencyDiscrepancy": ({ currencySymbol, oldConfig, newConfig }) => (
       <Compare of={`${currencySymbol} discrepancy settings`} fromObj={oldConfig} toObj={newConfig}/>
     )
   }
@@ -313,21 +324,28 @@ const parseVal = (thing) => {
 
 // dictionary to translate to human readable
 const keyDict = {
-  "business_unit": "business unit",
-  "code": "code",
-  "name": "name",
+  "businessUnit": "business unit",
+  "buCode": "code",
+  "buName": "name",
   "description": "description",
   "account": "account",
+  "accountCode": "code",
+  "accountName": "name",
   "currency": "currency",
-  "account_type": "account type",
-  "data_source": "data source",
+  "accountType": "account type",
+  "dataSource": "data source",
+  "dataSourceType": "data source",
   "api": "API",
   "balance": "balance",
   "basis": "basis",
-  "crit_high": "critical high threshold",
-  "acctble_high": "acceptable high threshold",
-  "crit_low": "critical low threshold",
-  "acctble_low": "acceptable low threshold",
+  "apiCode": "code",
+  "apiName": "name",
+  "url" : "URL",
+  "customHeaders": "custom headers",
+  "critHigh": "critical high threshold",
+  "acctbleHigh": "acceptable high threshold",
+  "critLow": "critical low threshold",
+  "acctbleLow": "acceptable low threshold",
   "basis": "basis"
 }
 

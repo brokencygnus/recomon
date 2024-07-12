@@ -49,12 +49,7 @@ export default function SnapshotPage() {
     const searchArray = value.split(" ")
     setSearchTerm(searchArray)
   }
-
-  const handleDateRangeChange = (value) => {
-    setDateRange(value)
-    console.log(value)
-  }
-
+  
   const handleResetFilters = () => {
     resetRouter()
     // TODO set default date range based on API later
@@ -139,7 +134,7 @@ export default function SnapshotPage() {
             <div className="sticky top-0 bg-white px-12 2xl:px-16 z-[2]">
               <SnapshotFilter 
                 handleSearchChange={handleSearchChange}
-                handleDateRangeChange={handleDateRangeChange}
+                handleDateRangeChange={setDateRange}
                 handleResetFilters={handleResetFilters}
               />
             </div>
