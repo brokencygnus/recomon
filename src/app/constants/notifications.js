@@ -5,7 +5,7 @@ export const notificationTypes = {
     header: "Critical gap in business unit",
     body: `The ${buName} business unit as a whole has reached the critical gap threshold.`,
     link: "Investigate immediately.",
-    href: `/business-unit/${buSlug}`
+    href: `/business-units/${buSlug}`
   }),
 
   "gap_critical_currency": ({ buName, buSlug, curSymbol }) => ({
@@ -14,7 +14,7 @@ export const notificationTypes = {
     header: "Critical gap in currency",
     body: `The ${curSymbol} currency of the ${buName} business unit has reached the critical gap threshold.`,
     link: "Investigate immediately.",
-    href: `/business-unit/${buSlug}?currency=${curSymbol}`
+    href: `/business-units/${buSlug}?currency=${curSymbol}`
   }),
 
   "gap_unacceptable_entireBU": ({ buName, buSlug }) => ({
@@ -23,7 +23,7 @@ export const notificationTypes = {
     header: "Gap in business unit",
     body: `The ${buName} business unit as a whole has surpassed the acceptable gap threshold.`,
     link: "Review",
-    href: `/business-unit/${buSlug}`
+    href: `/business-units/${buSlug}`
   }),
 
   "gap_unacceptable_currency": ({ buName, buSlug, curSymbol }) => ({
@@ -32,7 +32,7 @@ export const notificationTypes = {
     header: "Gap in currency",
     body: `The ${curSymbol} currency of the ${buName} business unit has surpassed the acceptable gap threshold.`,
     link: "Review",
-    href: `/business-unit/${buSlug}?currency=${curSymbol}`
+    href: `/business-units/${buSlug}?currency=${curSymbol}`
   }),
 
   "new_snapshot": ({ buName, buSlug, snapshotID }) => ({
@@ -41,7 +41,7 @@ export const notificationTypes = {
     header: "Snapshot taken!",
     body: `A snapshot has been taken of your business unit ${buName}.`,
     link: "View",
-    href: `/business-unit/${buSlug}/snapshot/${snapshotID}`
+    href: `/business-units/${buSlug}/snapshot/${snapshotID}`
   }),
 
   "api_config_error": ({ apiID }) => ({
@@ -70,7 +70,7 @@ export const notificationTypes = {
     header: "Blockchain connection failed",
     body: `A retrieval attempt to the ${networkName} network has failed. Your ${currencyName} balance data might be outdated.`,
     link: "Review",
-    href: `/business-unit/${buSlug}`
+    href: `/business-units/${buSlug}`
   }),
 
   // TODO change link to account page if it exists
@@ -78,8 +78,8 @@ export const notificationTypes = {
     icon: "info",
     color: "gray",
     header: `Data age more than ${daysSinceLastUpdate} days`,
-    body: `Your ${accountName} account in ${buName} has not been updated for ${daysSinceLastUpdate} days. Consider updating its data or mark it as updated.`,
+    body: `Your ${accountName} account in ${buName} has not been updated for ${daysSinceLastUpdate} days. Consider updating its data or mark it as up-to-date.`,
     link: "Review",
-    href: `/business-unit/${buSlug}`
+    href: `/business-units/${buSlug}`
   }),
 }

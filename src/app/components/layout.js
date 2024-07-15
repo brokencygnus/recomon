@@ -119,11 +119,17 @@ export default function Layout({ children, currentTab }) {
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
             <div className="flex pt-6 shrink-0 items-center justify-center">
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=sky&shade=500"
-                alt="Your Company"
-              />
+              <svg
+                className="h-8 w-auto fill-stone-400"
+                width="208" height="199" viewBox="0 0 224 199" fill="none" xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M166 0H191C199.284 0 206 6.71573 206 15V30C206 38.2843 199.284 45 191 45H166V0Z" fill=""/>
+                <path d="M186 154H209C217.284 154 224 160.716 224 169V184C224 192.284 217.284 199 209 199H186V154Z" fill=""/>
+                <path d="M148 77H173C181.284 77 188 83.7157 188 92V107C188 115.284 181.284 122 173 122H148V77Z" fill=""/>
+                <rect x="18" width="160" height="45" fill=""/>
+                <rect x="36" y="154" width="160" height="45" fill=""/>
+                <rect y="77" width="160" height="45" fill=""/>
+              </svg>
             </div>
             <div className="flex flex-col flex-grow justify-between">
               <nav className="mt-8">
@@ -180,7 +186,7 @@ export default function Layout({ children, currentTab }) {
                                 { navMenu.submenus.map((submenu) => (
                                   <a
                                     key={submenu.id}
-                                    href={"/business-unit/" + submenu.slug}
+                                    href={"/business-units/" + submenu.slug}
                                     className="group flex items-center px-6 py-3 hover:bg-gray-100"
                                   >
                                     <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">

@@ -24,7 +24,7 @@ function classNames(...classes) {
 
 import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { exchangeCurrencies, exchangeSummary } from "@/app/constants/mockdata/exchange_mockdata";
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 
 // Mock data end
@@ -96,7 +96,7 @@ export function ReconciliationHeader({ businessUnit, snapshotID=undefined }) {
                 View snapshots
               </a>
               <a
-                href={`/business-unit/${businessUnit?.slug}/accounts`}
+                href={`/business-units/${businessUnit?.slug}/accounts`}
                 className="h-10 flex text-nowrap items-center rounded px-2 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
               >
                 View all accounts
@@ -137,24 +137,24 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
 
     if (!snapshotID) {
       router.replace({
-        pathname: '/business-unit/[business-unit]',
+        pathname: '/business-units/[business-unit]',
         query: {
           'business-unit': businessUnit.slug,
           'currency': newCurrency
         }
       }, 
-      `/business-unit/${businessUnit.slug}?currency=${newCurrency}`, 
+      `/business-units/${businessUnit.slug}?currency=${newCurrency}`, 
       { shallow: true })
     } else {
       router.replace({
-        pathname: '/business-unit/[business-unit]/snapshot/[snapshot-id]',
+        pathname: '/business-units/[business-unit]/snapshot/[snapshot-id]',
         query: {
           'business-unit': businessUnit.slug,
           'snapshot-id': snapshotID,
           'currency': newCurrency
         }
       }, 
-      `/business-unit/${businessUnit.slug}/snapshot/${snapshotID}?currency=${newCurrency}`, 
+      `/business-units/${businessUnit.slug}/snapshot/${snapshotID}?currency=${newCurrency}`, 
       { shallow: true })
     }
   };
@@ -446,13 +446,21 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     const convert = (amount) => convertedCurrency(amount, symbol, referenceCurrency)
 
     const { addToast } = useContext(ToastContext)
-    const launchToast = () => {
+    const launchSaveToast = () => {
       addToast({ color: "green", message: "Account balance saved!" })
+    }
+    const launchMarkToast = () => {
+      addToast({ color: "sky", message: "Marked account as up-to-date." })
     }
 
     const handleSave = () => {
       // Insert API implementation here
-      launchToast()
+      launchSaveToast()
+    }
+
+    const markAsUpdated = () => {
+      // Insert API Implementation here
+      launchMarkToast()
     }
 
     return (
@@ -466,7 +474,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
               <div className="flex items-end">
                 <Link
                   href={{
-                    pathname: `/business-unit/${businessUnit?.slug}/accounts`,
+                    pathname: `/business-units/${businessUnit?.slug}/accounts`,
                     query: { action: 'new', "account-type": type, currency: symbol },
                   }}
                   className="text-sky-600 hover:text-sky-900"
@@ -525,8 +533,8 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                         { !snapshotID && account.dataSource == "manual" ?
                           <EditableField
                             onSave={handleSave}
-                            inputClass="block w-52 px-2 py-1 rounded-md border-0 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
-                            pClass="text-sm px-2 py-2 text-gray-500"
+                            inputClass="block px-2 py-1 rounded-md border-0 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
+                            pClass="text-sm py-2 text-gray-500"
                             defaultValue={account.balance}
                             unit={symbol}
                           >                          
@@ -541,13 +549,28 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{convert(account.balance)}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{dataSources.find((data) => data.value == account.dataSource).name}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <div className='w-fit'>
+                        <div className="w-fit flex gap-x-3">
                           <ClientOnly>
                             <PopoverComp position="top">
                               {/* TODO when converting to API-consumed data, please implement snapshot time instead of new Date() for snapshots */}
                               <p className="hover:text-sky-600">{convertMsToTimeAgo(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
                               <p className="text-sm text-gray-900">{convertAgeMsToDateTime(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
                             </PopoverComp>
+                            {/* Somehow the following <button> needs to be CSR for some reason
+                                The above <p>s are client only because of the data, there should
+                                be no reason why the <button>s triggers hydration errors ??? */}
+                            {!snapshotID && account.dataSource == "manual" &&
+                              <PopoverComp position="top">
+                                <button className="text-gray-500 hover:text-sky-600"
+                                  onClick={markAsUpdated}
+                                >  
+                                  <DocumentCheckIcon 
+                                    className="h-4 w-4"
+                                  />
+                                </button>
+                                <p className="text-sm text-gray-900">Mark as up-to-date</p>
+                              </PopoverComp>
+                            }
                           </ClientOnly>
                         </div>
                       </td>
@@ -555,7 +578,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-2 text-right text-sm font-semibold">
                           <Link
                             href={{
-                              pathname: `/business-unit/${businessUnit?.slug}/accounts`,
+                              pathname: `/business-units/${businessUnit?.slug}/accounts`,
                               query: { action: 'edit', edit: account.code },
                             }}
                             className="text-sky-600 hover:text-sky-900"

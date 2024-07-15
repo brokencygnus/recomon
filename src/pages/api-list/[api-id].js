@@ -3,8 +3,8 @@ import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import ClientOnly from '@/app/components/csr';
 import { TestConnectionDetails, LastConnectionDetails } from '@/app/components/sections/test_connection';
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { ToastContext } from '@/app/components/toast';
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 
 // mock data start
 
@@ -23,7 +23,6 @@ export default function APIPage() {
     { name: 'Endpoint Details', href: '#', current: true },
   ]
 
-  const [isEdit, setIsEdit] = useState(false);
 
   return (
     <Layout currentTab="api">
@@ -34,14 +33,7 @@ export default function APIPage() {
         >
           <div className="w-3/5 pb-16 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
-            <APIDetailsHeader
-              isEdit={isEdit}
-              setIsEdit={setIsEdit}
-            />
-            <APIDetailsContent
-              APIData={APIs[0]}
-              isEdit={isEdit}
-            />
+            <APIDetails APIData={APIs[0]}/>
           </div>
         </div>
         <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-[6.5rem] pb-16 xl:px-8">
@@ -52,8 +44,17 @@ export default function APIPage() {
     </Layout>
   )
 }
+
+function APIDetails({ APIData }) {
+  const [isEdit, setIsEdit] = useState(false);
+
+  const [formState, setFormState] = useState({
+    "code": APIData?.code ?? '',
+    "api-name": APIData?.name ?? '',
+    "url": APIData?.url.replace(/^https?:\/\//, '') ?? '',
+    "custom-headers": APIData?.custom_headers ? JSON.stringify(JSON.parse(APIData?.custom_headers), null, 2) : '',
+  });
   
-function APIDetailsHeader({ isEdit, setIsEdit }) {
   const { addToast } = useContext(ToastContext)
   const launchToast = () => {
     addToast({ color: "green", message: "Endpoint details edited!" })
@@ -65,6 +66,24 @@ function APIDetailsHeader({ isEdit, setIsEdit }) {
     // Enter save logic here
   }
 
+  return (
+    <>
+      <APIDetailsHeader
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
+        handleSave={handleSave}
+      />
+      <APIDetailsContent
+        formState={formState}
+        setFormState={setFormState}
+        APIData={APIs[0]}
+        isEdit={isEdit}
+      />
+    </>
+  )
+}
+  
+function APIDetailsHeader({ isEdit, setIsEdit, handleSave }) {
   return (
     <div className="flex items-center mb-4">
       <div className="flex-auto">
@@ -109,12 +128,16 @@ function APIDetailsHeader({ isEdit, setIsEdit }) {
 }
 
 
-function APIDetailsContent({ APIData, isEdit }) {
-
+function APIDetailsContent({ formState, setFormState, APIData, isEdit }) {
   return (
     <div className="flex flex-col divide-y divide-gray-900/10">
       <div className="pb-12">
-        <EditEndpoint APIData={APIData} isEdit={isEdit} />
+        <EditEndpoint
+          formState={formState}
+          setFormState={setFormState}
+          APIData={APIData}
+          isEdit={isEdit}
+        />
       </div>
       <div className="py-12">
         <TestConnectionDetails item={APIs[0]} />
@@ -137,14 +160,7 @@ function APIDetailsContent({ APIData, isEdit }) {
   )
 }
 
-function EditEndpoint({ APIData, isEdit }) {
-  const [formState, setFormState] = useState({
-    "code": APIData?.code ?? '',
-    "api-name": APIData?.name ?? '',
-    "url": APIData?.url.replace(/^https?:\/\//, '') ?? '',
-    "custom-headers": JSON.stringify(JSON.parse(APIData?.custom_headers), null, 2) ?? '',
-  });
-
+export function EditEndpoint({ formState, setFormState, APIData, isEdit }) {
   const handleFormChange = (event) => {
     const { name, value } = event.target;
 
@@ -179,46 +195,50 @@ function EditEndpoint({ APIData, isEdit }) {
         </p> */}
 
         <div className="grid grid-cols-4 gap-x-4 gap-y-6">
-          <div className="flex grid grid-cols-5 col-span-4 gap-x-6 ">
-            <div className="col-span-1">
-              <p className="block text-sm font-medium leading-6 text-gray-900">
-                Code
-              </p>
-              {isEdit ? (
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    name="code"
-                    value={formState["code"]}
-                    onChange={handleFormChange}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
-                    placeholder="A001"
-                  />
-                </div>
-              ) : (
-                <p className="mt-2 py-1.5 text-gray-500">{APIData?.code}</p>
-              )}
-            </div>
+          <div className="col-span-1">
+            <p className="block text-sm font-medium leading-6 text-gray-900">
+              Code
+            </p>
+            {isEdit ? (
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="code"
+                  value={formState?.["code"]}
+                  onChange={handleFormChange}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
+                  placeholder="A001"
+                />
+              </div>
+            ) : (
+              APIData?.code ?
+                <p className="mt-2 py-2 text-sm text-gray-500">{APIData.code}</p>
+              :
+                <p className="mt-2 py-2 text-sm text-gray-500 italic">&#40;No name set&#41;</p>
+            )}
+          </div>
 
-            <div className="col-span-4">
-              <p className="block text-sm font-medium leading-6 text-gray-900">
-                API name
-              </p>
-              {isEdit ? (
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    name="api-name"
-                    value={formState["api-name"]}
-                    onChange={handleFormChange}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
-                    placeholder="My API"
-                  />
-                </div>
-              ) : (
-                <p className="mt-2 py-1.5 text-gray-500">{APIData?.name}</p>
-              )}
-            </div>
+          <div className="col-span-3">
+            <p className="block text-sm font-medium leading-6 text-gray-900">
+              API name
+            </p>
+            {isEdit ? (
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="api-name"
+                  value={formState["api-name"]}
+                  onChange={handleFormChange}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6"
+                  placeholder="My API"
+                />
+              </div>
+            ) : (
+              APIData?.name ?
+                <p className="mt-2 py-1.5 text-sm text-gray-500">{APIData.name}</p>
+              :
+                <p className="mt-2 py-1.5 text-sm text-gray-500 italic">&#40;No name set&#41;</p>
+            )}
           </div>
 
           <div className="col-span-full">
@@ -240,14 +260,24 @@ function EditEndpoint({ APIData, isEdit }) {
                   </div>
               </div>
               ) : (
-                <p className="mt-2 py-1.5 text-wrap break-all text-gray-500">{APIData?.url}</p>
+                APIData?.url ?
+                  <p className="mt-2 py-2 text-sm text-wrap break-all text-gray-500">{APIData.url}</p>
+                :
+                  <p className="mt-2 py-2 text-sm text-gray-500 italic">&#40;No code set&#41;</p>
               )}
           </div>
 
           <div className="col-span-full">
-            <p className="block text-sm font-medium leading-6 text-gray-900">
-              Custom headers &#40;optional&#41;
-            </p>
+            <div className="flex justify-between">
+              <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
+                Custom headers
+              </label>
+              {isEdit &&
+                <span className="text-sm leading-6 text-gray-500" id="email-optional">
+                  Optional
+                </span>
+              }
+            </div>
             {isEdit ? (
               <>
                 <div className="mt-2 font-mono text-wrap break-all max-h-[8.5rem]">
@@ -259,21 +289,24 @@ function EditEndpoint({ APIData, isEdit }) {
                     rows={6}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 text-sm leading-6"
                     placeholder={`{ 
-"Authorization": "Bearer token",
-"Content-Type": "application/json"
+  "Authorization": "Bearer token",
+  "Content-Type": "application/json"
 }` /* Please don't "fix" the indentation, this is a template literal */}
                     />
                 </div>
               </>
             ) : (
-              <div className="mt-2 rounded-md bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300">
-                <p 
-                  className="px-3 py-1.5 text-sm font-mono text-wrap break-all text-gray-900 max-h-[8.5rem] leading-6 overflow-y-auto" 
-                  dangerouslySetInnerHTML={{ __html:
-                    JSON.stringify(JSON.parse(APIData?.custom_headers), null, 2)
-                    .replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;') }} 
-                />
-              </div>
+              APIData?.custom_headers ?
+                <div className="mt-2 rounded-md bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300">
+                  <p 
+                    className="px-3 py-1.5 text-sm font-mono text-wrap break-all text-gray-900 max-h-[8.5rem] leading-6 overflow-y-auto" 
+                    dangerouslySetInnerHTML={{ __html:
+                      JSON.stringify(JSON.parse(APIData.custom_headers), null, 2)
+                      .replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;') }} 
+                  />
+                </div>
+              :
+                <p className="mt-2 py-2 text-sm text-gray-500 italic">&#40;No custom headers set&#41;</p>
             )}
           </div>
         </div>

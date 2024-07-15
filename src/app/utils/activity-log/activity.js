@@ -36,13 +36,13 @@ export const activity = {
   },
   "api": {
     "create": ({ apiCode, apiName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the business unit {apiCode} {apiName}.</p>
+      <p className="font-normal"><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</p>
     ),
     "update": ({ apiCode, apiName, oldData, newData }) => ( // data: { apiCode, apiName, url, customHeaders }
       <Compare of={`${apiCode} ${apiName}`} fromObj={oldData} toObj={newData}/>
     ),
     "delete": ({ apiCode, apiName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the business unit {apiCode} {apiName}.</p>
+      <p className="font-normal"><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</p>
     ),
   },
   "config": {
@@ -79,6 +79,8 @@ export const activity = {
 // listObj: {"name": "A", "description": "B"}
 // unused for now
 // output: "name A and description B"
+
+//
 // export const listInWords = ({ listObj }) => {
 //   let str = ""
 //   const keys = Object.keys(listObj)
@@ -102,6 +104,7 @@ export const joinWithAnd = (stringArray) => {
   return `${rest.join(", ")}, and ${last}`
 }
 
+// Generic compare
 export function Compare({ of, fromObj, toObj }) {
   const fromKeys = Object.keys(fromObj)
   const toKeys = Object.keys(toObj)
@@ -186,6 +189,7 @@ export function Compare({ of, fromObj, toObj }) {
   )
 }
 
+// Compare frequency config
 export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
   let newFromObj = {}
   let newToObj = {}
@@ -312,7 +316,7 @@ const parseKey = (thing) => {
   }
 }
 
-// Translate key to human readable
+// Translate val to human readable
 const parseVal = (thing) => {
   if (thing in valDict) {
     return valDict[thing]

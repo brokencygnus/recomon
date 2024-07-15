@@ -1,4 +1,4 @@
-import { ReconciliationHeader, ReconciliationSection } from '@/pages/business-unit/[business-unit]/index'
+import { ReconciliationHeader, ReconciliationSection } from '@/pages/business-units/[business-unit]/index'
 import { useRouter } from 'next/router';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';

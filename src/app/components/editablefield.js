@@ -17,9 +17,9 @@ export function EditableField({ defaultValue, inputClass, pClass, unit, onSave, 
   }
 
   return (
-    <div className="w-fit">
-      {isEdit ? (
-        <div className="flex items-center gap-x-2 mr-2">
+    <div className="relative">
+      {isEdit &&
+        <div className="absolute inset-y-0 -ml-2 flex items-center gap-x-2 mr-2">
           <div className="relative">
             <NumberInput
               value={defaultValue}
@@ -46,19 +46,19 @@ export function EditableField({ defaultValue, inputClass, pClass, unit, onSave, 
           />
           </button>
         </div>
-      ) : (
-        <div className={classNames(pClass, "flex items-center gap-x-3")}>
-          {children}
-          <button
-            className="text-gray-500 hover:text-sky-600"
-            onClick={() => setIsEdit(true)}
-          >  
-            <PencilSquareIcon 
-              className="h-4 w-4"
-            />
-          </button>
-        </div>
-      )}
+      }
+      {/* Do not hide when edit to keep <td/> the same width, make text transparent instead */}
+      <div className={classNames(pClass, "flex items-center gap-x-3", isEdit && "text-transparent")}>
+        {children}
+        <button
+          className="text-gray-500 hover:text-sky-600"
+          onClick={() => setIsEdit(true)}
+        >  
+          <PencilSquareIcon 
+            className="h-4 w-4"
+          />
+        </button>
+      </div>
     </div>
   )
 }

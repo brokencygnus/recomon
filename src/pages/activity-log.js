@@ -68,10 +68,9 @@ export default function ActivityLogPage() {
       const endDate = new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day + 1)
       
       // Mockdata only
-      const startDateAgoMS = (new Date()).getTime() - startDate.getTime()
+      const startDateAgoMS = startDate.getTime() - (new Date()).getTime()
       const endDateAgoMS = endDate.getTime() - (new Date()).getTime()
 
-      console.log(startDateAgoMS, endDateAgoMS)
       tempFilteredActivityLogs = tempFilteredActivityLogs.filter(activity => (activity.ageMS > startDateAgoMS && activity.ageMS < endDateAgoMS))
     }
 

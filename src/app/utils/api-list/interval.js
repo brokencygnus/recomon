@@ -1,8 +1,7 @@
 // Input and output dates are guard-claused by undefined
 //
 // For week, weekArray = [0, 1, 0, 0, 1, 0, 0] # length 7
-// For two weeks, fortnightArray = [0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0] # length 14
-// Else, primaryInterval = 3
+// Else, primaryInterval = 3 # integer
 // For time, use primaryInterval and secondaryInterval for hours and minutes
 
 import { config } from "@/app/constants/config"

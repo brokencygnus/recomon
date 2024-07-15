@@ -38,7 +38,7 @@ export default function AccountPage() {
   
   const breadcrumbPages = [
     { name: 'Business Units', href: '/business-units', current: false },
-    { name: businessUnit()?.name, href: `/business-unit/${businessUnit()?.slug}`, current: true },
+    { name: businessUnit()?.name, href: `/business-units/${businessUnit()?.slug}`, current: true },
     { name: 'Accounts', href: '#', current: true },
   ]
 
@@ -122,10 +122,10 @@ export default function AccountPage() {
   const closeModal = () => {
     setModalAction("");
     router.replace({
-      pathname: '/business-unit/[business-unit]/accounts',
+      pathname: '/business-units/[business-unit]/accounts',
       query: { 'business-unit': businessUnit()?.slug }
       }, 
-      `/business-unit/${businessUnit()?.slug}/accounts`, 
+      `/business-units/${businessUnit()?.slug}/accounts`, 
       {}
     );
   }
@@ -267,7 +267,7 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
       </div>
         <div className="flex items-end">
           <a
-            href={`/business-unit/${businessUnit?.slug}`}
+            href={`/business-units/${businessUnit?.slug}`}
             className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
           >
             View summary
@@ -564,7 +564,7 @@ function EditAccount({ setClose }) {
                 <div className="col-span-full">
                   <p className="mt-3 text-sm leading-6 text-gray-600">
                     Ensure that the account code matches the API response.&nbsp;
-                    <a href='/api-list' className="font-semibold text-blue-600">View your API settings</a>
+                    <a href='/api-list' className="font-semibold text-sky-600">View your API settings</a>
                   </p>
                 </div>
               </div>

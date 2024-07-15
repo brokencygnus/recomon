@@ -29,10 +29,10 @@ export default function BusinessUnitPage() {
   ]
 
   // modal
-  var isModalOpen = (["new", "edit"].includes(router.query.action) ? true : false)
-  var [modalAction, setModalAction] = useState(router.query.action)
+  var isModalOpen = (["new", "edit"].includes(query.action) ? true : false)
+  var [modalAction, setModalAction] = useState(query.action)
   var modalData = businessUnits.find((bu) =>
-    bu.slug == router.query.edit || bu.slug == router.query.delete
+    bu.slug == query.edit || bu.slug == query.delete
   )
 
   // modalData = accounts[index]
@@ -229,12 +229,12 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
   const menuOptions = {
     view: { 
       name: "View", 
-      onClick: (bu) => router.push(`business-unit/${bu.slug}`), 
+      onClick: (bu) => router.push(`business-units/${bu.slug}`), 
       className: "block px-3 py-1 text-sm leading-6 text-gray-900" 
     },
     accounts: { 
       name: "Accounts", 
-      onClick: (bu) => router.push(`business-unit/${bu.slug}/accounts`), 
+      onClick: (bu) => router.push(`business-units/${bu.slug}/accounts`), 
       className: "block px-3 py-1 text-sm leading-6 text-gray-900" 
     },
     snapshots: { 

@@ -435,7 +435,7 @@ function SnapshotTable() {
                 {bu.snapshots.map(snapshot => {
                   return (
                     <a
-                      href={`business-unit/${bu.slug}/snapshot/${snapshot.id}`}
+                      href={`business-units/${bu.slug}/snapshot/${snapshot.id}`}
                       className="h-16 relative group flex flex-col items-start justify-center w-full bg-white hover:bg-gray-50 rounded-xl p-3 px-6 ring-1 ring-inset ring-gray-200 shadow-md"
                     >
                       <div className="flex w-full justify-between">

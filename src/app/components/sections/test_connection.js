@@ -267,7 +267,7 @@ function ResponsePreview({ item, className }) {
           dangerouslySetInnerHTML={{ __html:
             response()}} 
         />
-        <p className="text-gray-500">{item?.testResponse ? null : "(No response body was given by the server.)"}</p>
+        <p className="text-gray-500 italic">{item?.testResponse ? null : "(No response body was given by the server.)"}</p>
       </div>
     </div>
   )

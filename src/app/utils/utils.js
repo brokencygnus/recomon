@@ -11,6 +11,7 @@ export const checkDataEdited = ( initialState, currentState, setIsDataEdited ) =
   }
 }
 
+// Format numbers with commas as decimal separator
 export const formatNumber = ( numberString ) => {
   try {
     const parts = numberString.toString().split('.');

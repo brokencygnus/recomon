@@ -1,22 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { APIs } from '@/app/constants/mockdata/mockdata';
+import { Modal } from '@/app/components/modal';
 import { SearchFilter } from '@/app/utils/highlight_search'
 import ClientOnly from '@/app/components/csr'
 import { SeeMore } from '@/app/components/seemore';
-import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
 import { TestConnectionList } from '@/app/components/sections/test_connection';
-import { HighlightSearch } from '@/app/utils/highlight_search';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
+import { ToastContext } from '@/app/components/toast';
+import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
+import { HighlightSearch } from '@/app/utils/highlight_search';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+
+import { EditEndpoint } from './[api-id]';
+
+// mockdata start
+
+import { APIs } from '@/app/constants/mockdata/mockdata';
+import { useRouter } from 'next/router';
+
+// mockdata end
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function APIPage() {
+  const router = useRouter()
+  const { pathname } = router;
+  const query = { ...router.query };
+
   const breadcrumbPages = [
     { name: 'Manage APIs', href: '#', current: true },
   ]
@@ -43,6 +57,25 @@ export default function APIPage() {
     setFilteredAPIs(tempFilteredAPIs)
   }, [APIs, searchTerm])
 
+  // modal
+  var isModalOpen = (query.action === "new")
+
+  // modalData = accounts[index]
+  // mode = "edit" | "new"
+  const openModal = () => {
+    query.action = "new"
+    router.replace({ pathname, query }, undefined, { shallow: true });
+  }
+
+  const closeModal = () => {
+    router.replace({
+      pathname: '/api-list',
+    }, 
+      undefined,
+      { shallow: true }
+    );
+  }
+
   return (
       <Layout currentTab="api">
         <main className="pt-10 px-12 2xl:px-16">
@@ -52,6 +85,7 @@ export default function APIPage() {
             searchTerm={searchTerm}
             handleSearchChange={handleSearchChange}
             handleResetFilters={handleResetFilters}
+            openModal={openModal}
           />
         </main>
         <div className="flex-grow overflow-y-auto mt-8 px-12 2xl:px-16">
@@ -60,6 +94,15 @@ export default function APIPage() {
             searchTerm={searchTerm}
           />
         </div>
+        <Modal
+          open={isModalOpen}
+          setClose={closeModal}
+          panelTitle={"New API Endpoint"}
+        >
+          <AddAPI
+            setClose={closeModal}
+          />
+        </Modal>
       </Layout>
     )
   }
@@ -84,7 +127,7 @@ function APIHeader() {
     </div>
   );
 }
-function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
+function APIFilter({ searchTerm, handleSearchChange, handleResetFilters, openModal }) {
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
@@ -117,6 +160,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters }) {
       </div>
         <div className="flex items-end">
           <button
+            onClick={openModal}
             type="button"
             className="ml-4 rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
           >
@@ -216,5 +260,51 @@ export function APITable({ apiData, searchTerm }) {
         </div>
       </div>
     </div>
+  )
+}
+
+function AddAPI({ setClose }) {
+  const [formState, setFormState] = useState({
+    "code": null,
+    "api-name": null,
+    "url": null,
+    "custom-headers": null,
+  });
+
+  const { addToast } = useContext(ToastContext)
+  const launchToast = () => {
+    addToast({ color: "green", message: "New endpoint saved!" })
+  }
+  
+  const handleSave = () => {
+    launchToast()
+    // Enter save logic here
+  }
+  
+  return (
+    <>
+      <EditEndpoint
+        formState={formState}
+        setFormState={setFormState}
+        APIData={null}
+        isEdit={true}
+      />
+      <div className="mt-12 pt-6 flex items-center justify-end gap-x-6 border-t border-gray-900/10">
+        <button 
+          onClick={setClose}
+          type="button"
+          className="text-sm font-semibold leading-6 text-gray-900"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSave}
+          type="button"
+          className="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+        >
+          Save
+        </button>
+      </div>
+    </>
   )
 }
