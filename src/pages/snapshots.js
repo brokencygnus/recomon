@@ -13,6 +13,7 @@ import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon } from '@heroico
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { CameraIcon } from '@heroicons/react/16/solid';
 import { config } from '@/app/constants/config'
+import { Dropdown } from '@/app/components/dropdown';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -32,6 +33,7 @@ export default function SnapshotPage() {
   const [filteredSnapshots, setFilteredSnapshots] = useState(snapshotBusinessUnits);
   const [searchTerm, setSearchTerm] = useState([]);
   const [dateRange, setDateRange] = useState(null);
+  const [displayType, setDisplayType] = useState({ name:"Nominal", value: "nominal" })
 
   const resetRouter = () => {
     router.replace({
@@ -40,6 +42,10 @@ export default function SnapshotPage() {
       undefined,
       { shallow: true }
     );
+  }
+
+  const handleDisplayType = ({ target: {value} }) => {
+    setDisplayType(value)
   }
 
   const handleSearchChange = (event) => {
@@ -124,18 +130,19 @@ export default function SnapshotPage() {
 
   return (
       <Layout currentTab="snap">
-        <SnapshotContext.Provider value={{ allTimes, filteredSnapshots, sizeFactor, translate, setTranslate, searchTerm, dateRange}}>
+        <SnapshotContext.Provider value={{ allTimes, filteredSnapshots, sizeFactor, translate, setTranslate, displayType, searchTerm, dateRange}}>
           <main className="relative min-h-full">
             <div className="pt-10 px-12 2xl:px-16">
               <Breadcrumbs breadcrumbPages={breadcrumbPages} />
               <SnapshotHeader />
             </div>
             
-            <div className="sticky top-0 bg-white px-12 2xl:px-16 z-[2]">
+            <div className="sticky top-0 bg-white px-12 2xl:px-16 z-[3]">
               <SnapshotFilter 
                 handleSearchChange={handleSearchChange}
                 handleDateRangeChange={setDateRange}
                 handleResetFilters={handleResetFilters}
+                handleDisplayType={handleDisplayType}
               />
             </div>
             <div className="sticky top-6 bg-white z-[1] w-full h-10"></div>
@@ -176,12 +183,17 @@ function SnapshotHeader() {
   );
 }
 
-function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleResetFilters }) {
-  const { searchTerm, dateRange } = useContext(SnapshotContext)
+function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleResetFilters, handleDisplayType }) {
+  const { searchTerm, dateRange, displayType } = useContext(SnapshotContext)
+
+  const displayTypeOptions = [
+    { name:"Nominal", value: "nominal" },
+    { name:"% capital", value: "percent" },
+  ]
 
   return (
-    <div className="flex justify-between">
-      <div className="flex flex-row items-end mt-2 gap-x-3">
+    <div className="flex justify-between items-end">
+      <div className="flex flex-row items-center mt-3 gap-x-3">
         <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"
@@ -217,7 +229,15 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
           </button>
         </div>
       </div>
-        <div className="flex items-end">
+        <div className="flex items-center gap-x-3 mt-3">
+          <p className="text-sm text-gray-500">Display gap as</p>
+          <Dropdown
+            name='intervalType'
+            options={displayTypeOptions}
+            selectedOption={displayType.name}
+            onSelect={handleDisplayType}
+            className="w-36 rounded-md text-sm bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          />
           <a
             href='/settings?menu=snapshot-freq'
             className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-sky-600"
@@ -333,7 +353,7 @@ function SnapshotCarousel() {
 }
 
 function SnapshotTable() {
-  const { allTimes, filteredSnapshots, sizeFactor, translate } = useContext(SnapshotContext)
+  const { allTimes, filteredSnapshots, sizeFactor, translate, displayType } = useContext(SnapshotContext)
   const { referenceCurrency } = useContext(RefCurContext)
 
   // Quantize snapshot data based on date grid
@@ -397,8 +417,10 @@ function SnapshotTable() {
 
       if (isSnapshotExistInSlice(day)) {
         element.style.height = (16 + getHeight(day) * 76) + 'px'
+        element.style.opacity = 1
       } else {
         element.style.height = '0px'
+        element.style.opacity = 0
       }
     })
   }, [translate, filteredSnapshots])
@@ -411,22 +433,21 @@ function SnapshotTable() {
             key={day}
             style={{
               height: (16 + getHeight(day) * 76) + 'px',
-              transition: "height 0.2s ease-in",
+              opacity: 0,
+              transition: "all 0.2s ease-in",
             }}
             className="grid grid-cols-5 divide-x divide-gray-300 hover:bg-sky-200/20 -mx-40 2xl:-mx-32 2.5xl:-mx-24"
           >
-            {isSnapshotExistInSlice(day) &&
-              <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
-                <div className="flex justify-end items-center h-[5.5rem] z-[1] translate-x-2">
-                  <p className="text-sm text-gray-400 pr-3">
-                    {convertDateOnly(new Date(day))}
-                  </p>
-                  <svg viewBox="0 0 2 2" className="h-4 w-4 rounded-full fill-white stroke-1 stroke-gray-300 translate-x-[2px]">
-                    <circle cx={1} cy={1} r={1} />
-                  </svg>
-                </div>
+            <div className="flex justify-end col-start-1 border-r-4 border-gray-300 translate-x-[2px]">
+              <div className="flex justify-end items-center h-[5.5rem] z-[1] translate-x-2">
+                <p className="text-sm text-gray-400 pr-3">
+                  {convertDateOnly(new Date(day))}
+                </p>
+                <svg viewBox="0 0 2 2" className="h-3.5 w-3.5 rounded-full fill-white stroke-1 stroke-gray-300 translate-x-[1.25px]">
+                  <circle cx={1} cy={1} r={1} />
+                </svg>
               </div>
-            }
+            </div>
             {slicedDataInDay(day).map((bu, index) => (
               <div
                 key={index}
@@ -448,14 +469,19 @@ function SnapshotTable() {
                       <div className="flex w-full justify-between items-center">
                         <p className={classNames(
                             discrepancyColor({
-                              discrepancy:snapshot.value,
+                              discrepancy:snapshot.gap,
                               discrAlertConf:discrAlertConf[bu.slug],
                               colors:colors
                             }),
                             "text-sm font-semibold break-all"
                           )}
                         >
-                          {convertedCurrency(snapshot.value, config.collateCurrency, referenceCurrency, true)}
+                          {
+                            displayType.value === "nominal" ?
+                              convertedCurrency(snapshot.gap, config.collateCurrency, referenceCurrency, true)
+                            :
+                              (snapshot.gap / snapshot.capital * 100).toFixed(4) + '%'
+                          }
                         </p>
                         {snapshot.alerts && snapshot.alerts.length !== 0 &&
                           <div className="flex items-center gap-x-1 h-4">

@@ -93,7 +93,7 @@ export default function BusinessUnitPage() {
   return (
     <Layout currentTab="bu">
       <ModalContext.Provider value={{ modalData, modalAction }}>
-        <main className="min-h-full relative bg-gray-100">
+        <main className="min-h-full relative bg-stone-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
             <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <BusinessUnitsHeader />

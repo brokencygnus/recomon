@@ -1,6 +1,5 @@
 import Layout from '@/app/components/layout';
 import { useEffect, useContext, useState } from 'react';
-import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { config } from '@/app/constants/config'
 import { useRouter } from 'next/router';
 import { ToastContext, toastColors } from '@/app/components/toast'
@@ -15,10 +14,6 @@ function classNames(...classes) {
 
 export default function APIPage() {
   const router = useRouter()
-
-  const breadcrumbPages = [
-    { name: 'Debug', href: '#', current: true },
-  ]
 
   // Redirect to 404 if 
   useEffect(() => {
@@ -35,7 +30,6 @@ export default function APIPage() {
       <Layout>
         <main className="min-h-full relative bg-gray-100">
           <div className="bg-white pt-10 px-12 2xl:px-16">
-            <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <DebugHeader />
             {/* Content */}
           </div>
@@ -131,13 +125,11 @@ function ToastModule() {
     addToast({ color: toastColor.name, message: toastContents })
   }
 
-  const handleToastContent = (event) => {
-    const { value } = event.target
+  const handleToastContent = ({ target: {value} }) => {
     setToastContents(value)
   }
 
-  const handleToastColor = (event) => {
-    const { value } = event.target
+  const handleToastColor = ({ target: {value} }) => {
     setToastColor(value)
   }
 
@@ -250,8 +242,7 @@ function AlertModule() {
 function ColorModule() {
   const [text, setText] = useState(null)
 
-  const handleTextChange = (event) => {
-    const { value } = event.target
+  const handleTextChange = ({ target: {value} }) => {
     setText(value)
   }
 

@@ -31,7 +31,7 @@ const businessUnitNav = structuredClone(businessUnits)
   .concat({ id: 0, name: 'View All', href: '/business-units' })
 
 const navigation = [
-  { code: 'dash', name: 'Dashboard', href: '#', icon: HomeIcon, submenus: []},
+  { code: 'dash', name: 'Dashboard', href: '/dashboard', icon: HomeIcon, submenus: []},
   { code: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
   { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
   { code: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},

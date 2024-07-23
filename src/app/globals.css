@@ -31,3 +31,32 @@ body {
     scrollbar-width: none; /* Firefox */
   }
 }
+
+/* For apexcharts                                                   */
+/* This has no customization options except for CSS                 */
+/* and I don't see any way to integrate it with Next JS module CSS  */
+/* so here shall they live                                          */
+.apexcharts-tooltip {
+  background: #ffffff !important;
+  border-radius: 6px !important;
+  border: 1px solid rgb(17 24 39 / 0.05) !important;
+  white-space:nowrap;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+.apexcharts-tooltip-title {
+  background: #f3f4f6 !important;
+  border-bottom: 1px solid rgb(17 24 39 / 0.05) !important;
+}
+.apexcharts-xaxistooltip{
+  background: #ffffff !important;
+  border-radius: 6px !important;
+  border: 1px solid rgb(17 24 39 / 0.05) !important;
+  white-space:nowrap;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+.apexcharts-xaxistooltip-bottom:before{
+  border-bottom-color: rgb(17 24 39 / 0.05) !important;
+}
+.apexcharts-xaxistooltip-bottom:after{
+  border-bottom-color: #ffffff !important;
+}

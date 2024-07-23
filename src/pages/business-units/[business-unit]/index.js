@@ -14,8 +14,6 @@ import { ToastContext } from '@/app/components/toast';
 import { CurrencyIcon } from '@/app/components/currency_icon';
 import { config } from '@/app/constants/config';
 
-import * as util from 'util' // has no default export
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
