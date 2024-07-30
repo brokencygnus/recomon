@@ -84,17 +84,22 @@ export default function ActivityLogPage() {
   }, [activityLogs, searchTerm, dateRange])
 
   return (
-      <Layout>
+      <Layout currentTab='log' breadcrumbPages={breadcrumbPages}>
         <ActivityLogContext.Provider value={{ searchTerm, dateRange, filteredActivityLogs }}>
-          <main className="py-10 px-12 2xl:px-16">
-            <Breadcrumbs breadcrumbPages={breadcrumbPages} />
-            <ActivityLogHeader />
-            <ActivityLogFilter
-              handleSearchChange={handleSearchChange}
-              handleDateRangeChange={setDateRange}
-              handleResetFilters={handleResetFilters}
-            />
-            <ActivityLogTable />
+          <main>
+            <div className="pt-6 px-12 2xl:px-16">
+              <ActivityLogHeader />
+            </div>
+            <div className="sticky top-0 bg-white px-12 2xl:px-16">
+              <ActivityLogFilter
+                handleSearchChange={handleSearchChange}
+                handleDateRangeChange={setDateRange}
+                handleResetFilters={handleResetFilters}
+              />
+            </div>
+            <div className="pb-10 px-12 2xl:px-16">
+              <ActivityLogTable />
+            </div>
           </main>
         </ActivityLogContext.Provider>
       </Layout>
@@ -137,16 +142,16 @@ function ActivityLogTable() {
           <table className="table-fixed min-w-full divide-y divide-gray-300">
             <thead>
               <tr className="max-w-full">
-                <th scope="col" className="min-w-56 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                <th scope="col" className="min-w-56 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0 border-b border-gray-300">
                   Date
                 </th>
-                <th scope="col" className="min-w-56 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" className="min-w-56 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 border-b border-gray-300">
                   Business unit
                 </th>
-                <th scope="col" className="min-w-56 px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" className="min-w-56 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 border-b border-gray-300">
                   User
                 </th>
-                <th scope="col" className="w-full px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" className="w-full px-3 py-3.5 text-left text-sm font-semibold text-gray-900 border-b border-gray-300">
                   Action
                 </th>
               </tr>
@@ -180,7 +185,7 @@ function ActivityLogFilter({ handleSearchChange, handleDateRangeChange, handleRe
 
   return (
     <div className="flex justify-between">
-      <div className="flex flex-row items-end mt-2 gap-x-3">
+      <div className="flex flex-row items-end my-2 gap-x-3">
         <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"

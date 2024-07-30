@@ -25,18 +25,17 @@ export default function APIPage() {
 
 
   return (
-    <Layout currentTab="api">
+    <Layout currentTab="api" breadcrumbPages={breadcrumbPages}>
       <main className="relative flex flex-rows">
         <div
           style={{ scrollbarGutter: "stable" }}
-          className="h-screen w-full overflow-y-auto -mt-16 pt-[6.5rem] py-10"
+          className="h-screen w-full overflow-y-auto -mt-16 pt-[5.5rem] py-10"
         >
           <div className="w-3/5 pb-16 px-12 2xl:px-16">
-            <Breadcrumbs breadcrumbPages={breadcrumbPages} />
             <APIDetails APIData={APIs[0]}/>
           </div>
         </div>
-        <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-[6.5rem] pb-16 xl:px-8">
+        <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-20 pb-16 xl:px-8">
           <LastRetrievalCard APIData={APIs[0]} />
           <AccountListCard />
         </aside>

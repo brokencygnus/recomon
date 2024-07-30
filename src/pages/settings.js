@@ -23,7 +23,7 @@ export default function SettingsPage() {
   return (
       <Layout>
         <div className="bg-stone-100 min-h-full pb-16">
-          <div className="mx-auto max-w-7xl pt-16 px-8">
+          <div className="mx-auto max-w-7xl pt-6 px-8">
             <SettingsHeader />
             <div className="flex gap-x-6">
               <aside className="mt-6 block shrink-0 py-4 w-64">

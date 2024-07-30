@@ -1,11 +1,11 @@
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-export function TimelineChart({ children }) {
+export function TimelineChart({ height=350, series, children }) {
   const chartConfig = {
     type: 'line',
     stacked: false,
-    height: 350,
+    height: height,
     zoom: {
       type: 'x',
       enabled: true,
@@ -14,10 +14,7 @@ export function TimelineChart({ children }) {
     toolbar: {
       autoSelected: 'pan'
     },
-    series: [{
-      name: 'XYZ MOTORS',
-      data: [{ x: '2024-06-01T00:00Z', y: 123 }, { x: '2024-06-02T00:00Z', y: 17 }, { x: '2024-06-05T00:00Z', y: 126 }]
-    }],
+    series: series,
     options: {
       chart: {
       },
@@ -55,15 +52,15 @@ export function TimelineChart({ children }) {
       //   },
       // },
       yaxis: {
-        formatter: function (val) {
-          return (val / 1).toFixed(0);
-        },
         labels: {
           style: {
             colors: "#616161",
             fontSize: "14px",
             fontFamily: "inherit",
             fontWeight: 400,
+          },
+          formatter: function (val) {
+            return (val).toFixed(4)+'%'
           },
         },
       },
@@ -109,7 +106,7 @@ export function TimelineChart({ children }) {
         custom: children?.tooltip ?? undefined,
         y: {
           formatter: function (val) {
-            return (val / 1).toFixed(0)
+            return (val).toFixed(4)+'%'
           },
         }
       }

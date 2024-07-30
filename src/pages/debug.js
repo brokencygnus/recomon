@@ -6,7 +6,7 @@ import { ToastContext, toastColors } from '@/app/components/toast'
 import { AlertContext } from '@/app/components/notifications/alert'
 import { Dropdown } from '@/app/components/dropdown'
 import { notificationTypes } from '@/app/constants/notifications'
-import { stringToColor } from '@/app/components/currency_icon';
+import { stringToColor } from '@/app/components/stringToColor';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

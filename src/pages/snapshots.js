@@ -129,11 +129,10 @@ export default function SnapshotPage() {
   }
 
   return (
-      <Layout currentTab="snap">
+      <Layout currentTab="snap" breadcrumbPages={breadcrumbPages}>
         <SnapshotContext.Provider value={{ allTimes, filteredSnapshots, sizeFactor, translate, setTranslate, displayType, searchTerm, dateRange}}>
           <main className="relative min-h-full">
-            <div className="pt-10 px-12 2xl:px-16">
-              <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+            <div className="pt-6 px-12 2xl:px-16">
               <SnapshotHeader />
             </div>
             

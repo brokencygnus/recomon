@@ -138,11 +138,10 @@ export default function AccountPage() {
   }, [router.query.action])
 
   return (
-    <Layout currentTab="bu">
+    <Layout currentTab="bu" breadcrumbPages={breadcrumbPages}>
       <ModalContext.Provider value={{ modalData, modalAction }}>
         <main className="min-h-full relative bg-stone-100">
-          <div className="bg-white pt-10 px-12 2xl:px-16">
-            <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+          <div className="bg-white pt-6 px-12 2xl:px-16">
             <AccountHeader />
           </div>
           <div className="sticky top-0 px-12 bg-white 2xl:px-16 z-[2]">

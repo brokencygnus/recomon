@@ -1,18 +1,19 @@
 import { useRouter } from 'next/router';
-import { useEffect, useContext, useMemo, useState } from 'react'
+import { useEffect, useContext, useMemo, useState, createContext } from 'react'
 import Link from 'next/link';
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
 import { discrepancyColor, getDiscrLvl } from '@/app/utils/business-units/discrepancy-color'
 import { dataSources } from '@/app/constants/types'
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
-import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { PopoverComp } from '@/app/components/popover';
 import ClientOnly from '@/app/components/csr';
 import { EditableField } from '@/app/components/editablefield'
 import { ToastContext } from '@/app/components/toast';
 import { CurrencyIcon } from '@/app/components/currency_icon';
 import { config } from '@/app/constants/config';
+import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
+import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -22,8 +23,6 @@ function classNames(...classes) {
 
 import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { exchangeCurrencies, exchangeSummary } from "@/app/constants/mockdata/exchange_mockdata";
-import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
-import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 
 // Mock data end
 
@@ -45,19 +44,50 @@ export default function SummaryPage() {
     { name: 'Business Units', href: '/business-units', current: false },
     { name: businessUnit?.name, href: '#', current: true },
   ]
+
+  const [buAlerts, setBuAlerts] = useState([])
+
+  const addBuAlerts = (newAlert) => {
+    if (!buAlerts.some(alert => alert === newAlert)) {
+
+      // Critical currency blocks unacceptable currency
+      if (!(newAlert === "gap_unacceptable_currency" && buAlerts.some(alert => alert === "gap_critical_currency"))) {
+        setBuAlerts([...buAlerts, newAlert])
+      }
+      // Critical currency replaces unacceptable currency
+      if (newAlert === "gap_critical_currency" && buAlerts.some(alert => alert === "gap_unacceptable_currency")) {
+        const newBuAlerts = buAlerts.filter(alert => alert !== "gap_unacceptable_currency")
+        setBuAlerts([...newBuAlerts, newAlert])
+      }
+    }
+  }
+
+  switch (getDiscrLvl({
+    discrepancy: exchangeSummary.discrepancy,
+    discrAlertConf: exchangeSummary.discrAlertConf,
+    capital: exchangeSummary.capital
+  })) {
+    case "critical":
+      addBuAlerts("gap_critical_entireBU")
+      break
+    case "unacceptable":
+      addBuAlerts("gap_unacceptable_entireBU")
+      break
+  }
   
   return (
-    <Layout currentTab="bu">
-      <main className="min-h-full pt-10 py-10 px-12 2xl:px-16 bg-stone-100">
-        <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+    <Layout currentTab="bu" breadcrumbPages={breadcrumbPages} >
+      <main className="min-h-full pt-6 pb-12 px-12 2xl:px-16 bg-stone-100">
         <ReconciliationHeader
           businessUnit={businessUnit}
+          buAlerts={buAlerts}
         />
-        <div className="flex grow flex-col mt-8">
+        <div className="flex grow flex-col">
           <ReconciliationSection
             businessUnit={businessUnit}
             currencyData={exchangeCurrencies}
             summaryData={exchangeSummary}
+            addBuAlerts={addBuAlerts}
           />
         </div>
       </main>
@@ -65,16 +95,23 @@ export default function SummaryPage() {
   );
 }
 
-export function ReconciliationHeader({ businessUnit, snapshotID=undefined }) {
+export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAlerts }) {
   return (
     <div className="flex items-center mb-4">
       <div className="flex-auto">
         <div className="py-4">
           <header>
             <div className="max-w-7xl">
-              <div className="flex items-baseline">
-                <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">{businessUnit?.name}</h1>
-                <p className="pl-3 text-xl font-medium leading-tight tracking-tight text-gray-400">{businessUnit?.code}</p>
+              <div className="flex items-center gap-x-3">
+                <div className="flex items-baseline gap-x-3">
+                  <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">{businessUnit?.name}</h1>
+                  <p className="text-xl font-medium leading-tight tracking-tight text-gray-400">{businessUnit?.code}</p>
+                </div>
+                <div className="flex gap-x-2">
+                  <ClientOnly>
+                    <NotificationBadges size="md" alerts={buAlerts} />
+                  </ClientOnly>
+                </div>
               </div>
               <p className="mt-2 text-sm text-gray-700">
                 {businessUnit?.description ?? "View your tracked currencies in this business unit and monitor their discrepancies."}
@@ -113,12 +150,12 @@ export function ReconciliationHeader({ businessUnit, snapshotID=undefined }) {
   );
 }
 
-export function ReconciliationSection({ businessUnit, currencyData, summaryData, snapshotID, snapshotTime }) {
+export function ReconciliationSection({ businessUnit, currencyData, summaryData, snapshotID=undefined, snapshotTime, addBuAlerts }) {
   const { referenceCurrency } = useContext(RefCurContext)
 
   const colors = {
-    crit: "text-red-500",
-    acctble: "text-amber-500",
+    crit: "text-red-600",
+    acctble: "text-amber-600",
     default: "text-gray-700"
   }
 
@@ -157,36 +194,6 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     }
   };
 
-  const [buAlerts, setBuAlerts] = useState([])
-
-  const addBuAlerts = (newAlert) => {
-    if (!buAlerts.some(alert => alert === newAlert)) {
-
-      // Critical currency blocks unacceptable currency
-      if (!(newAlert === "gap_unacceptable_currency" && buAlerts.some(alert => alert === "gap_critical_currency"))) {
-        setBuAlerts([...buAlerts, newAlert])
-      }
-      // Critical currency replaces unacceptable currency
-      if (newAlert === "gap_critical_currency" && buAlerts.some(alert => alert === "gap_unacceptable_currency")) {
-        const newBuAlerts = buAlerts.filter(alert => alert !== "gap_unacceptable_currency")
-        setBuAlerts([...newBuAlerts, newAlert])
-      }
-    }
-  }
-
-  switch (getDiscrLvl({
-    discrepancy: summaryData.discrepancy,
-    discrAlertConf: summaryData.discrAlertConf,
-    capital: summaryData.capital
-  })) {
-    case "critical":
-      addBuAlerts("gap_critical_entireBU")
-      break
-    case "unacceptable":
-      addBuAlerts("gap_unacceptable_entireBU")
-      break
-  }
-
   // Wipe effect
   // I needed to scour stackoverflow for this
   // https://stackoverflow.com/a/26476282
@@ -203,11 +210,74 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
       }
     })
   }, [currentCurrency])
+
+  const stats = [
+    { name: 'Total capital', value: convertedCurrency(summaryData.capital, config.collateCurrency, referenceCurrency) },
+    { name: 'Total assets', value: convertedCurrency(summaryData.assets, config.collateCurrency, referenceCurrency) },
+    { name: 'Total liabilities', value: convertedCurrency(summaryData.liabilities, config.collateCurrency, referenceCurrency) },
+    { name: 'Gap', value: convertedCurrency(summaryData.discrepancy, config.collateCurrency, referenceCurrency, true) },
+  ]  
+
+  const bgColors = {
+    crit: "from-red-500",
+    acctble: "from-amber-500",
+    default: "from-sky-500"
+  }
   
   return (
     <>
       <div id={"summary"} key={"summary"}>
-        <div className="w-full px-4 sm:px-6 lg:px-8 p-4 rounded-lg mb-4">
+
+        <div className="relative bg-white rounded-lg ring-1 ring-inset ring-gray-300/5 overflow-hidden">
+          <div className="border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5 z-[12]">
+            <dl className="mx-auto grid max-w-7xl grid-cols-4">
+              {stats.map((stat, statIdx) => (
+                <div
+                  key={stat.name}
+                  className={classNames(
+                    statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
+                    'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 z-[12] px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
+                  )}
+                >
+                  <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
+                  <dd className={classNames(
+                    stat.name === 'Gap' && discrepancyColor({
+                      discrepancy: summaryData.discrepancy,
+                      discrAlertConf: summaryData.discrAlertConf,
+                      capital: summaryData.capital,
+                      colors: colors
+                    }), "w-full flex-none text-2xl font-medium leading-10 tracking-tight"
+                  )}>
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          
+          <div
+            aria-hidden="true"
+            className="absolute left-0 top-0 z-10 origin-top-left translate-x-64 transform-gpu opacity-20 blur-3xl sm:transform-gpu sm:opacity-50"
+          >
+            <div
+              style={{
+                clipPath:
+                  'polygon(100% 38.5%, 82.6% 100%, 60.2% 37.7%, 52.4% 32.1%, 47.5% 41.8%, 45.2% 65.6%, 27.5% 23.4%, 0.1% 35.3%, 17.9% 0%, 27.7% 23.4%, 76.2% 2.5%, 74.2% 56%, 100% 38.5%)',
+              }}
+              className={`aspect-[1154/678] w-[72.125rem] bg-gradient-to-br ${discrepancyColor({
+                discrepancy: summaryData.discrepancy,
+                discrAlertConf: summaryData.discrAlertConf,
+                capital: summaryData.capital,
+                colors: bgColors
+              })} to-[#9089FC]`}
+            />
+          </div>
+        
+          <div className="absolute left-0 top-0 origin-top-left size-full bg-gradient-to-r from-white/50 via-70% via-white/80 to-80% to-transparent z-[11]"/>
+        </div>
+
+        {/* Old header */}
+        {/* <div className="w-full px-4 sm:px-6 lg:px-8 p-4 rounded-lg mb-4">
           <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="grid grid-cols-6">
@@ -255,7 +325,8 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+
         {/* <div className="px-3 mb-8">
           <div 
             id={"summary-table"}
@@ -271,8 +342,8 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
         <DetailsHeader 
           currency={currency}
           referenceCurrency={referenceCurrency}
-          addBuAlerts={addBuAlerts}
           changeCurrency={changeCurrency}
+          addBuAlerts={addBuAlerts}
         />
         <div className="px-3">
           <div 
@@ -280,7 +351,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
             style={{
               height: '0px',
               opacity: 0,
-              marginBottom: currentCurrency == currency.symbol? '48px' : '18px',
+              marginBottom: currentCurrency == currency.symbol? '48px' : '0px',
               transition: currentCurrency == currency.symbol? ['height 0.3s ease-in-out', "opacity 0.2s"] : ['height 0.5s ease-in-out', "opacity 1s"]
             }}
             className="bg-white rounded-b-lg border-x border-b border-gray-200 shadow-md overflow-hidden"
@@ -333,10 +404,10 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     </>
   )
 
-  function DetailsHeader({ currency, referenceCurrency, addBuAlerts, changeCurrency }) {
+  function DetailsHeader({ currency, referenceCurrency, changeCurrency, addBuAlerts }) {
     const convert = (amount) => convertedCurrency(amount, currency.symbol, referenceCurrency)
     const convertSigned = (amount) => convertedCurrency(amount, currency.symbol, referenceCurrency, true)
-    const convertUSD = (amount) => convertCurrency(amount, currency.symbol, config.collateCurrency)
+    // const convertUSD = (amount) => convertCurrency(amount, currency.symbol, config.collateCurrency)
 
     const [currencyAlerts, setCurrencyAlerts] = useState([])
 
@@ -377,59 +448,63 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     accountAlert(currency.assets)
     accountAlert(currency.liabilities)
 
+    // TODO tooltip is cut off if unexpanded, z index does not work.
     return (
-      <div 
-        onClick={() => changeCurrency(currency.symbol)}
-        className="w-full px-4 sm:px-6 lg:px-8 p-4 rounded-lg border border-gray-200 shadow-md bg-white hover:bg-gray-50"
-      >
-        <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="grow grid grid-cols-6">
-              <div className="flex col-span-2 items-center gap-x-3">
-                <ChevronRightIcon className={classNames(
-                    "h-5 w-5 text-gray-500", currency.symbol == currentCurrency ? "rotate-90" : "rotate-0"
-                  )}
-                />
-                <CurrencyIcon size="sm" symbol={currency.symbol}/>
-                <p className="whitespace-nowrap text-lg text-gray-600">{currency.name} &#40;{currency.symbol}&#41;</p>
-                <div className="flex gap-x-2 pl-2">
-                  <ClientOnly>
-                    <NotificationBadges size="md" message={"currency"} alerts={currencyAlerts} />
-                  </ClientOnly>
+      <div className="sticky top-0 mt-3 z-10">
+        <div className="w-full h-3 bg-stone-100"/>
+        <div
+          onClick={() => changeCurrency(currency.symbol)}
+          className="w-full px-4 sm:px-6 lg:px-8 p-4 rounded-lg border border-gray-200 shadow-md bg-white hover:bg-gray-50"
+        >
+          <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+              <div className="grow grid grid-cols-6">
+                <div className="flex col-span-2 items-center gap-x-3">
+                  <ChevronRightIcon className={classNames(
+                      "h-5 w-5 text-gray-500", currency.symbol == currentCurrency ? "rotate-90" : "rotate-0"
+                    )}
+                  />
+                  <CurrencyIcon size="sm" symbol={currency.symbol}/>
+                  <p className="whitespace-nowrap text-lg text-gray-600">{currency.name} &#40;{currency.symbol}&#41;</p>
+                  <div className="flex gap-x-2 pl-2">
+                    <ClientOnly>
+                      <NotificationBadges size="md" message={"currency"} alerts={currencyAlerts} />
+                    </ClientOnly>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col justify-start text-left">
-                <p scope="col" className="pr-3 text-xs font-medium leading-6 text-gray-500">
-                  Total capital
-                </p>
-                <p className="whitespace-nowrap text-md text-gray-700">{convert(currency.capitalTotal)}</p>
-              </div>
-              <div className="flex flex-col justify-start text-left">
-                <p scope="col" className="pr-3 text-xs font-medium  leading-6 text-gray-500">
-                  Total assets
-                </p>
-                <p className="whitespace-nowrap text-md text-gray-700">{convert(currency.assetTotal)}</p>
-              </div>
-              <div className="flex flex-col justify-start text-left">
-                <p scope="col" className="pr-3 text-xs font-medium  leading-6 text-gray-500">
-                  Total liabilities
-                </p>
-                <p className="whitespace-nowrap text-md text-gray-700">{convert(currency.liabilityTotal)}</p>
-              </div>
-              <div className="flex flex-col justify-start text-left">
-                <p scope="col" className="pr-3 text-xs font-medium  leading-6 text-gray-500">
-                  Gap
-                </p>
-                <p className={classNames(discrepancyColor({
-                  discrepancy: currency.discrepancy,
-                  discrAlertConf: currency.discrAlertConf,
-                  capital: currency.capitalTotal,
-                  symbol: currency.symbol,
-                  colors: colors
-                }),
-                  "whitespace-nowrap text-md")}>
-                  {convertSigned(currency.discrepancy)}
-                </p>
+                <div className="flex flex-col justify-start text-left">
+                  <p scope="col" className="pr-3 text-xs font-medium leading-6 text-gray-500">
+                    Total capital
+                  </p>
+                  <p className="whitespace-nowrap text-sm 2xl:text-base text-gray-700">{convert(currency.capitalTotal)}</p>
+                </div>
+                <div className="flex flex-col justify-start text-left">
+                  <p scope="col" className="pr-3 text-xs font-medium  leading-6 text-gray-500">
+                    Total assets
+                  </p>
+                  <p className="whitespace-nowrap text-sm 2xl:text-base text-gray-700">{convert(currency.assetTotal)}</p>
+                </div>
+                <div className="flex flex-col justify-start text-left">
+                  <p scope="col" className="pr-3 text-xs font-medium  leading-6 text-gray-500">
+                    Total liabilities
+                  </p>
+                  <p className="whitespace-nowrap text-sm 2xl:text-base text-gray-700">{convert(currency.liabilityTotal)}</p>
+                </div>
+                <div className="flex flex-col justify-start text-left">
+                  <p scope="col" className="pr-3 text-xs font-medium leading-6 text-gray-500">
+                    Gap
+                  </p>
+                  <p className={classNames(discrepancyColor({
+                    discrepancy: currency.discrepancy,
+                    discrAlertConf: currency.discrAlertConf,
+                    capital: currency.capitalTotal,
+                    symbol: currency.symbol,
+                    colors: colors
+                  }),
+                    "whitespace-nowrap text-sm 2xl:text-base")}>
+                    {convertSigned(currency.discrepancy)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

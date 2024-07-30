@@ -77,32 +77,33 @@ export default function APIPage() {
   }
 
   return (
-      <Layout currentTab="api">
-        <main className="pt-10 px-12 2xl:px-16">
-          <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+      <Layout currentTab="api" breadcrumbPages={breadcrumbPages}>
+        <main className="relative pt-6 px-12 2xl:px-16">
           <APIHeader/>
-          <APIFilter
-            searchTerm={searchTerm}
-            handleSearchChange={handleSearchChange}
-            handleResetFilters={handleResetFilters}
-            openModal={openModal}
-          />
-        </main>
-        <div className="flex-grow overflow-y-auto mt-8 px-12 2xl:px-16">
-          <APITable
-            apiData={filteredAPIs}
-            searchTerm={searchTerm}
-          />
-        </div>
-        <Modal
-          open={isModalOpen}
-          setClose={closeModal}
-          panelTitle={"New API Endpoint"}
-        >
-          <AddAPI
+          <div className="sticky top-0 bg-white z-[11]">
+            <APIFilter
+              searchTerm={searchTerm}
+              handleSearchChange={handleSearchChange}
+              handleResetFilters={handleResetFilters}
+              openModal={openModal}
+            />
+          </div>
+          <div className="flex-grow mt-6">
+            <APITable
+              apiData={filteredAPIs}
+              searchTerm={searchTerm}
+            />
+          </div>
+          <Modal
+            open={isModalOpen}
             setClose={closeModal}
-          />
-        </Modal>
+            panelTitle={"New API Endpoint"}
+          >
+            <AddAPI
+              setClose={closeModal}
+            />
+          </Modal>
+        </main>
       </Layout>
     )
   }
@@ -130,7 +131,7 @@ function APIHeader() {
 function APIFilter({ searchTerm, handleSearchChange, handleResetFilters, openModal }) {
   return (
     <div className="flex justify-between">
-      <div className="flex flex-row items-end mt-2 gap-x-3">
+      <div className="flex flex-row items-end my-2 gap-x-3">
         <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <label htmlFor="search-field" className="sr-only">
             Search
@@ -173,11 +174,11 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters, openMod
 
 export function APITable({ apiData, searchTerm }) {
   return (
-    <div className="relative mb-8 flow-root">
+    <div className="mb-8 flow-root">
       <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full align-middle sm:px-6 lg:px-8">
           <table className="border-separate border-spacing-0 min-w-full">
-            <thead className="sticky -top-2 z-10 bg-white">
+            <thead className="sticky top-12 z-10 bg-white">
               <tr>
                 <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-300">
                   Code

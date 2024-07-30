@@ -23,6 +23,7 @@ import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
 import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
 import { NotificationMenu } from '@/app/components/notifications/notification_menu'
+import { Breadcrumbs } from "@/app/components/breadcrumbs";
 import { Dropdown } from "@/app/components/dropdown";
 import { config } from "@/app/constants/config";
 import { NotificationBadges } from "./notifications/notification_badges";
@@ -75,7 +76,7 @@ export const convertedCurrency = (amount, currency, referenceCurrency, signed=fa
   return approxSymbol + sign + convertedAmount + " " + currencySymbol
 }
 
-export default function Layout({ children, currentTab }) {
+export default function Layout({ children, breadcrumbPages, currentTab }) {
   const [expanded, setExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
   const [referenceCurrency, setReferenceCurrency] = useState({ noSelectionLabel:"None", name:"None", value:"self" })
@@ -245,11 +246,16 @@ export default function Layout({ children, currentTab }) {
           <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
             {/* Separator */}
-            <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" />
+            {/* <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" /> */}
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <form className="relative flex flex-1" action="#" method="GET">
-                {/* <label htmlFor="search-field" className="sr-only">
+              <div className="flex items-center flex-1 px-4">
+                { breadcrumbPages &&
+                  <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+                }
+              </div>
+              {/* <form className="relative flex flex-1" action="#" method="GET">
+                <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
                 <MagnifyingGlassIcon
@@ -262,8 +268,8 @@ export default function Layout({ children, currentTab }) {
                   placeholder="Search..."
                   type="search"
                   name="search"
-                /> */}
-              </form>
+                />
+              </form> */}
               <div className="flex items-center gap-x-4 lg:gap-x-6">
 
                 <div className="flex flex-row items-center">

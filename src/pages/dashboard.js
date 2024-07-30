@@ -2,19 +2,31 @@ import Layout from '@/app/components/layout';
 import { useMemo, useState, useEffect } from 'react';
 import { TimelineChart } from '@/app/components/charts'
 
+import { snapshotBusinessUnits } from '@/app/constants/mockdata/snapshot_mockdata'
+import { stringToColor } from '@/app/components/stringToColor';
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+const chartSeries = snapshotBusinessUnits.map(bu => (
+  {
+    name: bu.name,
+    color: stringToColor(bu.slug, {maxLum:80, minLum:40, maxSat:60, minSat:60}),
+    data:bu.snapshots.map(snap => (
+      {x:snap.date, y:snap.gap*100/snap.capital}
+    ))
+  }
+))
 
 export default function APIPage() {
   return (
       <Layout>
         <main className="py-10 px-12 2xl:px-16">
           <DashboardHeader />
-          <TimelineChart>
-            {/* It's not my idea to pass html strings, it's apexcharts' fault
-            {{ tooltip: function({series, seriesIndex, dataPointIndex, w}) {
+          <TimelineChart series={chartSeries} >
+            {/* It's not my idea to pass html strings, it's apexcharts' fault */}
+            {/* {{ tooltip: function({series, seriesIndex, dataPointIndex, w}) {
               return `
                 <div class="w-32">
                   <span>${series[seriesIndex][dataPointIndex]}</span>
