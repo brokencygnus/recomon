@@ -26,13 +26,13 @@ export function SeeMore({ content }) {
   
   return (
     <>
-      {expanded ? null : (
+      {!expanded && (
         <>
           <span ref={ref} className="break-all text-wrap line-clamp-1">{content}</span>
           {isTruncated && (
           <button
             className="font-medium text-sky-600 hover:text-sky-900 ml-2 focus:outline-none"
-            onClick={() => toggleExpand()}
+            onClick={toggleExpand}
           >
             See more
           </button>
@@ -53,7 +53,7 @@ export function SeeMore({ content }) {
             <span>
             <button
               className="font-sans font-medium text-sky-600 hover:text-sky-900 hover:cursor-pointer ml-2 focus:outline-none"
-              onClick={() => toggleExpand()}
+              onClick={toggleExpand}
             >
               See less
             </button>

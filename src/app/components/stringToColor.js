@@ -1,7 +1,8 @@
+import * as color from "pex-color";
+
 // Hash function to convert any string to color
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
 // With some modifications to make it more chaotic but still deterministic
-
 export const stringToColor = function (str, {maxLum, minLum, maxSat, minSat}={maxLum:70, minLum:50, maxSat:60, minSat:20}) {
   if (!str) { return "#ffffff"; }
 
@@ -16,29 +17,35 @@ export const stringToColor = function (str, {maxLum, minLum, maxSat, minSat}={ma
     return x - Math.floor(x);
   };
 
-  let h = Math.floor(rand() * 360);
-  let s = Math.floor(rand() * 100);
-  let l = Math.floor(rand() * 100);
+  // Seed should change every function call
+  let h = rand();
+  let s = rand();
+  let l = rand();
+  let hsl = [h, s, l];
 
-  let color = [h, s, l];
-  const clampedColor = clampHsl(color, {maxLum, minLum, maxSat, minSat});
-  const rgbColor = hslToRgb(...clampedColor);
+  // Convert to OkHSL (we'll convert back later)
+  const okhsl = color.toOkhsl(hsl)
+  const clampedColor = clampHsl(okhsl, {maxLum, minLum, maxSat, minSat});
+  const rgb = color.fromOkhsl(color.create(), ...clampedColor, 1);
+  const strColor = color.toHex(rgb, false)
 
-  var strColor = "#";
-  for (let i = 0; i < 3; i++) {
-    strColor += rgbColor[i].toString(16).substring(0, 2);
-  }
+  // var strColor = "#";
+  // for (let i = 0; i < 3; i++) {
+  //   strColor += rgb[i].toString(16).substring(0, 2);
+  // }
 
   return strColor;
 };
 // Function to clamp luminance and saturation between min and max
 // color = [h, s, l]
 const clampHsl = (color, {maxLum, minLum, maxSat, minSat}) => {
-  const clampedLum = minLum + color[2] * (maxLum - minLum) / 100;
-  const clampedSat = minSat + color[1] * (maxSat - minSat) / 100;
-
+  const clampedSat = minSat / 100 + color[1] * (maxSat - minSat) / 100;
+  const clampedLum = minLum / 100 + color[2] * (maxLum - minLum) / 100;
   return [color[0], clampedSat, clampedLum];
 };
+
+
+// unused in favor of okhsl
 // https://www.30secondsofcode.org/js/s/rgb-hex-hsl-hsb-color-format-conversion/
 const hslToRgb = (h, s, l) => {
   s /= 100;

@@ -228,7 +228,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     <>
       <div id={"summary"} key={"summary"}>
 
-        <div className="relative bg-white rounded-lg ring-1 ring-inset ring-gray-300/5 overflow-hidden">
+        <div className="relative bg-white rounded-lg ring-1 ring-inset ring-gray-300/5 shadow-md overflow-hidden">
           <div className="border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5 z-[12]">
             <dl className="mx-auto grid max-w-7xl grid-cols-4">
               {stats.map((stat, statIdx) => (

@@ -12,7 +12,7 @@ function classNames(...classes) {
 const chartSeries = snapshotBusinessUnits.map(bu => (
   {
     name: bu.name,
-    color: stringToColor(bu.slug, {maxLum:80, minLum:40, maxSat:60, minSat:60}),
+    color: stringToColor(bu.slug, {maxLum:70, minLum:40, maxSat:60, minSat:30}),
     data:bu.snapshots.map(snap => (
       {x:snap.date, y:snap.gap*100/snap.capital}
     ))

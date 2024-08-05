@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const ApexCharts = dynamic(() => import("apexcharts"), { ssr: false });
 
 export function TimelineChart({ height=350, series, children }) {
   const chartConfig = {
@@ -17,6 +18,7 @@ export function TimelineChart({ height=350, series, children }) {
     series: series,
     options: {
       chart: {
+        id: "snapshotsTimelineChart"
       },
       dataLabels: {
         enabled: false
@@ -27,16 +29,6 @@ export function TimelineChart({ height=350, series, children }) {
       },
       markers: {
         size: 0,
-      },
-      title: {
-        text: 'Stock Price Movement',
-        align: 'left',
-        style: {
-          colors: "#616161",
-          fontSize: "14px",
-          fontFamily: "inherit",
-          fontWeight: 400,
-        },
       },
       dataLabels: {
         enabled: false,
