@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, createContext, useContext } from 'react'
 import Layout, { RefCurContext, convertedCurrency } from '@/app/components/layout';
-import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { Dropdown } from '@/app/components/dropdown';
 import { Modal } from '@/app/components/modal';
 import { CurrencyIcon } from '@/app/components/currency_icon';

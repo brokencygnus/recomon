@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useContext, useMemo, useState, createContext } from 'react'
 import Link from 'next/link';
-import { formatNumber, convertCurrency } from '@/app/utils/utils';
+import { formatNumber } from '@/app/utils/utils';
 import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
 import { discrepancyColor, getDiscrLvl } from '@/app/utils/business-units/discrepancy-color'
 import { dataSources } from '@/app/constants/types'

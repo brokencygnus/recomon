@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, createContext, useContext } from 'react'
 import Layout, {RefCurContext, convertedCurrency} from '@/app/components/layout';
-import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { Modal } from '@/app/components/modal';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/app/components/dialog';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges'
