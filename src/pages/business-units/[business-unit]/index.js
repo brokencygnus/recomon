@@ -215,7 +215,10 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     { name: 'Total capital', value: convertedCurrency(summaryData.capital, config.collateCurrency, referenceCurrency) },
     { name: 'Total assets', value: convertedCurrency(summaryData.assets, config.collateCurrency, referenceCurrency) },
     { name: 'Total liabilities', value: convertedCurrency(summaryData.liabilities, config.collateCurrency, referenceCurrency) },
-    { name: 'Gap', value: convertedCurrency(summaryData.discrepancy, config.collateCurrency, referenceCurrency, true) },
+    { name: 'Gap',
+      value: convertedCurrency(summaryData.discrepancy, config.collateCurrency, referenceCurrency, true),
+      change: (summaryData.discrepancy / summaryData.capital * 100).toFixed(2) + '%'
+    },
   ]  
 
   const bgColors = {
@@ -240,6 +243,21 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                   )}
                 >
                   <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
+                  {stat.change && 
+                    <dd className='text-xs font-medium'>
+                      <span className={classNames(
+                        stat.name === 'Gap' && discrepancyColor({
+                          discrepancy: summaryData.discrepancy,
+                          discrAlertConf: summaryData.discrAlertConf,
+                          capital: summaryData.capital,
+                          colors: colors
+                        })
+                      )}>
+                        {stat.change}
+                      </span>
+                      <span className="text-gray-500"> of capital</span>
+                    </dd>
+                  }
                   <dd className={classNames(
                     stat.name === 'Gap' && discrepancyColor({
                       discrepancy: summaryData.discrepancy,
