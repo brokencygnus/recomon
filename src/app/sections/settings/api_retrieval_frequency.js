@@ -1,11 +1,12 @@
+import { useRouter } from 'next/router';
 import { useState, useContext } from 'react';
-import { RetrievalFreqProvider, RetrievalFreqBody, RetrievalFreqButtons } from '@/app/components/sections/api-list/retrieval_frequency';
+import { RetrievalFreqProvider, RetrievalFreqBody, RetrievalFreqButtons } from '@/app/sections/frequency/retrieval_frequency';
 import { Dropdown } from "@/app/components/dropdown";
 import { ToastContext } from '@/app/components/toast';
 
 // mock data start
 
-import { businessUnits, defaultSnapshotSettings } from '@/app/constants/mockdata/mockdata';
+import { APIs, defaultApiRetrievalSettings } from '@/app/constants/mockdata/mockdata';
 
 // mock data end
 
@@ -13,23 +14,29 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function SnapshotFrequency() {
-  const [isDefault, setIsDefault] = useState(true);
-  const [currentBu, setCurrentBu] = useState(null);
+export default function ApiRetrievalFrequency() {
+  const router = useRouter();
+  const query = { ...router.query };
 
-  const buOptions = businessUnits.map(bu => ({ name: bu.name, value: bu.id }));
+  const defaultAPI = query.api && APIs.find(api => api.code === query.api);
+  const defaultApiOption = query.api && { name: defaultAPI.name, value: defaultAPI.id };
 
-  const handleBuChange = (event) => {
+  const [isDefault, setIsDefault] = useState(query.api ? false : true);
+  const [currentAPI, setCurrentAPI] = useState(defaultApiOption);
+
+  const apiOptions = APIs.map(api => ({ name: api.name, value: api.id }));
+
+  const handleApiChange = (event) => {
     const { value } = event.target;
-    setCurrentBu(value);
+    setCurrentAPI(value);
   };
 
-  const currentBuData = () => {
+  const currentApiData = () => {
     if (isDefault) {
-      return defaultSnapshotSettings;
-    } else if (currentBu) {
-      let selectBu = businessUnits.find(bu => bu.id === currentBu.value);
-      return selectBu.snapshotSettings;
+      return defaultApiRetrievalSettings;
+    } else if (currentAPI) {
+      let selectAPI = APIs.find(api => api.id === currentAPI.value);
+      return selectAPI.apiRetrievalSettings;
     } else {
       return null;
     }
@@ -43,17 +50,18 @@ export function SnapshotFrequency() {
   const { addToast } = useContext(ToastContext);
 
   const launchToast = () => {
-    addToast({ color: "green", message: "Snapshot configuration saved!" });
+    addToast({ color: "green", message: "Retrieval configuration saved!" });
   };
+
   return (
     <RetrievalFreqProvider
-      retrievalSettings={currentBuData()}
-      defaultSettings={!isDefault && defaultSnapshotSettings}
-      disabled={!isDefault && !currentBu}
+      retrievalSettings={currentApiData()}
+      defaultSettings={!isDefault && defaultApiRetrievalSettings}
+      disabled={!isDefault && !currentAPI}
       onSave={handleSave}
     >
       <div className="flex flex-row justify-between pb-6">
-        <p className="mt-2 text-sm text-gray-600">Adjust how often to record snapshots of your business units' data.</p>
+        <p className="mt-2 text-sm text-gray-600">Adjust how often to retrieve data from your API.</p>
       </div>
       <div className="flex flex-col justify-start gap-y-6 pt-6 border-t border-gray-300">
         <div className="flex justify-between">
@@ -74,7 +82,7 @@ export function SnapshotFrequency() {
                 'rounded-md px-3 py-2 text-sm font-medium'
               )}
             >
-              Select business unit
+              Select API
             </button>
           </nav>
           <RetrievalFreqButtons />
@@ -82,20 +90,20 @@ export function SnapshotFrequency() {
         <div>
           {isDefault ?
             <p className="text-sm text-gray-600">
-              Default snapshot configuration will be used as fallback if a business unit does not have its own configuration.
+              Default API retrieval configuration will be used as fallback if an API does not have its own configuration.
             </p>
             :
             <p className="text-sm text-gray-600">
-              Snapshot configuration specific to a business unit.
+              Retrieval configuration specific to an API.
             </p>}
         </div>
         {!isDefault &&
           <div className="flex flex-row grow items-center">
-            <p className="w-56 text-sm text-gray-600">Business unit</p>
+            <p className="w-48 text-sm text-gray-600">API</p>
             <Dropdown
-              options={buOptions}
-              selectedOption={currentBu?.name}
-              onSelect={handleBuChange}
+              options={apiOptions}
+              selectedOption={currentAPI?.name}
+              onSelect={handleApiChange}
               className="w-72 rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-sky-600 leading-6" />
           </div>}
       </div>

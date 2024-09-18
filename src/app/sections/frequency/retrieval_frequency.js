@@ -476,7 +476,7 @@ export function RetrievalFreqBody() {
             <p className="text-nowrap text-red-400">Please select at least one day of the week.</p>
           : !nextIntervals() ?
               <p className="text-nowrap">
-                Fill out the above information to calculate the next retrieval times.
+                Fill out the above information to calculate the next schedules.
               </p>
             :
               <div className="flex flex-wrap gap-x-3">

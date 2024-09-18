@@ -17,4 +17,8 @@ export const config = {
   // Max and min years in date calculations
   minYear: 1999,
   maxYear: 2100,
+
+  // Number of logs to show in dashboard
+  dashboardShowNLogs: 6,
+  dashboardShowNNotifs: 6
 }

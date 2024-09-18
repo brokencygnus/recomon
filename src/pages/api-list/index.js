@@ -6,7 +6,7 @@ import { Modal } from '@/app/components/modal';
 import { SearchFilter } from '@/app/utils/highlight_search'
 import ClientOnly from '@/app/components/csr'
 import { SeeMore } from '@/app/components/seemore';
-import { TestConnectionList } from '@/app/components/sections/api-list/test_connection';
+import { TestConnectionList } from '@/app/sections/api-list/test_connection';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 import { ToastContext } from '@/app/components/toast';
 import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';

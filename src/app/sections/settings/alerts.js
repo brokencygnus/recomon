@@ -16,7 +16,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function Alerts() {
+export default function Alerts() {
   const [currentBu, setCurrentBu] = useState(null);
   const [currentCurrency, setCurrentCurrency] = useState(null);
 
@@ -92,6 +92,8 @@ export function Alerts() {
     </div>
   );
 }
+
+
 function BuDiscrepancyHeader({ discrAlertConf }) {
   const initialState = {
     buGapIsSendPush: discrAlertConf?.buSendPush ?? true,
@@ -152,6 +154,8 @@ function BuDiscrepancyHeader({ discrAlertConf }) {
     </div>
   );
 }
+
+
 function CurrencyDiscrepancyHeader({ discrAlertConf, currencyOptions, currentCurrency, handleCurrencyChange }) {
   const initialState = {
     curGapIsSendPush: discrAlertConf?.curSendPush ?? true,
@@ -222,6 +226,8 @@ function CurrencyDiscrepancyHeader({ discrAlertConf, currencyOptions, currentCur
     </div>
   );
 }
+
+
 // Set currency to currency.symbol if configuring currency instead of business unit as a whole
 function DiscrepancyConfig({ discrAlertConf, onSave, currency = null }) {
   const gapBasisOptions = [{ name: "USD", value: "usd" }];
@@ -476,6 +482,8 @@ function DiscrepancyConfig({ discrAlertConf, onSave, currency = null }) {
     </div>
   );
 }
+
+
 function OtherAlerts() {
   const initialState = {
     remindUpdateIsSendEmail: false,

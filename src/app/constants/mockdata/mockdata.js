@@ -1,6 +1,3 @@
-// Backend should ABSOLUTELY provide startingDate AND referenceDate (or frontend can copy referenceDate based on startingDate)
-// startingDate is mutated when recursing, while referenceDate remains the same throughout recursion, used as a reference point
-// There's not a lot of guard clauses because this shit is frustrating
 export const APIs = [
   {
     id: 1,

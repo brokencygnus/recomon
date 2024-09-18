@@ -173,4 +173,31 @@ export const activityLogs = [
       },
     }
   },
+  {
+    "id": 11,
+    "buCode": "CFD",
+    "buName": "CFD Unit",
+    "ageMS": 3491735,
+    "userName": "Rameshbabu Praggnandhaa",
+    "eventCategory": "config",
+    "eventName": "defaultSnapshot",
+    "details": {
+      "oldConfig": {
+        "startingDate": "2024-01-01T11:30Z",
+        "intervalType": "week",
+        "intervalOption": undefined,
+        "primaryInterval": 3,
+        "secondaryInterval": 0,
+        "weekArray": [true, false, false, false, false, false, false],
+      },
+      "newConfig": {
+        "startingDate": "2024-01-01T11:30Z",
+        "intervalType": "hour",
+        "intervalOption": "time-continuous",
+        "primaryInterval": 9,
+        "secondaryInterval": 30,
+        "weekArray": null,
+      }
+    }
+  },
 ]

@@ -1,9 +1,10 @@
 import Layout from '@/app/components/layout';
 import { useRouter } from 'next/router';
 import { UserIcon, BanknotesIcon, CameraIcon, CodeBracketIcon, BellAlertIcon } from '@heroicons/react/24/outline';
-import { ApiRetrievalFrequency } from '@/app/components/sections/settings/api_retrieval_frequency';
-import { SnapshotFrequency } from '@/app/components/sections/settings/snapshot_frequency';
-import { Alerts } from '@/app/components/sections/settings/alerts';
+import ApiRetrievalFrequency from '@/app/sections/settings/api_retrieval_frequency';
+import SnapshotFrequency from '@/app/sections/settings/snapshot_frequency';
+import Alerts from '@/app/sections/settings/alerts';
+import Currencies from '@/app/sections/settings/currencies';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -108,7 +109,7 @@ function CurrentSettings() {
 
   switch (currentMenu) {
     case 'general': return null
-    case 'currencies': return null
+    case 'currencies': return <Currencies />
     case 'api-freq': return <ApiRetrievalFrequency />
     case 'snapshot-freq': return <SnapshotFrequency />
     case 'alerts': return <Alerts />

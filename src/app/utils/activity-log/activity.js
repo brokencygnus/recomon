@@ -1,4 +1,5 @@
 import { convertShortDate } from '@/app/utils/dates'
+import _ from 'lodash'
 
 // output:
 // "Tom Scott changed the name of SDN-3-BKS-04 MTG Trading Account from MTG Trading Account to YGO Trading Account, currency from USD to JMD, and account type from asset to liability"
@@ -7,58 +8,70 @@ import { convertShortDate } from '@/app/utils/dates'
 // "Nigel Braun set the currency of CHEV-091 Petroleum Industry Takeover to USD"
 export const activity = {
   "businessUnit": {
-    "create": ({ buCode, buName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</p>
+    "create": ({ buCode, buName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">created </span> the business unit {buCode} {buName}.</>
+        : <p><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</p>
+    },
+    "update": ({ buCode, buName, oldData, newData, oneLine=false }) => ( // data: { buCode, buName, description }
+      <Compare of={`the business unit ${buCode} ${buName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
     ),
-    "update": ({ buCode, buName, oldData, newData }) => ( // data: { buCode, buName, description }
-      <Compare of={`${buCode} ${buName}`} fromObj={oldData} toObj={newData}/>
-    ),
-    "delete": ({ buCode, buName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</p>
-    ),
+    "delete": ({ buCode, buName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">deleted </span> the business unit {buCode} {buName}.</>
+        : <p><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</p>
+    }
   },
   "account": {
-    "create": ({ accountCode, accountName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</p>
+    "create": ({ accountCode, accountName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">created </span> the account {accountCode} {accountName}.</>
+        : <p><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</p>
+    },
+    "updateMetadata": ({ accountCode, accountName, oldData, newData, oneLine=false }) => ( // data: { accountCode, accountName, description, currency, accountType }
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
     ),
-    "updateMetadata": ({ accountCode, accountName, oldData, newData }) => ( // data: { accountCode, accountName, description, currency, accountType }
-      <Compare of={`${accountCode} ${accountName}`} fromObj={oldData} toObj={newData}/>
-    ),
-    "updateBalance": ({ accountCode, accountName, currency, oldBalance, newBalance }) => ( // balance: string
-      <Compare of={`${accountCode} ${accountName}`} fromObj={{balance:`${oldBalance} ${currency}`}} toObj={{balance:`${newBalance} ${currency}`}}/>
+    "updateBalance": ({ accountCode, accountName, currency, oldBalance, newBalance, oneLine=false }) => ( // balance: string
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={{balance:`${oldBalance} ${currency}`}} toObj={{balance:`${newBalance} ${currency}`}} oneLine={oneLine}/>
     ), 
-    "updateDataSource": ({ accountCode, accountName, oldData, newData }) => ( // data: { dataSourceType, api = `{code} {name}`, network, blockchainAddress }
-      <Compare of={`${accountCode} ${accountName}`} fromObj={oldData} toObj={newData}/>
+    "updateDataSource": ({ accountCode, accountName, oldData, newData, oneLine=false }) => ( // data: { dataSourceType, api = `{code} {name}`, network, blockchainAddress }
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
     ),
-    "delete": ({ accountCode, accountName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</p>
-    ),
+    "delete": ({ accountCode, accountName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">deleted </span> the account {accountCode} {accountName}.</>
+        : <p><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</p>
+    },
   },
   "api": {
-    "create": ({ apiCode, apiName }) => (
-      <p className="font-normal"><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</p>
+    "create": ({ apiCode, apiName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">created </span> the API {apiCode} {apiName}.</>
+        : <p><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</p>
+    },
+    "update": ({ apiCode, apiName, oldData, newData, oneLine=false }) => ( // data: { apiCode, apiName, url, customHeaders }
+      <Compare of={`the API ${apiCode} ${apiName}`} fromObj={oldData} toObj={newData} oneLine={oneLine} className="break-all"/>
     ),
-    "update": ({ apiCode, apiName, oldData, newData }) => ( // data: { apiCode, apiName, url, customHeaders }
-      <Compare of={`${apiCode} ${apiName}`} fromObj={oldData} toObj={newData}/>
-    ),
-    "delete": ({ apiCode, apiName }) => (
-      <p className="font-normal"><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</p>
-    ),
+    "delete": ({ apiCode, apiName, oneLine=false }) => {
+      return oneLine
+        ? <><span className="font-semibold">deleted </span> the API {apiCode} {apiName}.</>
+        : <p><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</p>
+    },
   },
   "config": {
     "organization": null, // TBD
     "currency": null, // TBD 
-    "defaultSnapshot": ({ oldConfig, newConfig }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
-      <CompareFreqConfig configName={"default snapshot frequency settings"} of={null} fromObj={oldConfig} toObj={newConfig}/>
+    "defaultSnapshot": ({ oldConfig, newConfig, oneLine=false }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
+      <CompareFreqConfig configName={"default snapshot frequency settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     ), 
-    "buSnapshot": ({ buName, oldConfig, newConfig }) => (
-      <CompareFreqConfig configName={"snapshot frequency settings"} of={`${buName}`} fromObj={oldConfig} toObj={newConfig}/>
+    "buSnapshot": ({ buName, oldConfig, newConfig, oneLine=false }) => (
+      <CompareFreqConfig configName={"snapshot frequency settings"} of={`${buName}`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     ), 
-    "defaultApiRetrieval": ({ oldConfig, newConfig }) => (
-      <CompareFreqConfig configName={"default API retrieval settings"} of={null} fromObj={oldConfig} toObj={newConfig}/>
+    "defaultApiRetrieval": ({ oldConfig, newConfig, oneLine=false }) => (
+      <CompareFreqConfig configName={"default API retrieval settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     ), 
-    "specificApiRetrieval": ({ apiCode, apiName, oldConfig, newConfig }) => (
-      <CompareFreqConfig configName={"API retrieval settings"} of={`${apiCode} ${apiName}`} fromObj={oldConfig} toObj={newConfig}/>
+    "specificApiRetrieval": ({ apiCode, apiName, oldConfig, newConfig, oneLine=false }) => (
+      <CompareFreqConfig configName={"API retrieval settings"} of={`${apiCode} ${apiName}`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     ), 
     // I think we should skip this one, it needs a bespoke function for it
     // and it's not even worth the time for something that probably shouldn't be in activity log anyway
@@ -66,11 +79,11 @@ export const activity = {
     // "buNotifications": ({ buCode, buName, oldConfig, newConfig }) => ( // config: { buIsSendPush, buIsSendEmail, currencyIsSendPush, currencyIsSendEmail, IsRemindUpdate, remindUpdateDays, isNotifyApiFailed, isNotifyApiError, repeatNotif }
     //   <Compare of={`${buName} notification settings`} fromObj={oldConfig} toObj={newConfig}/>
     // ), 
-    "buDiscrepancy": ({ buName, oldConfig, newConfig }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
-      <Compare of={`${buName} discrepancy settings`} fromObj={oldConfig} toObj={newConfig}/>
+    "buDiscrepancy": ({ buName, oldConfig, newConfig, oneLine=false }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
+      <Compare of={`${buName} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     ),
-    "currencyDiscrepancy": ({ currencySymbol, oldConfig, newConfig }) => (
-      <Compare of={`${currencySymbol} discrepancy settings`} fromObj={oldConfig} toObj={newConfig}/>
+    "currencyDiscrepancy": ({ currencySymbol, oldConfig, newConfig, oneLine=false }) => (
+      <Compare of={`${currencySymbol} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
     )
   }
 }
@@ -95,17 +108,26 @@ export const activity = {
 // }
 
 // turns [a, b, c] to "a, b, and c" 
-export const joinWithAnd = (stringArray) => {
-  if (stringArray.length === 1) return stringArray[0]
-  if (stringArray.length === 2) return stringArray[0] + " and " + stringArray[1]
+export const joinWithAnd = (anyArray) => {
+  if (anyArray.length === 1) return [anyArray[0]]
+  if (anyArray.length === 2) return [anyArray[0], " and ", anyArray[1]]
 
-  const last = stringArray.pop()
-  const rest = stringArray
-  return `${rest.join(", ")}, and ${last}`
+  const last = anyArray.pop()
+  const rest = anyArray
+
+  const outputArray = []
+  for (let i in rest) {
+    outputArray.push(rest[i])
+    outputArray.push(", ")
+  }
+  outputArray.push("and ")
+  outputArray.push(last)
+
+  return outputArray
 }
 
 // Generic compare
-export function Compare({ of, fromObj, toObj }) {
+export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
   const fromKeys = Object.keys(fromObj)
   const toKeys = Object.keys(toObj)
 
@@ -165,74 +187,97 @@ export function Compare({ of, fromObj, toObj }) {
     deletedStr.push(`the ${parseKey(thing)} (was "${parseVal(fromObj[thing])}")`)
   }
 
-  return (
-    <div className="flex flex-col font-normal gap-y-1">
-      {addedStr.length ?
-        <p>
-          <span className="font-semibold">Set </span>
-          <span>{joinWithAnd(addedStr)}.</span>
-        </p>
-      : null }
-      {changedStr.length ?
-        <p>
-          <span className="font-semibold">Changed </span>
-          <span>{joinWithAnd(changedStr)}.</span>
-        </p>
-      : null }
-      {deletedStr.length ?
-        <p>
-          <span className="font-semibold">Removed </span>
-          <span>{joinWithAnd(deletedStr)}.</span>
-        </p>
-      : null }
-    </div>
-  )
+  function AddedComp() {
+    return (
+      <>
+        <span className="font-semibold">{oneLine ? 'set ' : 'Set '}</span>
+        <span className={className}>{joinWithAnd(addedStr)}</span>
+      </>
+    )
+  }
+  function ChangedComp() {
+    return (
+      <>
+        <span className="font-semibold">{oneLine ? 'changed ' : 'Changed '}</span>
+        <span className={className}>{joinWithAnd(changedStr)}</span>
+      </>
+    )
+  }
+  function DeletedComp() {
+    return ( 
+      <>
+        <span className="font-semibold">{oneLine ? 'removed ' : 'Removed '} </span>
+        <span className={className}>{joinWithAnd(deletedStr)}</span>
+      </>
+    )
+  }
+
+  if (oneLine) {
+    return (
+      <>
+        {joinWithAnd([
+          addedStr.length && <AddedComp/>,
+          changedStr.length && <ChangedComp/>,
+          deletedStr.length && <DeletedComp/>
+        ].filter(e => e !== 0))}
+      </>
+    )
+  } else {
+    return (
+      // Can't use && here since it returns false instead of null
+      <div className="flex flex-col font-normal gap-y-1">
+        <p>{addedStr.length ? <><AddedComp/>.</> : null }</p>
+        <p>{changedStr.length ? <><ChangedComp/>.</> : null }</p>
+        <p>{deletedStr.length ? <><DeletedComp/>.</> : null }</p>
+      </div>
+    )
+  }
 }
 
 // Compare frequency config
-export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
-  let newFromObj = {}
+export function CompareFreqConfig({ configName, of, fromObj, toObj, oneLine=false }) {
   let newToObj = {}
 
-  switch (true) {
-    case (fromObj.startingDate !== toObj.startingDate):
-      // Starting date is changed
-      newFromObj.startingDate = fromObj.startingDate
-      newToObj.startingDate = toObj.startingDate
-    case (fromObj.intervalType !== toObj.intervalType):
-      // Everything except for starting date is changed
-      newFromObj = fromObj
-      newToObj = toObj
-      break;
-    case (fromObj.primaryInterval !== toObj.primaryInterval
+  if (fromObj.intervalType !== toObj.intervalType) {
+    // If interval type is changed, treat as if everything except for starting date is changed
+    const {startingDate: fromStartingDate, ...restFromObj} = fromObj
+    const {startingDate: toStartingDate, ...restToObj} = toObj
+    
+    newToObj = restToObj
+  } else {
+    if (fromObj.primaryInterval !== toObj.primaryInterval
       || fromObj.secondaryInterval !== toObj.secondaryInterval
-    ):
+    ) {
       // Interval duration is changed
-      newFromObj.primaryInterval = fromObj.primaryInterval
       newToObj.primaryInterval = toObj.primaryInterval
-      newFromObj.secondaryInterval = fromObj.secondaryInterval
       newToObj.secondaryInterval = toObj.secondaryInterval
-    case (fromObj.intervalType === "week"
-      && fromObj.weekArray !== toObj.weekArray
-    ):
+      newToObj.intervalType = toObj.intervalType
+    }
+    if (fromObj.intervalType === "week"
+      && !_.isEqual(fromObj.weekArray, toObj.weekArray)
+    ) {
       // weekArray is changed
-      newFromObj.weekArray = fromObj.weekArray
       newToObj.weekArray = toObj.weekArray
-    case ((fromObj.intervalType === "month" || fromObj.intervalType === "hour")
+    }
+    if ((fromObj.intervalType === "month" || fromObj.intervalType === "hour")
       && fromObj.intervalOption !== toObj.intervalOption
-    ):
+    ) {
       // Interval option is changed
-      newFromObj.intervalOption = fromObj.intervalOption
       newToObj.intervalOption = toObj.intervalOption
-    default:
-      break;
+    }
   }
 
-  // parse both newFromObj and toFromObj
+  if (fromObj.startingDate !== toObj.startingDate) {
+    // Starting date is changed
+    newToObj.startingDate = toObj.startingDate
+
+  }
+
+  // parse fromObj and newToObj
   const parseFreq = (obj) => {
     const { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray } = obj
 
-    let str = "Repeating"
+    let str = ""
 
     if (primaryInterval) {
       str += "every"
@@ -244,7 +289,7 @@ export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
         str += ` ${intervalType}s`
       } else {
         if (intervalType === 'hour' && secondaryInterval) {
-          //Repeating  every 1 hour (...and x minutes)
+          //Repeating every 1 hour (...and x minutes)
           str += ` ${primaryInterval} ${intervalType}`
         } else {
           // Repeating every hour
@@ -260,8 +305,8 @@ export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
 
     // Repeating every 2 weeks on Mondays, Thursdays, and Sundays
     if (weekArray) {
-      str += " on"
-      str += () => {
+      str += " on "
+      str += (() => {
         const weekStringArray = []
         if (weekArray[0]) weekStringArray.push("Mondays")
         if (weekArray[1]) weekStringArray.push("Tuesdays")
@@ -270,8 +315,8 @@ export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
         if (weekArray[4]) weekStringArray.push("Fridays")
         if (weekArray[5]) weekStringArray.push("Saturday")
         if (weekArray[6]) weekStringArray.push("Sundays")
-        return joinWithAnd(weekStringArray)
-      }
+        return joinWithAnd(weekStringArray).join("")
+      })()
     }
 
     // Every 4 hours and 30 minutes starting at the same time every day
@@ -290,21 +335,22 @@ export function CompareFreqConfig({ configName, of, fromObj, toObj }) {
         str += " continuously, ignoring day changes"
         break;
     }
+    console.log(str)
 
     if (startingDate) {
-      str += convertShortDate
+      str += " starting from "
+      str += convertShortDate(new Date(startingDate))
     }
+
+    return str
   }
+
+  const returnString = ` the ${configName} ${of ? `of ${of}` : ''} from ${parseFreq(fromObj)} to ${parseFreq(newToObj)}`
   
-  return (
-    <>
-      <p className="font-normal">
-        {`changed the ${configName} ${of && `of ${of}`} from ${parseFreq(fromObj)} to ${parseFreq(toObj)}`}
-      </p>
-    </>
-  )
+  return oneLine
+    ? <><span className="font-semibold">changed</span>{returnString}</>
+    : <p><span className="font-semibold">Changed</span>{returnString}</p>
 }
-  
 
 
 // Translate key to human readable
@@ -339,7 +385,7 @@ const keyDict = {
   "accountType": "account type",
   "dataSource": "data source",
   "dataSourceType": "data source",
-  "api": "API",
+  "api": "API source",
   "balance": "balance",
   "basis": "basis",
   "apiCode": "code",

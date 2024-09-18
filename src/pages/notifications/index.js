@@ -1,12 +1,17 @@
 import Layout from '@/app/components/layout';
 import { NotificationCard } from '@/app/components/notifications/notification_card'
 import { convertMsToTimeAgo } from '@/app/utils/dates'
-import { notifications } from '@/app/constants/mockdata/notification_mockdata'
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
+
+// mock data start
+
+import { notifications } from '@/app/constants/mockdata/notification_mockdata'
+
+// mock data end
 
 export default function NotificationsPage() {
   return (
@@ -48,14 +53,25 @@ function NotificationHeader() {
   );
 }
 
+// TODO convert logic from ageMS to datetime
 function NotificationsList({ notifications }) {
+  const todayNotif = notifications.filter(notif => notif.ageMs < 86400000)
+  const yesterNotif = notifications.filter(notif => notif.ageMs >= 86400000 && notif.ageMs < 2*86400000)
+  const olderNotif = notifications.filter(notif => notif.ageMs >= 2*86400000)
+
   return (
     <div className="flex flex-col mt-8 gap-y-5">
-      {notifications.map(notification => (
-        <div>
-          <p className="text-sm text-gray-400 py-3">{convertMsToTimeAgo(notification.ageMs)}</p>
-          <NotificationCard data={notification} displayedIn="page"/>
-        </div>
+      <p className="text-sm text-gray-400 py-3">Today</p>
+      {todayNotif.map(notification => (
+        <NotificationCard data={notification} displayedIn="page"/>
+      ))}
+      <p className="text-sm text-gray-400 py-3">Yesterday</p>
+      {yesterNotif.map(notification => (
+        <NotificationCard data={notification} displayedIn="page"/>
+      ))}
+      <p className="text-sm text-gray-400 py-3">Older</p>
+      {olderNotif.map(notification => (
+        <NotificationCard data={notification} displayedIn="page"/>
       ))}
     </div>
   )

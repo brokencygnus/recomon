@@ -14,8 +14,8 @@ function classNames(...classes) {
 //   args: {buName: "Exchange", buSlug: "exchange"}
 // },
 //
-// displayedIn = "page" | "popover"
-export function NotificationCard({ data, displayedIn="page" }) {
+// displayedIn = "page" | "popover" | "dashboard"
+export function NotificationCard({ data, displayedIn="page", ref }) {
   const alertColor = (colorName) => {
     const color = alertColors.find(color => color.name == colorName)
     return color
@@ -38,9 +38,9 @@ export function NotificationCard({ data, displayedIn="page" }) {
   // Sorry for the messy code, this is for notifications page and popover menu at the same time
   return (
     <div className={classNames(
-      displayedIn == "page" ? "rounded-lg shadow-md": "",
+      displayedIn == "popover" ? "": "rounded-lg shadow-md",
       "w-full overflow-hidden bg-white ring-1 ring-black ring-opacity-5 hover:bg-gray-50"
-    )}>
+    )} ref={ref}>
       <a href={notification?.href ?? '#'} >
         <div className="relative p-4">
           <div className="flex items-start">
@@ -68,7 +68,7 @@ export function NotificationCard({ data, displayedIn="page" }) {
               </p>
             </div>
           </div>
-          {displayedIn == "page" && (
+          {(displayedIn == "page" || displayedIn == "dashboard") && (
             <div className={classNames(
               "absolute inset-x-0 bottom-0 h-0.5 w-full", !data.read ? alertColor(notification.color).progress : "bg-white"
             )}/>

@@ -12,6 +12,10 @@ export const NextInterval = (paramObj) => {
     return undefined
   }
 
+  if (!paramObj.secondaryInterval) {
+    paramObj.secondaryInterval = 0
+  }
+
   var nextDate = new Date(limitYear(paramObj.startingDate))
 
   switch (paramObj.intervalType.value) {
@@ -59,6 +63,7 @@ export const NextInterval = (paramObj) => {
       switch (paramObj.intervalOption.value) {
         case "time-same-time-every-day": // Once every n hours and n minutes, resets every day
           const previousDate = new Date(paramObj.startingDate)
+          // referenceDate is not mutated during recursion
           const referenceDate = new Date(paramObj.referenceDate)
 
           // Set reference day, month, and years based on current date

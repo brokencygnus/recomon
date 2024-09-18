@@ -109,3 +109,14 @@ export function quantizeDates(timeArray) {
   // Convert the set to an array
   return Array.from(dateSet).sort((a, b) => new Date(b) - new Date(a))
 }
+
+
+export function getTimeGreeting() {
+  const date = new Date()
+
+  switch (true) {
+    case ([4, 5, 6, 7, 8, 9, 10, 11].includes(date.getHours())): return "Good Morning"
+    case ([12, 13, 14, 15, 16, 17, 18].includes(date.getHours())): return "Good Afternoon"
+    default: return "Good Evening"
+  }
+}

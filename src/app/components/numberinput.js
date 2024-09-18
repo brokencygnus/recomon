@@ -14,19 +14,19 @@ const validate = (input, minimum, maximum) => {
   // Replace additional (.)s
   input = input.replace(/(\..*)\./g, '$1');
 
+  if (input === '' || input === undefined) {
+    return undefined
+  }
+
   // Ceiling the value if maximum is defined
   if (maximum !== undefined) {
-    if (input !== undefined) {
-      input = Math.min(maximum, input)
-    }
+    input = Math.min(maximum, input)
   }
 
   // Floor the value if minimum is defined
   // Remember that 0 is falsy
   if (minimum !== undefined) {
-    if (input !== undefined) {
-      input = Math.max(minimum, input)
-    }
+    input = Math.max(minimum, input)
   }
 
   return input
@@ -39,14 +39,16 @@ export function NumberInput({ name, value, onChange, minimum, maximum, ...rest }
   useEffect(() => {
     // Handle value change
     let formatted = ""
-    let inputValue = null
+    let inputValue = undefined
     
     try {
-      inputValue = value.toString();
-      inputValue = validate(inputValue, minimum, maximum)
+      if (value !== undefined) {
+        inputValue = value.toString();
+        inputValue = validate(inputValue, minimum, maximum)
+      }
 
       formatted = formatNumber(inputValue);
-    } catch (error) {}
+    } catch (error) {console.error(error)}
 
     // Format number with comma separators
     setFormattedValue(formatted);

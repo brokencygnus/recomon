@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import Layout from '@/app/components/layout';
 import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import ClientOnly from '@/app/components/csr';
-import { TestConnectionDetails, LastConnectionDetails } from '@/app/components/sections/api-list/test_connection';
+import { TestConnectionDetails, LastConnectionDetails } from '@/app/sections/api-list/test_connection';
 import { ToastContext } from '@/app/components/toast';
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 

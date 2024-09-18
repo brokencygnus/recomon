@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
 import { useState, useContext, useEffect, createContext } from 'react';
 import Layout from '@/app/components/layout';
-import { Breadcrumbs } from '@/app/components/breadcrumbs';
 import { DateRangePickerComp } from '@/app/components/datepicker'
 import { convertAgeMsToDateTime } from '@/app/utils/dates'
 import { SearchFilter, HighlightSearch } from '@/app/utils/highlight_search';
 import ClientOnly from '@/app/components/csr'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { CalendarIcon } from '@heroicons/react/24/outline';
+import { activity } from '@/app/utils/activity-log/activity';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -16,7 +16,6 @@ function classNames(...classes) {
 // mock data start
 
 import { activityLogs } from '@/app/constants/mockdata/activity_log_mockdata'
-import { activity } from '@/app/utils/activity-log/activity';
 
 // mock data end
 
@@ -60,7 +59,7 @@ export default function ActivityLogPage() {
   }
 
   const doFilter = () => {
-    let tempFilteredActivityLogs = activityLogs.filter(activity => SearchFilter(activity.buName, searchTerm))
+    let tempFilteredActivityLogs = activityLogs.filter(activity => SearchFilter(activity.buName, searchTerm) || SearchFilter(activity.buCode, searchTerm))
 
     if (dateRange) {
       const startDate = new Date(dateRange.start.year, dateRange.start.month - 1, dateRange.start.day)
@@ -132,13 +131,13 @@ function ActivityLogTable() {
   const renderActivity = (log) => {
     const category = activity[log.eventCategory]
     const action = category[log.eventName]
-    return action(log.details);
+    return action({ ...log.details, oneLine:false});
   };
   
   return (
     <div className="mt-8 flow-root">
-      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+      <div className="-my-2 overflow-x-auto">
+        <div className="inline-block min-w-full py-2 align-middle">
           <table className="table-fixed min-w-full divide-y divide-gray-300">
             <thead>
               <tr className="max-w-full">
@@ -164,7 +163,7 @@ function ActivityLogTable() {
                       {convertAgeMsToDateTime(log.ageMS)}
                     </ClientOnly>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{log.buCode} {HighlightSearch(log.buName, searchTerm, {highlight: "bg-sky-300"})}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{HighlightSearch(log.buCode, searchTerm, {highlight: "bg-sky-300"})} {HighlightSearch(log.buName, searchTerm, {highlight: "bg-sky-300"})}</td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{log.userName}</td>
                   <td className="w-24 whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <div className="text-wrap">{renderActivity(log)}</div>
