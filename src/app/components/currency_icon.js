@@ -1,18 +1,32 @@
-import { currencies } from '@/app/constants/mockdata/mockdata'
+import { currencies } from '@/app/constants/mockdata/currency_mockdata'
 import { stringToColor } from './stringToColor'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+// Dynamic text size to fit
+// Formula: base / (length + constant)
+function textSize( iconSize, symbol ) {
+  const length = symbol.length
+  
+  const size = {
+    xs: {1: "text-[0.9rem]", 2: "text-[0.6rem]", 3: "text-[0.45rem]", 4: "text-[0.36rem]"}, // base = 1.8, constant = 1
+    sm: {1: "text-[1rem]", 2: "text-[0.75rem]", 3: "text-[0.6rem]", 4: "text-[0.5rem]"}, // base = 3, constant = 2
+    md: {1: "text-[1.2rem]", 2: "text-[0.96rem]", 3: "text-[0.8rem]", 4: "text-[0.69rem]"}, // base = 4.8, constant = 3
+  }
+
+  return size[iconSize][length]
+}
+
 
 export function CurrencyIcon({ symbol, size, ...props }) {
   const iconSize = () => {
     switch (size) {
-      case "xs": return "text-xs h-5 w-5"
-      case "sm": return "text-sm h-6 w-6"
-      case "md": return "text-lg h-8 w-8"
-      default: return "text-sm h-6 w-6"
+      case "xs": return "h-5 w-5"
+      case "sm": return "h-6 w-6"
+      case "md": return "h-8 w-8"
+      default: return "h-6 w-6"
     }
   }
 
@@ -20,7 +34,8 @@ export function CurrencyIcon({ symbol, size, ...props }) {
     currencies.find(currency => currency.symbol === symbol)
   )
 
-  const color = stringToColor(symbol)
+  const textSymbol = currentCurrencyData(symbol)?.fiatSymbol ?? currentCurrencyData(symbol)?.symbol
+  const color = stringToColor(currentCurrencyData(symbol)?.name + symbol)
 
   return (
     <>
@@ -36,24 +51,11 @@ export function CurrencyIcon({ symbol, size, ...props }) {
               borderColor: color,
               backgroundColor: color
             }}
-            className={classNames(iconSize(), "overflow-hidden flex items-center justify-center border-2 rounded-full text-white font-bold")}
+            className={classNames(textSize(size, textSymbol), iconSize(), "overflow-hidden flex items-center justify-center border-2 rounded-full text-white font-bold")}
           >
-            {SymbolDictionary(symbol)}
+            {textSymbol}
           </div>
       }
     </>    
   );
-}
-
-const SymbolDictionary = (symbol) => {
-  switch (symbol) {
-    case "BTC": return '₿';
-    case "ETH": return 'ETH';
-    case "USDT": return 'T';
-    case "SOL": return 'S';
-    case "IDR": return 'Rp';
-    case "USD": return '$';
-    case "INR": return '₹';
-    default : return '$';
-  }
 }

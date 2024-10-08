@@ -8,8 +8,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 
 // mock data start
 
-import { APIs } from '@/app/constants/mockdata/mockdata';
-import { accountsUsingAPI } from '@/app/constants/mockdata/api-list_mockdata';
+import { APIs, accountsUsingAPI } from '@/app/constants/mockdata/api-list_mockdata';
 
 // mock data end
 
@@ -186,7 +185,7 @@ export function EditEndpoint({ formState, setFormState, APIData, isEdit }) {
   };
 
   return (
-    <form id="edit-endpoint-form">
+    <div id="edit-endpoint-form">
       <div className="space-y-12">
         {/* <h2 className="text-base font-semibold leading-7 text-gray-900">API Details</h2>
         <p className="mt-1 mb-10 text-sm leading-6 text-gray-600">
@@ -268,7 +267,7 @@ export function EditEndpoint({ formState, setFormState, APIData, isEdit }) {
 
           <div className="col-span-full">
             <div className="flex justify-between">
-              <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
+              <label htmlFor="custom-headers" className="block text-sm font-medium leading-6 text-gray-900">
                 Custom headers
               </label>
               {isEdit &&
@@ -312,7 +311,7 @@ export function EditEndpoint({ formState, setFormState, APIData, isEdit }) {
       </div>
       {/* debug */}
       {/* {JSON.stringify(formState)} */}
-    </form>
+    </div>
   )
 }
 

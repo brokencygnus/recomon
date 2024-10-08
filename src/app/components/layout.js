@@ -18,7 +18,8 @@ import {
   NewspaperIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { businessUnits, currencies, menusNotifications } from "@/app/constants/mockdata/mockdata";
+import { businessUnits, menusNotifications } from "@/app/constants/mockdata/mockdata";
+import { enabledCurrencies as currencies } from '@/app/utils/currencies'
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
 import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
@@ -254,7 +255,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                   <Breadcrumbs breadcrumbPages={breadcrumbPages} />
                 }
               </div>
-              {/* <form className="relative flex flex-1" action="#" method="GET">
+              {/* <div className="relative flex flex-1" action="#" method="GET">
                 <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
@@ -269,7 +270,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                   type="search"
                   name="search"
                 />
-              </form> */}
+              </div> */}
               <div className="flex items-center gap-x-4 lg:gap-x-6">
 
                 <div className="flex flex-row items-center">

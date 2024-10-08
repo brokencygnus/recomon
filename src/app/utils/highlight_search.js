@@ -1,4 +1,4 @@
-export function HighlightSearch(string, searchTerms, { base = 'font-normal', highlight = 'font-bold' } = {}) {
+export function HighlightSearch(string, searchTerms, { base = undefined, highlight = undefined } = {}) {
   if (!searchTerms || searchTerms.length == 0 || (searchTerms.length == 1 && searchTerms[0] == '')) {
     return (
       <span className={base}>{string}</span>
@@ -8,7 +8,7 @@ export function HighlightSearch(string, searchTerms, { base = 'font-normal', hig
   const searchTermLower = searchTerms.map(s => s.toLowerCase());
   const currentTerm = searchTermLower.shift();
 
-  // Skip if current term is empy
+  // Skip if current term is empty
   if (currentTerm == '') {
     return HighlightSearch(string, searchTermLower, { base, highlight })
   }

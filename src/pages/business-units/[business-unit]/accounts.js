@@ -8,11 +8,18 @@ import { NumberInput } from '@/app/components/numberinput';
 import { checkDataEdited } from '@/app/utils/utils';
 import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { businessUnits, APIs, currencies } from '@/app/constants/mockdata/mockdata'
-import { accounts } from '@/app/constants/mockdata/account_mockdata'
 import { accountTypes, dataSources } from '@/app/constants/types'
 import { ToastContext } from '@/app/components/toast';
 import { PencilSquareIcon } from '@heroicons/react/20/solid';
+
+// mock data start 
+
+import { businessUnits } from '@/app/constants/mockdata/mockdata'
+import { APIs } from '@/app/constants/mockdata/api-list_mockdata';
+import { enabledCurrencies as currencies } from '@/app/utils/currencies'
+import { accounts } from '@/app/constants/mockdata/account_mockdata'
+
+// mock data end
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -208,7 +215,7 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <div className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <label htmlFor="search-field" className="sr-only">
             Search
           </label>
@@ -225,7 +232,7 @@ function AccountFilter({ businessUnit, accountFilters, handleCurrencyFilter, han
             className="pointer-events-none w-5 mx-2 text-gray-400"
             aria-hidden="true"
           />
-        </form>
+        </div>
         <div>
           <Dropdown
             options={filterCurrencies}
@@ -412,7 +419,7 @@ function EditAccount({ setClose }) {
 
   return (
     <div className="w-[50rem]">
-      <form id="edit-account-form">
+      <div id="edit-account-form">
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900">Account Details</h2>
@@ -562,7 +569,7 @@ function EditAccount({ setClose }) {
                 <div className="col-span-full">
                   <p className="mt-3 text-sm leading-6 text-gray-600">
                     Ensure that the account code matches the API response.&nbsp;
-                    <a href='/api-list' className="font-semibold text-sky-600">View your API settings</a>
+                    <a href='/api-list' className="font-semibold text-sky-600 hover:text-sky-900">View your API settings</a>
                   </p>
                 </div>
               </div>
@@ -631,7 +638,7 @@ function EditAccount({ setClose }) {
             {modalAction == "edit" ? "Save ": "Submit"}
           </button>
         </div>
-      </form>
+      </div>
 
       {/* debug */}
       {/* {JSON.stringify(formState)} */}

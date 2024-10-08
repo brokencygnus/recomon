@@ -45,6 +45,7 @@ export default function SnapshotFrequency() {
   const launchToast = () => {
     addToast({ color: "green", message: "Snapshot configuration saved!" });
   };
+
   return (
     <RetrievalFreqProvider
       retrievalSettings={currentBuData()}

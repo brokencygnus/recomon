@@ -78,7 +78,7 @@ export function DialogActions({ className, ...props }) {
       {...props}
       className={clsx(
         className,
-        'mt-8 flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto'
+        'mt-6 flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto'
       )}
     />
   )

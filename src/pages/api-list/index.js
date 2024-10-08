@@ -11,16 +11,15 @@ import { NotificationBadges } from '@/app/components/notifications/notification_
 import { ToastContext } from '@/app/components/toast';
 import { convertMsToTimeAgo, convertAgeMsToDateTime } from '@/app/utils/dates';
 import { HighlightSearch } from '@/app/utils/highlight_search';
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import { useRouter } from 'next/router';
 import { EditEndpoint } from './[api-id]';
 
-// mockdata start
+// mock data start
 
-import { APIs } from '@/app/constants/mockdata/mockdata';
-import { useRouter } from 'next/router';
+import { APIs } from '@/app/constants/mockdata/api-list_mockdata';
 
-// mockdata end
+// mock data end
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -117,7 +116,7 @@ function APIHeader() {
             <div className="max-w-7xl">
               <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">Manage APIs</h1>
               <p className="mt-2 text-sm text-gray-700">Manage your data source APIs to keep your balances up to date.&nbsp;
-                <a href='#' className="font-semibold text-sky-600">How do I set up APIs?</a>
+                <a href='#' className="font-semibold text-sky-600 hover:text-sky-900">How do I set up APIs?</a>
               </p>
             </div>
           </header>
@@ -132,7 +131,7 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters, openMod
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end my-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <div className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <label htmlFor="search-field" className="sr-only">
             Search
           </label>
@@ -145,18 +144,22 @@ function APIFilter({ searchTerm, handleSearchChange, handleResetFilters, openMod
             type="text"
             name="search"
           />
-          <MagnifyingGlassIcon
-            className="pointer-events-none w-5 mx-2 text-gray-400"
-          />
-        </form>
-        <div>
-          <button
-            type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
-            onClick={handleResetFilters}
-          >
-            Reset search
-          </button>
+          { searchTerm.length !== 0 ?
+            <button
+              type="button"
+              className="mx-2 text-sm text-sky-600"
+              onClick={handleResetFilters}
+            >
+              <XMarkIcon
+                className="w-5 text-gray-400 hover:text-gray-500"
+              />
+            </button>
+          :
+            <MagnifyingGlassIcon
+              className="pointer-events-none w-5 mx-2 text-gray-400"
+              aria-hidden="true"
+            />
+          }
         </div>
       </div>
         <div className="flex items-end">

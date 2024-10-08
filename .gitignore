@@ -37,4 +37,3 @@ next-env.d.ts
 
 # dev util
 rng.js
-src/app/sections/settings/currencies.js

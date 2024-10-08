@@ -4,7 +4,7 @@ import Layout, {RefCurContext, convertedCurrency} from '@/app/components/layout'
 import { Modal } from '@/app/components/modal';
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from '@/app/components/dialog';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { checkDataEdited } from '@/app/utils/utils'
 import { HighlightSearch, SearchFilter } from '@/app/utils/highlight_search';
@@ -153,7 +153,7 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
   return (
     <div className="flex justify-between">
       <div className="flex flex-row items-end mt-2 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <div className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
@@ -163,20 +163,22 @@ function BusinessAccountFilter({ searchTerm, handleResetFilters, handleSearchCha
             type="text"
             name="search"
           />
-          <MagnifyingGlassIcon
-            className="pointer-events-none w-5 mx-2 text-gray-400"
-            aria-hidden="true"
-          />
-        </form>
-
-        <div>
-          <button
-            type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
-            onClick={handleResetFilters}
-          >
-            Reset search
-          </button>
+          { searchTerm.length !== 0 ?
+            <button
+              type="button"
+              className="mx-2 text-sm text-sky-600"
+              onClick={handleResetFilters}
+            >
+              <XMarkIcon
+                className="w-5 text-gray-400 hover:text-gray-500"
+              />
+            </button>
+          :
+            <MagnifyingGlassIcon
+              className="pointer-events-none w-5 mx-2 text-gray-400"
+              aria-hidden="true"
+            />
+          }
         </div>
       </div>
         <div className="flex items-end">
@@ -317,13 +319,13 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
             <div className="flex justify-between gap-x-4 py-3">
               <dt className="font-medium text-gray-500">Accounts</dt>
               <dd className="text-gray-700">
-                {businessUnit.accounts}
+                {businessUnit.accountCount}
               </dd>
             </div>
             <div className="flex justify-between gap-x-4 py-3">
               <dt className="font-medium text-gray-500">Currencies</dt>
               <dd className="text-gray-700">
-                {businessUnit.currencies}
+                {businessUnit.currencyCount}
               </dd>
             </div>
             <div className="flex justify-between gap-x-4 py-3">
@@ -389,7 +391,7 @@ function EditBusinessUnit({ setClose }) {
 
   return (
     <div className="w-[50rem]">
-      <form id="edit-account-form">
+      <div id="edit-account-form">
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
 
@@ -475,7 +477,7 @@ function EditBusinessUnit({ setClose }) {
             {modalAction == "edit" ? "Save ": "Submit"}
           </button>
         </div>
-      </form>
+      </div>
 
       {/* debug */}
       {/* {JSON.stringify(formState)} */}
@@ -504,7 +506,7 @@ function DeleteDialog({ setClose }) {
   return (
     <Dialog size="lg" open={isOpen} onClose={setClose}>
       <DialogTitle>Confirm delete?</DialogTitle>
-      <DialogDescription className="text-gray-900">
+      <DialogDescription className="font-normal text-gray-900">
         Continuing will delete {buName} along with its accounts, snapshots, and configurations. This cannot be undone!
       </DialogDescription>
       <DialogActions>

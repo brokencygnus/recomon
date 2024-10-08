@@ -1,4 +1,4 @@
-import { currencies } from '../constants/mockdata/mockdata';
+import { enabledCurrencies as currencies } from '@/app/utils/currencies'
 import _ from 'lodash';
 
 

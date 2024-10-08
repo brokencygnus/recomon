@@ -193,7 +193,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
   return (
     <div className="flex justify-between items-end">
       <div className="flex flex-row items-center mt-3 gap-x-3">
-        <form className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
+        <div className="flex rounded-md w-fit h-9 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
           <input
             id="search-business-units"
             className="border-0 py-0 px-0 mx-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
@@ -207,7 +207,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
             className="pointer-events-none w-5 mx-2 text-gray-400"
             aria-hidden="true"
           />
-        </form>
+        </div>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -221,7 +221,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
         <div>
           <button
             type="button"
-            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600"
+            className="h-10 rounded px-2 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
             onClick={handleResetFilters}
           >
             Reset filters
@@ -239,7 +239,7 @@ function SnapshotFilter({ handleSearchChange, handleDateRangeChange, handleReset
           />
           <a
             href='/settings?menu=snapshot-freq'
-            className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-sky-600"
+            className="h-10 flex items-center rounded px-2 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
           >
             Configure snapshots
           </a>

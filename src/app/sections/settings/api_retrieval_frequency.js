@@ -6,7 +6,7 @@ import { ToastContext } from '@/app/components/toast';
 
 // mock data start
 
-import { APIs, defaultApiRetrievalSettings } from '@/app/constants/mockdata/mockdata';
+import { APIs, defaultApiRetrievalSettings } from '@/app/constants/mockdata/api-list_mockdata';
 
 // mock data end
 

@@ -8,52 +8,52 @@ import _ from 'lodash'
 // "Nigel Braun set the currency of CHEV-091 Petroleum Industry Takeover to USD"
 export const activity = {
   "businessUnit": {
-    "create": ({ buCode, buName, oneLine=false }) => {
-      return oneLine
+    "create": ({ buCode, buName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">created </span> the business unit {buCode} {buName}.</>
         : <p><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</p>
     },
-    "update": ({ buCode, buName, oldData, newData, oneLine=false }) => ( // data: { buCode, buName, description }
-      <Compare of={`the business unit ${buCode} ${buName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
+    "update": ({ buCode, buName, oldData, newData, isOneLine=false }) => ( // data: { buCode, buName, description }
+      <Compare of={`the business unit ${buCode} ${buName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine}/>
     ),
-    "delete": ({ buCode, buName, oneLine=false }) => {
-      return oneLine
+    "delete": ({ buCode, buName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">deleted </span> the business unit {buCode} {buName}.</>
         : <p><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</p>
     }
   },
   "account": {
-    "create": ({ accountCode, accountName, oneLine=false }) => {
-      return oneLine
+    "create": ({ accountCode, accountName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">created </span> the account {accountCode} {accountName}.</>
         : <p><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</p>
     },
-    "updateMetadata": ({ accountCode, accountName, oldData, newData, oneLine=false }) => ( // data: { accountCode, accountName, description, currency, accountType }
-      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
+    "updateMetadata": ({ accountCode, accountName, oldData, newData, isOneLine=false }) => ( // data: { accountCode, accountName, description, currency, accountType }
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine}/>
     ),
-    "updateBalance": ({ accountCode, accountName, currency, oldBalance, newBalance, oneLine=false }) => ( // balance: string
-      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={{balance:`${oldBalance} ${currency}`}} toObj={{balance:`${newBalance} ${currency}`}} oneLine={oneLine}/>
+    "updateBalance": ({ accountCode, accountName, currency, oldBalance, newBalance, isOneLine=false }) => ( // balance: string
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={{balance:`${oldBalance} ${currency}`}} toObj={{balance:`${newBalance} ${currency}`}} isOneLine={isOneLine}/>
     ), 
-    "updateDataSource": ({ accountCode, accountName, oldData, newData, oneLine=false }) => ( // data: { dataSourceType, api = `{code} {name}`, network, blockchainAddress }
-      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} oneLine={oneLine}/>
+    "updateDataSource": ({ accountCode, accountName, oldData, newData, isOneLine=false }) => ( // data: { dataSourceType, api = `{code} {name}`, network, blockchainAddress }
+      <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine}/>
     ),
-    "delete": ({ accountCode, accountName, oneLine=false }) => {
-      return oneLine
+    "delete": ({ accountCode, accountName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">deleted </span> the account {accountCode} {accountName}.</>
         : <p><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</p>
     },
   },
   "api": {
-    "create": ({ apiCode, apiName, oneLine=false }) => {
-      return oneLine
+    "create": ({ apiCode, apiName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">created </span> the API {apiCode} {apiName}.</>
         : <p><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</p>
     },
-    "update": ({ apiCode, apiName, oldData, newData, oneLine=false }) => ( // data: { apiCode, apiName, url, customHeaders }
-      <Compare of={`the API ${apiCode} ${apiName}`} fromObj={oldData} toObj={newData} oneLine={oneLine} className="break-all"/>
+    "update": ({ apiCode, apiName, oldData, newData, isOneLine=false }) => ( // data: { apiCode, apiName, url, customHeaders }
+      <Compare of={`the API ${apiCode} ${apiName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine} className="break-all"/>
     ),
-    "delete": ({ apiCode, apiName, oneLine=false }) => {
-      return oneLine
+    "delete": ({ apiCode, apiName, isOneLine=false }) => {
+      return isOneLine
         ? <><span className="font-semibold">deleted </span> the API {apiCode} {apiName}.</>
         : <p><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</p>
     },
@@ -61,17 +61,17 @@ export const activity = {
   "config": {
     "organization": null, // TBD
     "currency": null, // TBD 
-    "defaultSnapshot": ({ oldConfig, newConfig, oneLine=false }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
-      <CompareFreqConfig configName={"default snapshot frequency settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "defaultSnapshot": ({ oldConfig, newConfig, isOneLine=false }) => (  // config: { startingDate, intervalType, intervalOption, primaryInterval, secondaryInterval, weekArray }
+      <CompareFreqConfig configName={"default snapshot frequency settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     ), 
-    "buSnapshot": ({ buName, oldConfig, newConfig, oneLine=false }) => (
-      <CompareFreqConfig configName={"snapshot frequency settings"} of={`${buName}`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "buSnapshot": ({ buName, oldConfig, newConfig, isOneLine=false }) => (
+      <CompareFreqConfig configName={"snapshot frequency settings"} of={`${buName}`} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     ), 
-    "defaultApiRetrieval": ({ oldConfig, newConfig, oneLine=false }) => (
-      <CompareFreqConfig configName={"default API retrieval settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "defaultApiRetrieval": ({ oldConfig, newConfig, isOneLine=false }) => (
+      <CompareFreqConfig configName={"default API retrieval settings"} of={undefined} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     ), 
-    "specificApiRetrieval": ({ apiCode, apiName, oldConfig, newConfig, oneLine=false }) => (
-      <CompareFreqConfig configName={"API retrieval settings"} of={`${apiCode} ${apiName}`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "specificApiRetrieval": ({ apiCode, apiName, oldConfig, newConfig, isOneLine=false }) => (
+      <CompareFreqConfig configName={"API retrieval settings"} of={`${apiCode} ${apiName}`} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     ), 
     // I think we should skip this one, it needs a bespoke function for it
     // and it's not even worth the time for something that probably shouldn't be in activity log anyway
@@ -79,11 +79,11 @@ export const activity = {
     // "buNotifications": ({ buCode, buName, oldConfig, newConfig }) => ( // config: { buIsSendPush, buIsSendEmail, currencyIsSendPush, currencyIsSendEmail, IsRemindUpdate, remindUpdateDays, isNotifyApiFailed, isNotifyApiError, repeatNotif }
     //   <Compare of={`${buName} notification settings`} fromObj={oldConfig} toObj={newConfig}/>
     // ), 
-    "buDiscrepancy": ({ buName, oldConfig, newConfig, oneLine=false }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
-      <Compare of={`${buName} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "buDiscrepancy": ({ buName, oldConfig, newConfig, isOneLine=false }) => ( // config: { basis, critHigh, acctbleHigh, acctbleLow, critLow }; basis: "percent" | "usd"
+      <Compare of={`${buName} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     ),
-    "currencyDiscrepancy": ({ currencySymbol, oldConfig, newConfig, oneLine=false }) => (
-      <Compare of={`${currencySymbol} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} oneLine={oneLine}/>
+    "currencyDiscrepancy": ({ currencySymbol, oldConfig, newConfig, isOneLine=false }) => (
+      <Compare of={`${currencySymbol} discrepancy settings`} fromObj={oldConfig} toObj={newConfig} isOneLine={isOneLine}/>
     )
   }
 }
@@ -127,7 +127,7 @@ export const joinWithAnd = (anyArray) => {
 }
 
 // Generic compare
-export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
+export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
   const fromKeys = Object.keys(fromObj)
   const toKeys = Object.keys(toObj)
 
@@ -190,7 +190,7 @@ export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
   function AddedComp() {
     return (
       <>
-        <span className="font-semibold">{oneLine ? 'set ' : 'Set '}</span>
+        <span className="font-semibold">{isOneLine ? 'set ' : 'Set '}</span>
         <span className={className}>{joinWithAnd(addedStr)}</span>
       </>
     )
@@ -198,7 +198,7 @@ export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
   function ChangedComp() {
     return (
       <>
-        <span className="font-semibold">{oneLine ? 'changed ' : 'Changed '}</span>
+        <span className="font-semibold">{isOneLine ? 'changed ' : 'Changed '}</span>
         <span className={className}>{joinWithAnd(changedStr)}</span>
       </>
     )
@@ -206,13 +206,13 @@ export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
   function DeletedComp() {
     return ( 
       <>
-        <span className="font-semibold">{oneLine ? 'removed ' : 'Removed '} </span>
+        <span className="font-semibold">{isOneLine ? 'removed ' : 'Removed '} </span>
         <span className={className}>{joinWithAnd(deletedStr)}</span>
       </>
     )
   }
 
-  if (oneLine) {
+  if (isOneLine) {
     return (
       <>
         {joinWithAnd([
@@ -235,7 +235,7 @@ export function Compare({ of, fromObj, toObj, className, oneLine=false }) {
 }
 
 // Compare frequency config
-export function CompareFreqConfig({ configName, of, fromObj, toObj, oneLine=false }) {
+export function CompareFreqConfig({ configName, of, fromObj, toObj, isOneLine=false }) {
   let newToObj = {}
 
   if (fromObj.intervalType !== toObj.intervalType) {
@@ -347,7 +347,7 @@ export function CompareFreqConfig({ configName, of, fromObj, toObj, oneLine=fals
 
   const returnString = ` the ${configName} ${of ? `of ${of}` : ''} from ${parseFreq(fromObj)} to ${parseFreq(newToObj)}`
   
-  return oneLine
+  return isOneLine
     ? <><span className="font-semibold">changed</span>{returnString}</>
     : <p><span className="font-semibold">Changed</span>{returnString}</p>
 }

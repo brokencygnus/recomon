@@ -123,7 +123,7 @@ function ChartSection() {
   const renderActivity = (log) => {
     const category = activity[log.eventCategory]
     const action = category[log.eventName]
-    return action({ ...log.details, oneLine:true});
+    return action({ ...log.details, isOneLine:true});
   };
 
   const slicedActivityLogs = activityLogs.slice(0, dashboardShowNLogs)
@@ -164,7 +164,7 @@ function ActivityLogSection() {
   const renderActivity = (log) => {
     const category = activity[log.eventCategory]
     const action = category[log.eventName]
-    return action({ ...log.details, oneLine:true});
+    return action({ ...log.details, isOneLine:true});
   };
 
   const slicedActivityLogs = activityLogs.slice(0, dashboardShowNLogs)
