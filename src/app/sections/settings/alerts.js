@@ -37,6 +37,7 @@ export default function Alerts() {
 
   const currentBuData = businessUnits.find(bu => bu.id === currentBu?.value);
   const buDiscrAlertConf = currentBuData?.discrAlertConf;
+  const buOtherAlertConf = currentBuData?.otherAlertConf;
 
   const currentCurrencyData = exchangeCurrencies.find(cur => cur.symbol == currentCurrency?.value);
 
@@ -87,7 +88,10 @@ export default function Alerts() {
               currency={currentCurrencyData?.symbol}
               onSave={handleSave} />
           </div>
-          <OtherAlerts />
+          <OtherAlerts
+              otherAlertConf={buOtherAlertConf}
+              onSave={handleSave}
+          />
         </>}
     </div>
   );
@@ -126,7 +130,7 @@ function BuDiscrepancyHeader({ discrAlertConf }) {
   return (
     <div className="flex flex-row justify-between">
       <div>
-        <h3 className="text-base font-semibold leading-6 text-gray-900">Business unit gap</h3>
+        <h3 className="text-base font-semibold leading-6 text-gray-900">Business unit gap levels</h3>
         <p className="mt-2 text-sm text-gray-600">Notify everyone in your organization if the gap in this business unit has reached the following thresholds.</p>
       </div>
       <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
@@ -189,7 +193,7 @@ function CurrencyDiscrepancyHeader({ discrAlertConf, currencyOptions, currentCur
     <div className="flex flex-col">
       <div className="flex flex-row justify-between">
         <div>
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Currency gap</h3>
+          <h3 className="text-base font-semibold leading-6 text-gray-900">Currency gap levels</h3>
           <p className="mt-2 text-sm text-gray-600">Notify everyone in your organization if the gap in a currency has reached the following thresholds.</p>
         </div>
         <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
@@ -484,21 +488,30 @@ function DiscrepancyConfig({ discrAlertConf, onSave, currency = null }) {
 }
 
 
-function OtherAlerts() {
+function OtherAlerts({ otherAlertConf, onSave }) {
   const initialState = {
-    remindUpdateIsSendEmail: false,
-    remindUpdateIsSendPush: false,
-    remindUpdateDays: 60,
-    apiFailedIsSendEmail: false,
-    apiFailedIsSendPush: false,
-    apiErrorIsSendEmail: false,
-    apiErrorIsSendPush: false,
-    repeatNotif: "always",
-    repeatConfig: null,
-    coolDownDelayMinutes: 0,
+    remindUpdateIsSendEmail: otherAlertConf?.remindUpdateIsSendEmail ?? true,
+    remindUpdateIsSendPush: otherAlertConf?.remindUpdateIsSendPush ?? true,
+    remindUpdateDays: otherAlertConf?.remindUpdateDays ?? 60,
+    apiFailedIsSendEmail: otherAlertConf?.apiFailedIsSendEmail ?? true,
+    apiFailedIsSendPush: otherAlertConf?.apiFailedIsSendPush ?? true,
+    apiErrorIsSendEmail: otherAlertConf?.apiErrorIsSendEmail ?? true,
+    apiErrorIsSendPush: otherAlertConf?.apiErrorIsSendPush ?? true,
+    blockchainErrorIsSendEmail: otherAlertConf?.blockchainErrorIsSendEmail ?? true,
+    blockchainErrorIsSendPush: otherAlertConf?.blockchainErrorIsSendPush ?? true,
+    snapshotIsSendEmail: otherAlertConf?.snapshotIsSendEmail ?? true,
+    snapshotIsSendPush: otherAlertConf?.snapshotIsSendPush ?? true,
+    repeatNotif: otherAlertConf?.repeatNotif ?? "always",
+    coolDownDelayMinutes: otherAlertConf?.coolDownDelayMinutes ?? 30,
   };
 
   const [formState, setFormState] = useState(initialState);
+  const [isDataEdited, setIsDataEdited] = useState(false);
+
+  // Reset if data is changed
+  useEffect(() => {
+    setFormState(initialState);
+  }, [otherAlertConf]);
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
@@ -507,12 +520,22 @@ function OtherAlerts() {
       [name]: value,
     };
     setFormState(updatedState);
+    checkDataEdited(initialState, updatedState, setIsDataEdited);
   };
 
   const handleToggle = (event) => {
     const { name } = event.target;
     const newValue = !formState[name];
     handleFormChange({ target: { name, value: newValue } });
+  };
+
+  const handleCancel = () => {
+    setFormState(initialState);
+  };
+
+  const handleSave = () => {
+    onSave();
+    setIsDataEdited(false);
   };
 
   return (
@@ -561,6 +584,35 @@ function OtherAlerts() {
                 className="block w-24 text-right rounded-md border-0 py-1.5 pl-8 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
               <p className="mt-2 text-sm text-gray-600">days</p>
             </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between py-6">
+          <div className="flex flex-col">
+            <p className="text-sm font-semibold leading-6 text-gray-900">Notify after taking snapshots</p>
+            <p className="mt-2 text-sm text-gray-600 text-pretty">Notify everyone in your organization if a snapshot of your business unit has been taken.</p>
+          </div>
+          <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="snapshotIsSendPush"
+                name="snapshotIsSendPush"
+                type="checkbox"
+                checked={formState.snapshotIsSendPush}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <EnvelopeIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="snapshotIsSendEmail"
+                name="snapshotIsSendEmail"
+                type="checkbox"
+                checked={formState.snapshotIsSendEmail}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
           </div>
         </div>
 
@@ -622,12 +674,41 @@ function OtherAlerts() {
           </div>
         </div>
 
+        <div className="flex justify-between py-6">
+          <div className="flex flex-col">
+            <p className="text-sm font-semibold leading-6 text-gray-900">Notify blockchain connection failure</p>
+            <p className="mt-2 text-sm text-gray-600 text-pretty">Notify everyone in your organization if a balance retrieval to the blockchain has failed.</p>
+          </div>
+          <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="blockchainErrorIsSendPush"
+                name="blockchainErrorIsSendPush"
+                type="checkbox"
+                checked={formState.blockchainErrorIsSendPush}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <EnvelopeIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="blockchainErrorIsSendEmail"
+                name="blockchainErrorIsSendEmail"
+                type="checkbox"
+                checked={formState.blockchainErrorIsSendEmail}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
+          </div>
+        </div>
+
         <div>
           <div className="flex flex-col py-6">
             <h3 className="text-sm font-semibold leading-6 text-gray-900">Repeat gap notifications</h3>
           </div>
           <fieldset>
-            <div className="space-y-5">
+            <div className="space-y-5 mb-5">
               <label className="flex justify-start items-center w-full rounded-md pl-2 py-1.5 hover:cursor-pointer hover:bg-gray-50">
                 <input
                   checked={formState.repeatNotif === "always"}
@@ -641,7 +722,7 @@ function OtherAlerts() {
                     Always send
                   </p>
                   <p className="text-gray-500 text-pretty">
-                    Send notifications even if the current gap has been reached during the previous retrieval cycle.
+                    Send notifications even if the current gap level has been reached during the previous retrieval cycle. If the notifications are too frequent, consider switching from this option.
                   </p>
                 </div>
               </label>
@@ -659,7 +740,7 @@ function OtherAlerts() {
                       With cool down period
                     </p>
                     <p className="text-gray-500 text-pretty">
-                      Only send notifications if a specified time interval has passed since the last.
+                      Only send gap notifications if a specified time interval has passed since the last notification at the same gap level or above. Notifications will always be sent if the new gap level is above the previous gap.
                     </p>
                   </div>
                 </div>
@@ -691,13 +772,36 @@ function OtherAlerts() {
                     With hysteresis
                   </p>
                   <p className="text-gray-500 text-pretty">
-                    Only send notifications when the gap has reached the same threshold again after lowering to the previous threshold.
+                    Only send gap notifications when the gap has reached the same threshold again after lowering to the previous gap level first. Notifications will always be sent if the new gap level is above the previous gap.
                   </p>
                 </div>
               </label>
             </div>
           </fieldset>
         </div>
+
+        <div className="flex justify-end py-6 gap-x-4">
+        {isDataEdited ?
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Cancel
+          </button>
+          : null}
+        <button
+          type="button"
+          onClick={handleSave}
+          className={classNames(
+            isDataEdited ? "bg-sky-600 hover:bg-sky-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              : "bg-gray-50 text-gray-600 pointer-events-none",
+            "rounded-md px-2.5 py-1.5 text-sm font-semibold shadow-sm"
+          )}
+        >
+          Save
+        </button>
+      </div>
 
       </div>
     </div>

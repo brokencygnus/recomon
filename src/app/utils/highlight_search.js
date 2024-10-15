@@ -1,3 +1,5 @@
+// Outputs a highlighted collection of <span>s based on search term
+// use base and highlight to define the tailwind class
 export function HighlightSearch(string, searchTerms, { base = undefined, highlight = undefined } = {}) {
   if (!searchTerms || searchTerms.length == 0 || (searchTerms.length == 1 && searchTerms[0] == '')) {
     return (

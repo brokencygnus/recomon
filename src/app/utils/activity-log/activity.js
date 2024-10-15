@@ -174,7 +174,7 @@ export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
   // ..., (set) the description to "Charitable donations from unsuspecting folk", ...
   for (let i in added) {
     let thing = added[i]
-    addedStr.push(`${parseKey(thing)} to "${parseVal(toObj[i])}"`)
+    addedStr.push(`${parseKey(thing)} to "${parseVal(toObj[thing])}"`)
   }
   // ..., (changed) the name from "Hasil Maling" to "Sumbangan Tidak Sukarela", ...
   for (let i in changed) {

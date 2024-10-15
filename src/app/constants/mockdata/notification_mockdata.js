@@ -42,3 +42,12 @@ export const notifications = [
     args: { buName: "Contract Market", buSlug: "contract-market", accountName: "Hedging Cold Wallet in Fireblocks", daysSinceLastUpdate: "60" }
   },
 ]
+
+export const menusNotifications = [
+  { code: 'dash', notifications: false },
+  { code: 'bu', notifications: true },
+  { code: 'snap', notifications: false },
+  { code: 'api', notifications: true },
+  { code: 'log', notifications: false },
+  { code: 'dbug', notifications: true },
+]

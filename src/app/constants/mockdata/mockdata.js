@@ -1,12 +1,3 @@
-export const menusNotifications = [
-  { code: 'dash', notifications: false },
-  { code: 'bu', notifications: true },
-  { code: 'snap', notifications: false },
-  { code: 'api', notifications: true },
-  { code: 'log', notifications: false },
-  { code: 'dbug', notifications: true },
-]
-
 export const businessUnits = [
   {
     id: 1,
@@ -38,6 +29,21 @@ export const businessUnits = [
       acctbleHigh: 5000,
       acctbleLow: -5000,
       critLow: -12000,
+    },
+    otherAlertConf: {
+      remindUpdateIsSendEmail: true,
+      remindUpdateIsSendPush: false,
+      remindUpdateDays: 60,
+      apiFailedIsSendEmail: false,
+      apiFailedIsSendPush: true,
+      apiErrorIsSendEmail: true,
+      apiErrorIsSendPush: true,
+      blockchainErrorIsSendPush: false,
+      blockchainErrorIsSendEmail: true,
+      snapshotIsSendEmail: false,
+      snapshotIsSendPush: false,
+      repeatNotif: "hysteresis",
+      coolDownDelayMinutes: 0,
     }
   },
   {
@@ -70,6 +76,21 @@ export const businessUnits = [
       acctbleHigh: null,
       acctbleLow: -2,
       critLow: -5,
+    },
+    otherAlertConf: {
+      remindUpdateIsSendEmail: true,
+      remindUpdateIsSendPush: false,
+      remindUpdateDays: 60,
+      apiFailedIsSendEmail: false,
+      apiFailedIsSendPush: true,
+      apiErrorIsSendEmail: true,
+      apiErrorIsSendPush: true,
+      blockchainErrorIsSendPush: false,
+      blockchainErrorIsSendEmail: true,
+      snapshotIsSendEmail: false,
+      snapshotIsSendPush: false,
+      repeatNotif: "hysteresis",
+      coolDownDelayMinutes: 0,
     }
   },
   { id: 3,
@@ -113,6 +134,21 @@ export const businessUnits = [
       acctbleHigh: 5000,
       acctbleLow: -3000,
       critLow: -8000,
+    },
+    otherAlertConf: {
+      remindUpdateIsSendEmail: true,
+      remindUpdateIsSendPush: false,
+      remindUpdateDays: 30,
+      apiFailedIsSendEmail: false,
+      apiFailedIsSendPush: true,
+      apiErrorIsSendEmail: true,
+      apiErrorIsSendPush: true,
+      blockchainErrorIsSendPush: false,
+      blockchainErrorIsSendEmail: true,
+      snapshotIsSendEmail: false,
+      snapshotIsSendPush: false,
+      repeatNotif: "cooldown",
+      coolDownDelayMinutes: 50,
     }
   },
   {
@@ -127,7 +163,8 @@ export const businessUnits = [
     description: 'Concerns the assets used in Loan, product that offers liquid fiat and stablecoins loaned with comparatively volatile crypto assets.',
     alerts: ["api_config_error"],
     snapshotSettings: null,
-    discrAlertConf: null
+    discrAlertConf: null,
+    otherAlertConf: null
   },
 ]
 

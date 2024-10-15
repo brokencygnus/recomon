@@ -18,7 +18,6 @@ import {
   NewspaperIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { businessUnits, menusNotifications } from "@/app/constants/mockdata/mockdata";
 import { enabledCurrencies as currencies } from '@/app/utils/currencies'
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
@@ -28,6 +27,13 @@ import { Breadcrumbs } from "@/app/components/breadcrumbs";
 import { Dropdown } from "@/app/components/dropdown";
 import { config } from "@/app/constants/config";
 import { NotificationBadges } from "./notifications/notification_badges";
+
+// mock data start
+
+import { businessUnits } from "@/app/constants/mockdata/mockdata";
+import { menusNotifications } from "@/app/constants/mockdata/notification_mockdata";
+
+// mock data end
 
 const businessUnitNav = structuredClone(businessUnits)
   .concat({ id: 0, name: 'View All', href: '/business-units' })
