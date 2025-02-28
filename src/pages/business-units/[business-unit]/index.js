@@ -239,7 +239,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                   key={stat.name}
                   className={classNames(
                     statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
-                    'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 z-[12] px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
+                    'flex flex-wrap items-baseline justify-start gap-x-4 gap-y-2 border-t border-gray-900/5 z-[12] px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
                   )}
                 >
                   <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
@@ -467,9 +467,17 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     accountAlert(currency.assets)
     accountAlert(currency.liabilities)
 
+    const currentColor = discrepancyColor({
+      discrepancy: currency.discrepancy,
+      discrAlertConf: currency.discrAlertConf,
+      capital: currency.capitalTotal,
+      symbol: currency.symbol,
+      colors: colors
+    })
+
     // TODO tooltip is cut off if unexpanded, z index does not work.
     return (
-      <div className="sticky top-0 mt-3 z-10">
+      <div className={classNames(currency.symbol == currentCurrency ?? "sticky", "top-0 mt-3 z-10")}>
         <div className="w-full h-3 bg-stone-100"/>
         <div
           onClick={() => changeCurrency(currency.symbol)}
@@ -510,16 +518,16 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                   <p className="whitespace-nowrap text-sm 2xl:text-base text-gray-700">{convert(currency.liabilityTotal)}</p>
                 </div>
                 <div className="flex flex-col justify-start text-left">
-                  <p scope="col" className="pr-3 text-xs font-medium leading-6 text-gray-500">
-                    Gap
-                  </p>
-                  <p className={classNames(discrepancyColor({
-                    discrepancy: currency.discrepancy,
-                    discrAlertConf: currency.discrAlertConf,
-                    capital: currency.capitalTotal,
-                    symbol: currency.symbol,
-                    colors: colors
-                  }),
+                  <div scope="col" className="flex gap-x-4 pr-3 text-xs font-medium leading-6 text-gray-500">
+                    <p>Gap</p>
+                    <p>
+                      <span className={"text-gray-700"}>
+                        {(currency.discrepancy / currency.capitalTotal * 100).toFixed(2) + '%'}
+                      </span>
+                      <span className="text-gray-500"> of capital</span>
+                    </p>
+                  </div>
+                  <p className={classNames(currentColor,
                     "whitespace-nowrap text-sm 2xl:text-base")}>
                     {convertSigned(currency.discrepancy)}
                   </p>

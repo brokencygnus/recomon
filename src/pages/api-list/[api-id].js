@@ -34,7 +34,7 @@ export default function APIPage() {
             <APIDetails APIData={APIs[0]}/>
           </div>
         </div>
-        <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col block gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-20 pb-16 xl:px-8">
+        <aside className="absolute inset-y-0 w-2/5 right-0 h-screen -mt-16 flex flex-col gap-y-6 overflow-y-scroll bg-gray-100 border-l border-gray-200 px-4 pt-20 pb-16 xl:px-8">
           <LastRetrievalCard APIData={APIs[0]} />
           <AccountListCard />
         </aside>

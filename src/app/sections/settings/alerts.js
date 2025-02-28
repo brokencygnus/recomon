@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { checkDataEdited } from '@/app/utils/utils';
 import { Dropdown } from "@/app/components/dropdown";
 import { NumberInput } from "@/app/components/numberinput";
-import { EnvelopeIcon, BellIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
+import { TagIcon, EnvelopeIcon, BellIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 import { ToastContext } from '@/app/components/toast';
 
 // mock data start
@@ -56,7 +56,7 @@ export default function Alerts() {
     <div className="flex flex-col space-y-14">
       <div className="mb-6">
         <div className="flex flex-row justify-between">
-          <p className="mt-2 text-sm text-gray-600">Alerts appear as desktop notifications as well as email notifications, and is configured on a business unit basis.</p>
+          <p className="mt-2 text-sm text-gray-600">Alerts appear as badges, desktop notifications, as well as email notifications, and is configured on a business unit basis.</p>
         </div>
         <div className="flex flex-row grow items-center mt-6">
           <p className="w-56 text-sm font-medium text-gray-600">Business unit</p>
@@ -100,6 +100,7 @@ export default function Alerts() {
 
 function BuDiscrepancyHeader({ discrAlertConf }) {
   const initialState = {
+    buGapIsBadge: discrAlertConf?.buGapIsBadge ?? true,
     buGapIsSendPush: discrAlertConf?.buSendPush ?? true,
     buGapIsSendEmail: discrAlertConf?.buSendEmail ?? true,
   };
@@ -135,6 +136,16 @@ function BuDiscrepancyHeader({ discrAlertConf }) {
       </div>
       <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
         <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+          <TagIcon className="shrink-0 h-6 w-6 text-gray-400" />
+          <input
+            id="buGapIsBadge"
+            name="buGapIsBadge"
+            type="checkbox"
+            checked={formState.buGapIsBadge}
+            onChange={handleToggle}
+            className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+        </label>
+        <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
           <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
           <input
             id="buGapIsSendPush"
@@ -162,6 +173,7 @@ function BuDiscrepancyHeader({ discrAlertConf }) {
 
 function CurrencyDiscrepancyHeader({ discrAlertConf, currencyOptions, currentCurrency, handleCurrencyChange }) {
   const initialState = {
+    curGapIsBadge: discrAlertConf?.curGapIsBadge ?? true,
     curGapIsSendPush: discrAlertConf?.curSendPush ?? true,
     curGapIsSendEmail: discrAlertConf?.curSendEmail ?? true,
   };
@@ -197,6 +209,16 @@ function CurrencyDiscrepancyHeader({ discrAlertConf, currencyOptions, currentCur
           <p className="mt-2 text-sm text-gray-600">Notify everyone in your organization if the gap in a currency has reached the following thresholds.</p>
         </div>
         <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
+          <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+            <TagIcon className="shrink-0 h-6 w-6 text-gray-400" />
+            <input
+              id="curGapIsBadge"
+              name="curGapIsBadge"
+              type="checkbox"
+              checked={formState.curGapIsBadge}
+              onChange={handleToggle}
+              className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+          </label>
           <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
             <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
             <input
@@ -490,19 +512,19 @@ function DiscrepancyConfig({ discrAlertConf, onSave, currency = null }) {
 
 function OtherAlerts({ otherAlertConf, onSave }) {
   const initialState = {
-    remindUpdateIsSendEmail: otherAlertConf?.remindUpdateIsSendEmail ?? true,
-    remindUpdateIsSendPush: otherAlertConf?.remindUpdateIsSendPush ?? true,
-    remindUpdateDays: otherAlertConf?.remindUpdateDays ?? 60,
-    apiFailedIsSendEmail: otherAlertConf?.apiFailedIsSendEmail ?? true,
-    apiFailedIsSendPush: otherAlertConf?.apiFailedIsSendPush ?? true,
-    apiErrorIsSendEmail: otherAlertConf?.apiErrorIsSendEmail ?? true,
-    apiErrorIsSendPush: otherAlertConf?.apiErrorIsSendPush ?? true,
-    blockchainErrorIsSendEmail: otherAlertConf?.blockchainErrorIsSendEmail ?? true,
-    blockchainErrorIsSendPush: otherAlertConf?.blockchainErrorIsSendPush ?? true,
-    snapshotIsSendEmail: otherAlertConf?.snapshotIsSendEmail ?? true,
-    snapshotIsSendPush: otherAlertConf?.snapshotIsSendPush ?? true,
-    repeatNotif: otherAlertConf?.repeatNotif ?? "always",
-    coolDownDelayMinutes: otherAlertConf?.coolDownDelayMinutes ?? 30,
+    remindUpdateIsBadge: false,
+    remindUpdateIsSendEmail: false,
+    remindUpdateIsSendPush: false,
+    remindUpdateDays: 60,
+    apiFailedIsBadge: false,
+    apiFailedIsSendEmail: false,
+    apiFailedIsSendPush: false,
+    apiErrorIsBadge: false,
+    apiErrorIsSendEmail: false,
+    apiErrorIsSendPush: false,
+    repeatNotif: "always",
+    repeatConfig: null,
+    coolDownDelayMinutes: 0,
   };
 
   const [formState, setFormState] = useState(initialState);
@@ -550,6 +572,16 @@ function OtherAlerts({ otherAlertConf, onSave }) {
               <p className="mt-2 text-sm text-gray-600">Notify everyone in your organization if an account has not been updated for a period of time.</p>
             </div>
             <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
+              <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+                <TagIcon className="shrink-0 h-6 w-6 text-gray-400" />
+                <input
+                  id="remindUpdateIsBadge"
+                  name="remindUpdateIsBadge"
+                  type="checkbox"
+                  checked={formState.remindUpdateIsBadge}
+                  onChange={handleToggle}
+                  className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+              </label>
               <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
                 <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
                 <input
@@ -623,6 +655,16 @@ function OtherAlerts({ otherAlertConf, onSave }) {
           </div>
           <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
             <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <TagIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="apiFailedIsBadge"
+                name="apiFailedIsBadge"
+                type="checkbox"
+                checked={formState.apiFailedIsBadge}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
               <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
               <input
                 id="apiFailedIsSendPush"
@@ -651,6 +693,16 @@ function OtherAlerts({ otherAlertConf, onSave }) {
             <p className="mt-2 text-sm text-gray-600 text-pretty">Notify everyone in your organization if an API did not return data for every account that it is assigned to.</p>
           </div>
           <div className="flex items-center -mt-1.5 gap-x-4 pl-6 pr-3">
+            <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
+              <TagIcon className="shrink-0 h-6 w-6 text-gray-400" />
+              <input
+                id="apiErrorIsBadge"
+                name="apiErrorIsBadge"
+                type="checkbox"
+                checked={formState.apiErrorIsBadge}
+                onChange={handleToggle}
+                className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-600 pointer-events-none" />
+            </label>
             <label className="flex items-center rounded-md px-2 py-1.5 gap-x-3 hover:cursor-pointer hover:bg-gray-50">
               <BellIcon className="shrink-0 h-6 w-6 text-gray-400" />
               <input
@@ -737,7 +789,7 @@ function OtherAlerts({ otherAlertConf, onSave }) {
                     className="h-4 w-4 border-gray-300 text-sky-600 focus:ring-sky-600" />
                   <div className="ml-3 text-sm leading-6">
                     <p className="font-medium text-gray-700">
-                      With cool down period
+                      With cooldown period
                     </p>
                     <p className="text-gray-500 text-pretty">
                       Only send gap notifications if a specified time interval has passed since the last notification at the same gap level or above. Notifications will always be sent if the new gap level is above the previous gap.

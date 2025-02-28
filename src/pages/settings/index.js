@@ -71,7 +71,7 @@ function SettingsMenus() {
   ]
 
   return (
-      <nav className="px-4 sm:px-6 lg:px-0">
+      <nav className="sticky top-8 px-4 sm:px-6 lg:px-0">
         <ul role="list" className="flex gap-x-3 gap-y-1 whitespace-nowrap lg:flex-col">
           {menus.map((menu) => (
             <li key={menu.name}>

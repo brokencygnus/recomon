@@ -1,7 +1,5 @@
-// Outputs a highlighted collection of <span>s based on search term
-// use base and highlight to define the tailwind class
-export function HighlightSearch(string, searchTerms, { base = undefined, highlight = undefined } = {}) {
-  if (!searchTerms || searchTerms.length == 0 || (searchTerms.length == 1 && searchTerms[0] == '')) {
+export function HighlightSearch(string, searchTerms, { base = 'font-normal', highlight = 'font-bold' } = {}) {
+  if (string === undefined || !searchTerms || searchTerms.length == 0 || (searchTerms.length == 1 && searchTerms[0] == '')) {
     return (
       <span className={base}>{string}</span>
     );
@@ -51,10 +49,14 @@ export function HighlightSearch(string, searchTerms, { base = undefined, highlig
 }
 
 
+// Returns boolean
 export const SearchFilter = (string, searchTerms) => {
   return (
+    // True if searchTerms is empty
     searchTerms.length == 0
+    // True if none of the searchTerms is valid
     || searchTerms.every(term => !term)
-    || searchTerms.every(term => string.toLowerCase().includes(term.toLowerCase()))
+    // True if every search term matches (e.g. "camp invest tech" matches "CAMP Investment Technologies")
+    || (string !== undefined && searchTerms.every(term => string.toLowerCase().includes(term.toLowerCase())))
   ) 
 }

@@ -150,8 +150,8 @@ export const activityLogs = [
   },
   {
     "id": 10,
-    "buCode": "LOAN",
-    "buName": "Loan",
+    "buCode": undefined,
+    "buName": undefined,
     "ageMS": 3042337,
     "userName": "Viswanathan Anand",
     "eventCategory": "api",

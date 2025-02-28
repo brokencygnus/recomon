@@ -163,7 +163,7 @@ function ActivityLogTable() {
                       {convertAgeMsToDateTime(log.ageMS)}
                     </ClientOnly>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{HighlightSearch(log.buCode, searchTerm, {highlight: "bg-sky-300"})} {HighlightSearch(log.buName, searchTerm, {highlight: "bg-sky-300"})}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{log.buCode ?? HighlightSearch(log.buCode, searchTerm, {highlight: "bg-sky-300"})} {log.buName ? HighlightSearch(log.buName, searchTerm, {highlight: "bg-sky-300"}) : "-"}</td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{log.userName}</td>
                   <td className="w-24 whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <div className="text-wrap">{renderActivity(log)}</div>
