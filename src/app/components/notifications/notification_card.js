@@ -33,7 +33,8 @@ export function NotificationCard({ data, displayedIn="page", ref }) {
       {...props}/>
   }
 
-  const notification = notificationTypes[data.type](data.args)
+  const notificationFunction = data?.type ? notificationTypes[data.type] : notificationTypes.fallback 
+  const notification = notificationFunction(data.args)
 
   // Sorry for the messy code, this is for notifications page and popover menu at the same time
   return (

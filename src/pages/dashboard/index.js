@@ -217,7 +217,7 @@ function ActivityLogSection() {
 
 function NotificationSection() {
   const { dashboardShowNNotifs } = config
-  const slicedNotifs = notifications.slice(0, dashboardShowNNotifs)
+  const slicedNotifs = notifications?.data.slice(0, dashboardShowNNotifs)
 
   return (
     <div className="flex flex-col h-full">

@@ -1,6 +1,6 @@
 'use client'
 import "../globals.css";
-import { createContext, useCallback, useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import {
   Menu,
   MenuButton,
@@ -9,29 +9,24 @@ import {
   Transition,
 } from '@headlessui/react'
 import {
-  IconLayoutSidebar,
-  IconHome,
-  IconPackage,
-  IconCamera,
-  IconCode,
-  IconNews,
-  IconBug,
-  IconSettings,
-  IconMenu2
-} from "@tabler/icons-react";
+  Cog6ToothIcon,
+  Square3Stack3DIcon,
+  HomeIcon,
+  CodeBracketIcon,
+  CameraIcon,
+  BugAntIcon,
+  NewspaperIcon,
+} from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { enabledCurrencies as currencies } from '@/app/utils/currencies'
-import { CurrencyIcon } from "@/app/components/currency_icon";
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
 import { ToastProvider, ToastGroup } from '@/app/components/toast'
 import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
 import { NotificationMenu } from '@/app/components/notifications/notification_menu'
 import { Breadcrumbs } from "@/app/components/breadcrumbs";
 import { Dropdown } from "@/app/components/dropdown";
-import KeyboardHotkey from "@/app/components/keyboard_hotkey";
 import { config } from "@/app/constants/config";
 import { NotificationBadges } from "./notifications/notification_badges";
-
 
 // mock data start
 
@@ -40,37 +35,30 @@ import { menusNotifications } from "@/app/constants/mockdata/notification_mockda
 
 // mock data end
 
-
 const businessUnitNav = structuredClone(businessUnits)
   .concat({ id: 0, name: 'View All', href: '/business-units' })
 
-
 const navigation = [
-  { code: 'dash', name: 'Dashboard', href: '/dashboard', icon: IconHome, submenus: []},
-  { code: 'bu', name: 'Business Units', href: '/business-units', icon: IconPackage, submenus: businessUnitNav},
-  { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: IconCamera, submenus: []},
-  { code: 'api', name: 'Manage APIs', href: '/api-list', icon: IconCode, submenus: []},
-  { code: 'log', name: 'Activity Log', href: '/activity-log', icon: IconNews, submenus: []},
+  { code: 'dash', name: 'Dashboard', href: '/dashboard', icon: HomeIcon, submenus: []},
+  { code: 'bu', name: 'Business Units', href: '/business-units', icon: Square3Stack3DIcon, submenus: businessUnitNav},
+  { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: CameraIcon, submenus: []},
+  { code: 'api', name: 'Manage APIs', href: '/api-list', icon: CodeBracketIcon, submenus: []},
+  { code: 'log', name: 'Activity Log', href: '/activity-log', icon: NewspaperIcon, submenus: []},
 ]
 
-
-config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: IconBug, submenus: []})
-
+config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: BugAntIcon, submenus: []})
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
   { name: 'Sign out', href: '#' },
 ]
 
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-
 // Context to configure reference currency on the sticky header
 export const RefCurContext = createContext({});
-
 
 // Import this if you want to use RefCurContext
 export const convertedCurrency = (amount, currency, referenceCurrency, signed=false) => {
@@ -83,9 +71,9 @@ export const convertedCurrency = (amount, currency, referenceCurrency, signed=fa
     sign = "+"
   }
 
-  if (referenceCurrency?.value !== 'self' && currency !== referenceCurrency?.value) {
-    convertedAmount = formatNumber(convertCurrency(amount, currency, referenceCurrency?.value))
-    currencySymbol = referenceCurrency?.value
+  if (referenceCurrency?.value !== 'self' && currency !== referenceCurrency?.symbol) {
+    convertedAmount = formatNumber(convertCurrency(amount, currency, referenceCurrency?.symbol))
+    currencySymbol = referenceCurrency?.symbol
     approxSymbol = "≈ "
   } else {
     let amountRounded = +parseFloat(amount).toFixed(8)
@@ -95,63 +83,44 @@ export const convertedCurrency = (amount, currency, referenceCurrency, signed=fa
   return approxSymbol + sign + convertedAmount + " " + currencySymbol
 }
 
-
 export default function Layout({ children, breadcrumbPages, currentTab }) {
   const [expanded, setExpanded] = useState(false)
-  const [keepExpanded, setKeepExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
   const [referenceCurrency, setReferenceCurrency] = useState({ noSelectionLabel:"None", name:"None", value:"self" })
 
   const nullRefCur = { noSelectionLabel:"None", name:"None", value:"self"}
 
-  const currencyOptions = currencies.map(currency => ({ name: currency.name, value: currency.symbol, icon: <CurrencyIcon size="xs" symbol={currency.symbol} /> }))
-
-  const openSidebar = () => {
-    !expanded && setKeepExpanded(false)
-    setExpanded(true)
+  const handleMouseEnterSidebar = () => {
+    setExpanded(true);
   };
 
-  const openSidebarAndKeepOpen = () => {
-    setExpanded(true)
-    setKeepExpanded(true)
-  };
-
-  const closeSidebar = () => {
-    !keepExpanded && setExpanded(false)
-  };
-
-  const forceCloseSidebar = () => {
-    setExpanded(false)
-    setHoveredMenu(null)
+  const handleMouseLeaveSidebar = () => {
+    setExpanded(false);
   };
 
   const handleMouseEnterMenu = (name) => {
-    const id = name
-    setHoveredMenu(id)
+    const id = name;
+    setHoveredMenu(id);
   };
 
   const handleMouseLeaveMenu = () => {
-    setHoveredMenu(null)
+    setHoveredMenu(null);
   };
 
   const handleReferenceCurrency = (event) => {
     const { value } = event.target
     setReferenceCurrency(value)
   }
-  
+
   return (
     <>
       <div>
-        <KeyboardHotkey hotkey={"Escape"} callback={forceCloseSidebar}/>
-        <div 
-          onClick={forceCloseSidebar}
-          className={classNames(
-            'transition-opacity ease-in-out', expanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
-            "fixed inset-0 max-w-screen h-screen z-[60] bg-gray-500")}
-        />
+        <div className={classNames(
+          'transition-opacity ease-in-out', expanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
+          "fixed inset-0 max-w-screen h-screen z-[60] bg-gray-500")}/>
         <div
-          onMouseEnter={openSidebar}
-          onMouseLeave={closeSidebar}
+          onMouseEnter={handleMouseEnterSidebar}
+          onMouseLeave={handleMouseLeaveSidebar}
           className={classNames(
             'transition-all ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
             "fixed inset-y-0 left-0 z-[61] block w-20 overflow-visible bg-stone-600 pb-10"
@@ -210,7 +179,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         <span className="sr-only">{navMenu.name}</span>
                       </a>
                       { navMenu.code === "bu" ?
-                        navMenu.submenus && navMenu.submenus.length > 0 && (
+                        navMenu.submenus.length > 0 ? (
                           <div className={classNames(
                             'transition-all ease-in-out', hoveredMenu === navMenu.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
                             "absolute left-12 top-0"
@@ -225,7 +194,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                                 { navMenu.submenus.map((submenu) => (
                                   <a
                                     key={submenu.id}
-                                    href={submenu.href ?? "/business-units/" + submenu.slug}
+                                    href={"/business-units/" + submenu.slug}
                                     className="group flex items-center px-6 py-3 hover:bg-gray-100"
                                   >
                                     <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">
@@ -243,7 +212,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                               </dl>
                             </div>
                           </div>
-                        )
+                        ) : null
                         :
                         // If for some reason other menus other than business unit
                         // needs their submenus, add their logic here.
@@ -263,7 +232,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         'group flex gap-x-3 rounded-md p-3 text-stone-200 hover:bg-stone-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
-                      <IconSettings
+                      <Cog6ToothIcon
                         className="h-6 w-6 shrink-0 text-stone-200 group-hover:text-white"
                         aria-hidden="true"
                       />
@@ -281,28 +250,16 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
         </div>
 
         <div className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-hidden">
-          <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-1 border-b border-zinc-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
+          <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 
-            <button
-              onClick={openSidebarAndKeepOpen}
-              className="flex rounded-lg hover:bg-zinc-50"
-            >
-              <IconLayoutSidebar
-                className="size-5 m-1 shrink-0 text-zinc-500 hover:text-zinc-700"
-                aria-hidden="true"
-              />
-            </button>
-            <div
-              name="separator"
-              className="flex justify-center items-center size-4 m-1"
-              aria-hidden="true"
-            >
-              <div className="h-4 w-0.5 bg-zinc-300" aria-hidden="true" />
-            </div>
+            {/* Separator */}
+            {/* <div className="h-6 w-px bg-gray-900/10" aria-hidden="true" /> */}
 
-            <div className="flex flex-1 self-stretch lg:gap-x-6">
-              <div className="flex items-center flex-1">
-                <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+              <div className="flex items-center flex-1 px-4">
+                { breadcrumbPages &&
+                  <Breadcrumbs breadcrumbPages={breadcrumbPages} />
+                }
               </div>
               {/* <div className="relative flex flex-1" action="#" method="GET">
                 <label htmlFor="search-field" className="sr-only">
@@ -320,46 +277,43 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                   name="search"
                 />
               </div> */}
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-4 lg:gap-x-6">
 
-                <div className="flex flex-row items-center gap-x-1">
-                  <p className="text-sm text-zinc-600">Reference currency:</p>
+                <div className="flex flex-row items-center">
+                  <p className="text-sm text-gray-400 pr-3">Reference currency:</p>
                   <Dropdown
                     name='intervalType'
-                    options={currencyOptions}
+                    options={currencies}
                     nullOption={nullRefCur}
                     selectedOption={referenceCurrency.name}
-                    selectedIcon={referenceCurrency.icon}
                     onSelect={handleReferenceCurrency}
                     className="w-40 rounded-md bg-white hover:bg-gray-50"
                   />
                 </div>
 
+                {/* Separator */}
+                <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
+
                 <NotificationMenu />
+
+                {/* Separator */}
+                <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative">
-                  <MenuButton className="group flex items-center gap-x-2">
+                  <MenuButton className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    <div className="flex items-center outline outline-1 outline-zinc-200 py-1 p-1 gap-x-1 rounded-full group-hover:bg-zinc-50 group-hover:outline-zinc-300">
-                      <IconMenu2
-                        className="size-5 shrink-0 text-zinc-500 hover:text-zinc-500 group-hover:text-zinc-700"
-                        aria-hidden="true"
-                      />
-                      <img
-                        className="h-7 w-7 rounded-full bg-gray-50 object-cover"
-                        src="/profile.jpg"
-                        alt=""
-                      />
-                    </div>
-                    <div className="flex flex-col items-start gap-y-1">
-                      <p className="text-sm font-semibold leading-6 text-zinc-800 leading-none">
-                          Christian Hsieh
-                      </p>
-                      <p className="text-xs leading-6 text-zinc-600 leading-none">
-                        IP: 127.0.0.1
-                      </p>
-                    </div>
+                    <img
+                      className="h-8 w-8 rounded-full bg-gray-50"
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      alt=""
+                    />
+                    <span className="hidden lg:flex lg:items-center">
+                      <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
+                        Tom Cook
+                      </span>
+                      <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
                   </MenuButton>
                   <Transition
                     enter="transition ease-out duration-100"

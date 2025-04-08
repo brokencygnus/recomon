@@ -44,7 +44,7 @@ export default function AccountPage() {
   
   const breadcrumbPages = [
     { name: 'Business Units', href: '/business-units', current: false },
-    { name: businessUnit()?.name, href: `/business-units/${businessUnit()?.slug}`, current: true },
+    { name: businessUnit()?.name, href: `/business-units/${businessUnit()?.slug}`, current: false },
     { name: 'Accounts', href: '#', current: true },
   ]
 
@@ -350,7 +350,7 @@ function EditAccount({ setClose }) {
 
   // Dropdown options 1
   const apiOptions = APIs.map(api => ({ name: api.name, code: api.code, value: api.id }))
-  const currencyOptions = currencies.map(currency => ({ name: currency.name, value: currency.symbol }))
+  const currencyOptions = currencies.map(currency => ({ name: currency.name, value: currency.symbol, icon: <CurrencyIcon size="xs" symbol={currency.symbol} /> }))
 
   const initialState = {
     code: modalData?.code ?? '',
@@ -483,6 +483,7 @@ function EditAccount({ setClose }) {
                   labelText="Currency"
                   options={currencyOptions}
                   selectedOption={formState?.currency?.name}
+                  selectedIcon={formState?.currency?.icon}
                   onSelect={handleFormChange}
                   className="block w-full mt-3 rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-sky-600"
                 />

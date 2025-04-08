@@ -15,7 +15,7 @@ function classNames(...classes) {
 const badgeTypes = {
   "gap_unacceptable_entireBU": {
     icon: Square3Stack3DIcon,
-    color: "text-amber-500",
+    color: "text-yellow-500",
     snapshotMsg: "This business unit as a whole has surpassed the acceptable gap threshold.",
     currencyMsg: null,
     accountMsg: null,
@@ -23,7 +23,7 @@ const badgeTypes = {
   },
   "gap_critical_entireBU": {
     icon: Square3Stack3DIcon,
-    color: "text-red-400",
+    color: "text-red-600",
     snapshotMsg: "This business unit as a whole has reached the critical gap threshold.",
     currencyMsg: null,
     accountMsg: null,
@@ -31,7 +31,7 @@ const badgeTypes = {
   },
   "gap_unacceptable_currency": {
     icon: BanknotesIcon,
-    color: "text-amber-500",
+    color: "text-yellow-500",
     snapshotMsg: "One or more currencies has surpassed the acceptable gap threshold.",
     currencyMsg: "This currency has surpassed the acceptable gap threshold.",
     accountMsg: null,
@@ -39,7 +39,7 @@ const badgeTypes = {
   },
   "gap_critical_currency": {
     icon: BanknotesIcon,
-    color: "text-red-400",
+    color: "text-red-600",
     snapshotMsg: "One or more currencies has reached the critical gap threshold.",
     currencyMsg: "This currency has surpassed the critical gap threshold.",
     accountMsg: null,
@@ -47,7 +47,7 @@ const badgeTypes = {
   },
   "api_config_error": {
     icon: CodeBracketSquareIcon,
-    color: "text-red-400",
+    color: "text-red-600",
     snapshotMsg: "An API did not provide data for one or more accounts.",
     currencyMsg: "An API did not provide data for one or more accounts.",
     accountMsg: "The API did not provide data to this account.",
@@ -55,7 +55,7 @@ const badgeTypes = {
   },
   "api_request_failed": {
     icon: CodeBracketSquareIcon,
-    color: "text-amber-500",
+    color: "text-yellow-500",
     snapshotMsg: "A retrieval attempt to one of your APIs has recently failed.",
     currencyMsg: "A retrieval attempt to one of your APIs has recently failed.",
     accountMsg: "A recent attempt to retrieve this account's balances from the API has failed",
@@ -63,7 +63,7 @@ const badgeTypes = {
   },
   "blockchain_connection_failed": {
     icon: CubeTransparentIcon,
-    color: "text-amber-500",
+    color: "text-yellow-500",
     snapshotMsg: "A retrieval attempt to the blockchain network has recently failed.",
     currencyMsg: "A retrieval attempt to the blockchain network has recently failed.",
     accountMsg: "A recent attempt to retrieve this account's balances from the blockchain has failed",
@@ -71,7 +71,7 @@ const badgeTypes = {
   },
   "too_long_since_last_update": {
     icon: ClockIcon,
-    color: "text-gray-300",
+    color: "text-zinc-400",
     snapshotMsg: "One or more accounts has not been manually updated for a while.",
     currencyMsg: "One or more accounts has not been manually updated for a while.",
     accountMsg: "This account has not been manually updated for a while.",

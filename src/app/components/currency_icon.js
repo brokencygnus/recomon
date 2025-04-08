@@ -51,7 +51,7 @@ export function CurrencyIcon({ symbol, size, ...props }) {
               borderColor: color,
               backgroundColor: color
             }}
-            className={classNames(textSize(size, textSymbol), iconSize(), "overflow-hidden flex items-center justify-center border-2 rounded-full text-white font-bold")}
+            className={classNames(textSize(size, textSymbol), iconSize(), "overflow-hidden flex items-center justify-center border-2 rounded-full text-white font-bold shrink-0")}
           >
             {textSymbol}
           </div>

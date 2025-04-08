@@ -55,9 +55,9 @@ function NotificationHeader() {
 
 // TODO convert logic from ageMS to datetime
 function NotificationsList({ notifications }) {
-  const todayNotif = notifications.filter(notif => notif.ageMs < 86400000)
-  const yesterNotif = notifications.filter(notif => notif.ageMs >= 86400000 && notif.ageMs < 2*86400000)
-  const olderNotif = notifications.filter(notif => notif.ageMs >= 2*86400000)
+  const todayNotif = notifications?.data.filter(notif => notif.ageMs < 86400000)
+  const yesterNotif = notifications?.data.filter(notif => notif.ageMs >= 86400000 && notif.ageMs < 2*86400000)
+  const olderNotif = notifications?.data.filter(notif => notif.ageMs >= 2*86400000)
 
   return (
     <div className="flex flex-col mt-8 gap-y-5">

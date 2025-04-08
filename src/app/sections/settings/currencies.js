@@ -110,7 +110,7 @@ export default function Currencies() {
           <div className="flex flex-row justify-between">
             <div className="flex flex-col gap-y-2 text-sm text-gray-600">
               <p>Configure which supported currencies you want to use in your business units.</p>
-              <p>Don't see the currency you need?&#20;
+              <p>Don't see the currency you need?{" "}
               <a href='#' className="font-semibold text-sky-600 hover:text-sky-900">Submit a currency request</a>
               </p>
             </div>
@@ -221,7 +221,7 @@ function CurrencyCard({ currency, searchTerm, toggleCallback }) {
           <CurrencyIcon symbol={currency.symbol} size='xs'/>
       <p>
         {HighlightSearch(currency.name, searchTerm, {highlight: "bg-sky-300"})}
-        &#20;({HighlightSearch(currency.symbol, searchTerm, {highlight: "bg-sky-300"})})
+        {" "}({HighlightSearch(currency.symbol, searchTerm, {highlight: "bg-sky-300"})})
       </p>
       {currency.enabled && <XMarkIcon
         className="w-5 text-gray-400 hover:text-gray-500"

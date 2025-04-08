@@ -271,7 +271,7 @@ export function BusinessUnitGrid({ businessUnits, searchTerm }) {
                   </h3>
                   <div className="flex items-center justify-end gap-x-1">
                     {businessUnit.alerts && businessUnit.alerts.length !== 0 &&
-                      <NotificationBadges size="md" alerts={businessUnit.alerts}/>
+                      <NotificationBadges size="sm" alerts={businessUnit.alerts}/>
                     }
                   </div>
                 </div>

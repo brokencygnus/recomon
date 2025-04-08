@@ -1,4 +1,6 @@
 export const notificationTypes = {
+  "fallback": () => ({icon: "exclamationCircle", color: "red", header: null, body: null, link: null, href: null}),
+
   "gap_critical_entireBU": ({ buName, buSlug }) => ({
     icon: "exclamationCircle",
     color: "red",

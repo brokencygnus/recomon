@@ -14,7 +14,6 @@ import { CurrencyIcon } from '@/app/components/currency_icon';
 import { config } from '@/app/constants/config';
 import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
-import { IconPlus } from '@tabler/icons-react'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -78,7 +77,7 @@ export default function SummaryPage() {
   
   return (
     <Layout currentTab="bu" breadcrumbPages={breadcrumbPages} >
-      <main className="min-h-full pt-8 pb-12 px-8 bg-zinc-100">
+      <main className="min-h-full pt-6 pb-12 px-12 2xl:px-16 bg-stone-100">
         <ReconciliationHeader
           businessUnit={businessUnit}
           buAlerts={buAlerts}
@@ -98,49 +97,44 @@ export default function SummaryPage() {
 
 export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAlerts }) {
   return (
-    <div className="flex items-center mb-4 bg-white rounded-xl border p-6 border-zinc-200 shadow-sm">
+    <div className="flex items-center mb-4">
       <div className="flex-auto">
-        <header>
-          <div className="max-w-7xl">
-            <div className="flex items-center gap-x-2">
-              <div className="flex items-baseline gap-x-2">
-                <h1 className="text-2xl font-semibold text-zinc-800">{businessUnit?.name}</h1>
-                <p className="text-2xl font-semibold text-zinc-400">{businessUnit?.code}</p>
+        <div className="py-4">
+          <header>
+            <div className="max-w-7xl">
+              <div className="flex items-center gap-x-3">
+                <div className="flex items-baseline gap-x-3">
+                  <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900">{businessUnit?.name}</h1>
+                  <p className="text-xl font-medium leading-tight tracking-tight text-gray-400">{businessUnit?.code}</p>
+                </div>
+                <div className="flex gap-x-2">
+                  <ClientOnly>
+                    <NotificationBadges size="sm" alerts={buAlerts} />
+                  </ClientOnly>
+                </div>
               </div>
-              <div className="flex gap-x-2">
-                <ClientOnly>
-                  <NotificationBadges size="sm" alerts={buAlerts} />
-                </ClientOnly>
-              </div>
+              <p className="mt-2 text-sm text-gray-700">
+                {businessUnit?.description ?? "View your tracked currencies in this business unit and monitor their discrepancies."}
+              </p>
             </div>
-            <p className="mt-2 text-sm text-zinc-500">
-              {businessUnit?.description ?? "View your tracked currencies in this business unit and monitor their discrepancies."}
-            </p>
-          </div>
-        </header>
+          </header>
+        </div>
       </div>
       {!snapshotID ?
         <div className="flex items-end">
           <div className="flex flex-row justify-items-end">
-            <div className="flex gap-x-3 items-end">
+            <div className="flex mx-4 items-end">
               <a
                 href={`/snapshots?business-unit=${businessUnit?.slug}`}
-                className="h-10 flex text-nowrap items-center border border-zinc-200 shadow-sm rounded-lg px-2 py-3 text-sm font-semibold text-zinc-800"
+                className="h-10 flex text-nowrap items-center rounded px-2 mx-4 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
               >
                 View snapshots
               </a>
               <a
                 href={`/business-units/${businessUnit?.slug}/accounts`}
-                className="h-10 flex text-nowrap items-center border border-zinc-200 shadow-sm rounded-lg px-2 py-3 text-sm font-semibold text-zinc-800"
+                className="h-10 flex text-nowrap items-center rounded px-2 py-1 text-sm font-semibold text-sky-600 hover:text-sky-900"
               >
                 View all accounts
-              </a>
-              <a
-                href={`/business-units/${businessUnit?.slug}/accounts?action=new`}
-                className="h-10 flex text-nowrap items-center border border-dark-blue-700 shadow-sm rounded-lg px-2 py-3 bg-dark-blue-500 text-sm font-semibold text-white"
-              >
-                <IconPlus className="mr-1 size-4 shrink-0 text-zinc-50"/>
-                <span>Add account</span>
               </a>
             </div>
           </div>
