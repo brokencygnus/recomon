@@ -6,7 +6,7 @@ export const APIs = [
     ageMS: 7527951,
     url: "https://www.campinvestment.com/api/fireblocks-api",
     custom_headers: `{"Authorization": "Bearer aByw0ysG?a9p4DVE8dVejvRqQqc9gfu8bhjcQktePcGmmoQRD2kO7IIE-X?QIydVej6obypz8f3pb6xyzp7dMgTMniOZ3!pAUWaPxIFEntpcVETSLjO?FworL/ZIHK=d4lyKJYViK52Ho=bOUAEIw!VyBlbwjB6qA-T-MrF-F/QauhZUm2vSvIBX0Wk800iCSYH7j3N7US-hlso/2aHN5FAoV6gyFL83dsEP/DvTl3=xyg7QT6q-7rQYUJtjNy!j", "Content-Type": "application/json"}`,
-    alerts: ["api_config_error"],
+    alerts: {"api_config_error": 0},
     testResult: "200 OK",
     testResponse: `{"success": true, "data": { "BTC-A002":"12345678.12345678", "ETH-A001":"12345678.12345678", "BTC-FDA006":"12345678.12345678", "BTC-FDA007":"12345678.12345678", "ETH-FDA002":"12345678.12345678", "ETH-FDA003":"12345678.12345678", "ETH-A001":"12345678.12345678", "SOL-A001":"12345678.12345678" }}`,
     apiRetrievalSettings: {
@@ -72,7 +72,7 @@ export const APIs = [
     ageMS: 6149116,
     url: "https://www.campinvestment.com/api/falconx-api",
     custom_headers: `{"Authorization": "Bearer /yareM6OXxlkAp/fTeCMx!I8SBEdEapuWn0lMLoMY9ChLcYvpPk3a!f7V9DhyxSPe!TAr/cbC?udDm?OeIEndM?-LgMCS-imJbYjQw11w7=6I58?OcxWLn!/4F5nLWNN8N2l8K7Cf!vo1Yl5ITyz6fipN0QfA8OIg2l?Te=H1/qZNIFMs5jR1YjIWwZXcTZz2jXxh?cy8DyyIUgLYjLTukTeAdbKpcuU5nU9xiJ?fUr6Ff9ByFHifaDEFpi6t!zI, "Content-Type": "application/json"}`,
-    alerts: ["api_request_failed", "api_config_error"],
+    alerts: {"api_request_failed": 0, "api_config_error": 0},
     testResult: "218 This is fine",
     testResponse: `{ "success": false, "code": "500", "message": "Internal Server Error" }`,
     apiRetrievalSettings: null

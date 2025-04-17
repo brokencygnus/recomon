@@ -222,9 +222,7 @@ export function APITable({ apiData, searchTerm }) {
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">
                     <div className="flex justify-between items-center">
-                      <SeeMore
-                        content={HighlightSearch(api.url, searchTerm, {base: '', highlight: 'bg-sky-300'})}
-                      />
+                      <SeeMore>{HighlightSearch(api.url, searchTerm, {base: '', highlight: 'bg-sky-300'})}</SeeMore>
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600 border-b border-gray-300">
@@ -236,9 +234,7 @@ export function APITable({ apiData, searchTerm }) {
                   </td>
                   {/* <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">
                     <div className="flex justify-between items-center">
-                      <SeeMore
-                        content={item.custom_headers}
-                      />
+                      <SeeMore>item.custom_headers<SeeMore/>
                     </div>
                   </td> */}
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-b border-gray-300">

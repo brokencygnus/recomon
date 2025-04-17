@@ -14,7 +14,8 @@ import { CurrencyIcon } from '@/app/components/currency_icon';
 import { config } from '@/app/constants/config';
 import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconInfoCircle, IconHelp } from '@tabler/icons-react'
+import { DiscLabel } from '@/app/components/DiscLabel';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -24,8 +25,19 @@ function classNames(...classes) {
 
 import { businessUnits } from '@/app/constants/mockdata/mockdata'
 import { exchangeCurrencies, exchangeSummary } from "@/app/constants/mockdata/exchange_mockdata";
+import { Modal } from '@/app/components/modal';
 
 // Mock data end
+
+const accountAlert = (accountGroup, alertCallback) => {
+  accountGroup.forEach(account => {
+    if (account.alerts) {
+      Object.keys(account.alerts).forEach(newAlert => {
+        alertCallback(newAlert)
+      })
+    }
+  })
+}
 
 export default function SummaryPage() {
   const router = useRouter()
@@ -48,33 +60,62 @@ export default function SummaryPage() {
 
   const [buAlerts, setBuAlerts] = useState([])
 
-  const addBuAlerts = (newAlert) => {
-    if (!buAlerts.some(alert => alert === newAlert)) {
+  const addBuAlerts = (newAlert, amount=1) => {
+    setBuAlerts(prev => ({
+      ...prev,
+      [newAlert]: (prev[newAlert] || 0) + amount
+    }));
+  }
 
-      // Critical currency blocks unacceptable currency
-      if (!(newAlert === "gap_unacceptable_currency" && buAlerts.some(alert => alert === "gap_critical_currency"))) {
-        setBuAlerts([...buAlerts, newAlert])
-      }
-      // Critical currency replaces unacceptable currency
-      if (newAlert === "gap_critical_currency" && buAlerts.some(alert => alert === "gap_unacceptable_currency")) {
-        const newBuAlerts = buAlerts.filter(alert => alert !== "gap_unacceptable_currency")
-        setBuAlerts([...newBuAlerts, newAlert])
-      }
+  // const addBuAlerts = (newAlert) => {
+  //   if (!buAlerts.some(alert => alert === newAlert)) {
+
+  //     // Critical currency blocks unacceptable currency
+  //     if (!(newAlert === "gap_unacceptable_currency" && buAlerts.some(alert => alert === "gap_critical_currency"))) {
+  //       setBuAlerts([...buAlerts, newAlert])
+  //     }
+  //     // Critical currency replaces unacceptable currency
+  //     if (newAlert === "gap_critical_currency" && buAlerts.some(alert => alert === "gap_unacceptable_currency")) {
+  //       const newBuAlerts = buAlerts.filter(alert => alert !== "gap_unacceptable_currency")
+  //       setBuAlerts([...newBuAlerts, newAlert])
+  //     }
+  //   }
+  // }
+
+  useEffect(() => {
+    switch (getDiscrLvl({
+      discrepancy: exchangeSummary.discrepancy,
+      discrAlertConf: exchangeSummary.discrAlertConf,
+      capital: exchangeSummary.capital
+    })) {
+      case 2: case -2:
+        addBuAlerts("gap_critical_entireBU", 0)
+        break
+      case 1: case -1:
+        addBuAlerts("gap_unacceptable_entireBU", 0)
+        break
     }
-  }
 
-  switch (getDiscrLvl({
-    discrepancy: exchangeSummary.discrepancy,
-    discrAlertConf: exchangeSummary.discrAlertConf,
-    capital: exchangeSummary.capital
-  })) {
-    case "critical":
-      addBuAlerts("gap_critical_entireBU")
-      break
-    case "unacceptable":
-      addBuAlerts("gap_unacceptable_entireBU")
-      break
-  }
+    exchangeCurrencies.map(currency => {
+      switch (getDiscrLvl({
+        discrepancy: currency.discrepancy,
+        discrAlertConf: currency.discrAlertConf,
+        capital: currency.capitalTotal,
+        symbol: currency.symbol
+      })) {
+        case 2: case -2:
+          addBuAlerts("gap_critical_currency", 1)
+          break
+        case 1: case -1:
+            addBuAlerts("gap_unacceptable_currency", 1)
+          break
+      }
+
+      accountAlert(currency.capitals, addBuAlerts)
+      accountAlert(currency.assets, addBuAlerts)
+      accountAlert(currency.liabilities, addBuAlerts)
+    })
+  }, [exchangeSummary, exchangeCurrencies])
   
   return (
     <Layout currentTab="bu" breadcrumbPages={breadcrumbPages} >
@@ -98,7 +139,7 @@ export default function SummaryPage() {
 
 export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAlerts }) {
   return (
-    <div className="flex items-center mb-4 bg-white rounded-xl border p-6 border-zinc-200 shadow-sm">
+    <div className="flex items-center mb-4 bg-white rounded-xl border p-6 border-zinc-200 gap-x-12 shadow-sm">
       <div className="flex-auto">
         <header>
           <div className="max-w-7xl">
@@ -107,7 +148,7 @@ export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAle
                 <h1 className="text-2xl font-semibold text-zinc-800">{businessUnit?.name}</h1>
                 <p className="text-2xl font-semibold text-zinc-400">{businessUnit?.code}</p>
               </div>
-              <div className="flex gap-x-2">
+              <div className="flex gap-x-1.5">
                 <ClientOnly>
                   <NotificationBadges size="sm" alerts={buAlerts} />
                 </ClientOnly>
@@ -144,12 +185,6 @@ export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAle
               </a>
             </div>
           </div>
-          {/* <button
-            type="button"
-            className="ml-4 block rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            Add currency
-          </button> */}
         </div>
       : null }
     </div>
@@ -158,11 +193,12 @@ export function ReconciliationHeader({ businessUnit, snapshotID=undefined, buAle
 
 export function ReconciliationSection({ businessUnit, currencyData, summaryData, snapshotID=undefined, snapshotTime, addBuAlerts }) {
   const { referenceCurrency } = useContext(RefCurContext)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const colors = {
     crit: "text-red-600",
     acctble: "text-amber-600",
-    default: "text-gray-700"
+    default: "text-sky-600"
   }
 
   const router = useRouter()
@@ -200,6 +236,14 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     }
   };
 
+  const openHelp = () => {
+    setHelpOpen(true)
+  }
+  
+  const closeHelp = () => {
+    setHelpOpen(false)
+  }
+
   // Wipe effect
   // I needed to scour stackoverflow for this
   // https://stackoverflow.com/a/26476282
@@ -218,9 +262,15 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
   }, [currentCurrency])
 
   const stats = [
-    { name: 'Total capital', value: convertedCurrency(summaryData.capital, config.collateCurrency, referenceCurrency) },
-    { name: 'Total assets', value: convertedCurrency(summaryData.assets, config.collateCurrency, referenceCurrency) },
-    { name: 'Total liabilities', value: convertedCurrency(summaryData.liabilities, config.collateCurrency, referenceCurrency) },
+    { name: 'Total Capital',
+      value: convertedCurrency(summaryData.capital, config.collateCurrency, referenceCurrency),
+      tooltip: 'A list of capital sources from owners, stakeholders, etc.'},
+    { name: 'Total Assets',
+      value: convertedCurrency(summaryData.assets, config.collateCurrency, referenceCurrency),
+      tooltip: 'A list of available cryptocurrency or fiat resources.'},
+    { name: 'Total Liabilities',
+      value: convertedCurrency(summaryData.liabilities, config.collateCurrency, referenceCurrency),
+      tooltip: 'A list of obligations or debts owed tocustomers or counterparties.'},
     { name: 'Gap',
       value: convertedCurrency(summaryData.discrepancy, config.collateCurrency, referenceCurrency, true),
       change: (summaryData.discrepancy / summaryData.capital * 100).toFixed(2) + '%'
@@ -236,34 +286,47 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
   return (
     <>
       <div id={"summary"} key={"summary"}>
-
-        <div className="relative bg-white rounded-lg ring-1 ring-inset ring-gray-300/5 shadow-md overflow-hidden">
-          <div className="border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5 z-[12]">
-            <dl className="mx-auto grid max-w-7xl grid-cols-4">
+        <Modal
+          open={helpOpen}
+          setClose={closeHelp}
+          panelTitle={<>What is Gap?</>}
+        >
+          <GapHelp/>
+        </Modal>
+        <div className="relative bg-zinc-50 rounded-xl border border-zinc-200 shadow-sm">
+          <div className="border-b">
+            <div className="px-5 py-4">
+              <p className="text-base font-semibold text-zinc-800">Spotlight</p>
+            </div>
+            <dl className="rounded-xl w-full grid grid-cols-4 bg-white border-t border-zinc-200">
               {stats.map((stat, statIdx) => (
                 <div
                   key={stat.name}
                   className={classNames(
-                    statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
-                    'flex flex-wrap items-baseline justify-start gap-x-4 gap-y-2 border-t border-gray-900/5 z-[12] px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
+                    statIdx !== 0 && 'border-l border-zinc-200',
+                    'flex flex-col items-baseline justify-start gap-x-3 gap-y-2 px-6 py-8',
                   )}
                 >
-                  <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
-                  {stat.change && 
-                    <dd className='text-xs font-medium'>
-                      <span className={classNames(
-                        stat.name === 'Gap' && discrepancyColor({
-                          discrepancy: summaryData.discrepancy,
-                          discrAlertConf: summaryData.discrAlertConf,
-                          capital: summaryData.capital,
-                          colors: colors
-                        })
-                      )}>
-                        {stat.change}
-                      </span>
-                      <span className="text-gray-500"> of capital</span>
-                    </dd>
-                  }
+                  <dt>
+                    {stat.name !== 'Gap'
+                      ?
+                        <PopoverComp position="top">
+                          <div className="flex items-center gap-x-0.5 pb-1">
+                            <span className="text-sm font-medium leading-[17px] text-zinc-500">{stat.name}</span>
+                            <IconInfoCircle className="size-4 shrink-0 text-zinc-600"/>
+                          </div>
+                          <p className="leading-[27px] text-sm font-normal text-white">{stat.tooltip}</p>
+                        </PopoverComp>
+                      :
+                        <button
+                          className="group flex items-center p-1 -m-1 pb-2 rounded-lg gap-x-0.5 hover:cursor-pointer hover:bg-zinc-50"
+                          onClick={openHelp}
+                        >
+                          <span className="text-sm font-medium leading-[17px] text-zinc-500 group-hover:text-zinc-700">{stat.name}</span>
+                          <IconHelp className="size-4 shrink-0 text-zinc-600 group-hover:text-zinc-800"/>
+                        </button>
+                    }
+                  </dt>
                   <dd className={classNames(
                     stat.name === 'Gap' && discrepancyColor({
                       discrepancy: summaryData.discrepancy,
@@ -274,31 +337,33 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                   )}>
                     {stat.value}
                   </dd>
+                  {stat.change && 
+                    <dd className='flex items-center justify-center text-xs font-medium gap-x-1'>
+                      <div>
+                        <span className={classNames(
+                          stat.name === 'Gap' && discrepancyColor({
+                            discrepancy: summaryData.discrepancy,
+                            discrAlertConf: summaryData.discrAlertConf,
+                            capital: summaryData.capital,
+                            colors: colors
+                          })
+                        )}>
+                          {stat.change}
+                        </span>
+                        <span className="text-gray-500"> of capital</span>
+                      </div>
+                      <DiscLabel discrepancy={getDiscrLvl({
+                        discrepancy: summaryData.discrepancy,
+                        discrAlertConf: summaryData.discrAlertConf,
+                        capital: summaryData.capital,
+                        colors: colors
+                      })}/>
+                    </dd>
+                  }
                 </div>
               ))}
             </dl>
           </div>
-          
-          {/* Header */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-10 transform-gpu opacity-20 blur-3xl sm:transform-gpu sm:opacity-50"
-          >
-            <div
-              style={{
-                clipPath:
-                  'polygon(30% 0%, 64% 7%, 72% 35%, 100% 21%, 100% 100%, 31% 100%, 39% 22%, 0% 15%)',
-              }}
-              className={`size-full h-96 bg-gradient-to-br ${discrepancyColor({
-                discrepancy: summaryData.discrepancy,
-                discrAlertConf: summaryData.discrAlertConf,
-                capital: summaryData.capital,
-                colors: bgColors
-              })}`}
-            />
-          </div>
-        
-          <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-50% via-white/80 to-80% to-transparent z-[11]"/>
         </div>
 
         {/* Old header */}
@@ -362,70 +427,77 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
           </div>
         </div> */}
       </div>
-      {currencyData.map(currency => 
-      <div id={currency.symbol} key={currency.symbol}>
-        <DetailsHeader 
-          currency={currency}
-          referenceCurrency={referenceCurrency}
-          changeCurrency={changeCurrency}
-          addBuAlerts={addBuAlerts}
-        />
-        <div className="px-3">
-          <div 
-            id={currency.symbol + "-table"}
-            style={{
-              height: '0px',
-              opacity: 0,
-              marginBottom: currentCurrency == currency.symbol? '48px' : '0px',
-              transition: currentCurrency == currency.symbol? ['height 0.3s ease-in-out', "opacity 0.2s"] : ['height 0.5s ease-in-out', "opacity 1s"]
-            }}
-            className="bg-white rounded-b-lg border-x border-b border-gray-200 shadow-md overflow-hidden"
-          >
-            <DetailsTable
-              businessUnit={businessUnit}
-              accounts={currency.capitals}
-              total={currency.capitalTotal}
-              type={"capital"}
-              symbol={currency.symbol}
-              snapshotID={snapshotID}
-            >
-              <h1 className="text-base font-semibold leading-6 text-gray-900">Capitals</h1>
-              <p className="mt-2 text-sm text-gray-700">
-                A list of capital sources from owners, stakeholders, etc.
-              </p>
-            </DetailsTable>
-            <DetailsTable
-              businessUnit={businessUnit}
-              accounts={currency.assets}
-              total={currency.assetTotal}
-              type={"asset"}
-              symbol={currency.symbol}
-              snapshotID={snapshotID}
-              snapshotTime={snapshotTime}
-            >
-              <h1 className="text-base font-semibold leading-6 text-gray-900">Assets</h1>
-              <p className="mt-2 text-sm text-gray-700">
-                A list of available cryptocurrency or fiat resources.
-              </p>
-            </DetailsTable>
-            <DetailsTable
-              businessUnit={businessUnit}
-              accounts={currency.liabilities}
-              total={currency.liabilityTotal}
-              type={"liability"}
-              symbol={currency.symbol}
-              snapshotID={snapshotID}
-              snapshotTime={snapshotTime}
-            >
-              <h1 className="text-base font-semibold leading-6 text-gray-900">Liabilities</h1>
-              <p className="mt-2 text-sm text-gray-700">
-                A list of obligations or debts owed to customers or counterparties.
-              </p>
-            </DetailsTable>
+      <div className="relative bg-zinc-50 rounded-xl border border-zinc-200 mt-6 shadow-sm">
+        <div className="border-b">
+          <div className="px-5 py-4">
+            <p className="text-base font-semibold text-zinc-800">Currency Breakdown</p>
           </div>
         </div>
+        {currencyData.map(currency =>
+        <div id={currency.symbol} key={currency.symbol}>
+          <DetailsHeader
+            currency={currency}
+            referenceCurrency={referenceCurrency}
+            changeCurrency={changeCurrency}
+            addBuAlerts={addBuAlerts}
+          />
+          <div className="px-3">
+            <div
+              id={currency.symbol + "-table"}
+              style={{
+                height: '0px',
+                opacity: 0,
+                marginBottom: currentCurrency == currency.symbol? '48px' : '0px',
+                transition: currentCurrency == currency.symbol? ['height 0.3s ease-in-out', "opacity 0.2s"] : ['height 0.5s ease-in-out', "opacity 1s"]
+              }}
+              className="bg-white rounded-b-lg border-x border-b border-gray-200 shadow-md overflow-hidden"
+            >
+              <DetailsTable
+                businessUnit={businessUnit}
+                accounts={currency.capitals}
+                total={currency.capitalTotal}
+                type={"capital"}
+                symbol={currency.symbol}
+                snapshotID={snapshotID}
+              >
+                <h1 className="text-base font-semibold leading-6 text-gray-900">Capitals</h1>
+                <p className="mt-2 text-sm text-gray-700">
+                  A list of capital sources from owners, stakeholders, etc.
+                </p>
+              </DetailsTable>
+              <DetailsTable
+                businessUnit={businessUnit}
+                accounts={currency.assets}
+                total={currency.assetTotal}
+                type={"asset"}
+                symbol={currency.symbol}
+                snapshotID={snapshotID}
+                snapshotTime={snapshotTime}
+              >
+                <h1 className="text-base font-semibold leading-6 text-gray-900">Assets</h1>
+                <p className="mt-2 text-sm text-gray-700">
+                  A list of available cryptocurrency or fiat resources.
+                </p>
+              </DetailsTable>
+              <DetailsTable
+                businessUnit={businessUnit}
+                accounts={currency.liabilities}
+                total={currency.liabilityTotal}
+                type={"liability"}
+                symbol={currency.symbol}
+                snapshotID={snapshotID}
+                snapshotTime={snapshotTime}
+              >
+                <h1 className="text-base font-semibold leading-6 text-gray-900">Liabilities</h1>
+                <p className="mt-2 text-sm text-gray-700">
+                  A list of obligations or debts owed to customers or counterparties.
+                </p>
+              </DetailsTable>
+            </div>
+          </div>
+        </div>
+        )}
       </div>
-      )}
     </>
   )
 
@@ -434,44 +506,35 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
     const convertSigned = (amount) => convertedCurrency(amount, currency.symbol, referenceCurrency, true)
     // const convertUSD = (amount) => convertCurrency(amount, currency.symbol, config.collateCurrency)
 
-    const [currencyAlerts, setCurrencyAlerts] = useState([])
+    const [currencyAlerts, setCurrencyAlerts] = useState({})
 
-    const addCurrencyAlerts = (newAlert) => {
-      if (!currencyAlerts.some(alert => alert === newAlert)) {
-          setCurrencyAlerts([...currencyAlerts, newAlert])
+    const addCurrencyAlerts = (newAlert, amount=1) => {
+      setCurrencyAlerts(prev => ({
+        ...prev,
+        [newAlert]: (prev[newAlert] || 0) + amount
+      }));
+    }
+
+    useEffect(() => {
+      switch (getDiscrLvl({
+        discrepancy: currency.discrepancy,
+        discrAlertConf: currency.discrAlertConf,
+        capital: currency.capitalTotal,
+        symbol: currency.symbol
+      })) {
+        case 2: case -2:
+          addCurrencyAlerts("gap_critical_currency", 0)
+          break
+        case 1: case -1:
+            addCurrencyAlerts("gap_unacceptable_currency", 0)
+          break
       }
-    }
-    
-    switch (getDiscrLvl({
-      discrepancy: currency.discrepancy,
-      discrAlertConf: currency.discrAlertConf,
-      capital: currency.capitalTotal,
-      symbol: currency.symbol
-    })) {
-      case "critical":
-        addCurrencyAlerts("gap_critical_currency")
-        addBuAlerts("gap_critical_currency")
-        break
-      case "unacceptable":
-        addCurrencyAlerts("gap_unacceptable_currency")
-        addBuAlerts("gap_unacceptable_currency")
-        break
-    }
 
-    const accountAlert = (accountGroup) => {
-      accountGroup.forEach(account => {
-        if (account.alerts) {
-          account.alerts.forEach(newAlert => {
-            addBuAlerts(newAlert)
-            addCurrencyAlerts(newAlert)
-          })
-        }
-      })
-    }
+      accountAlert(currency.capitals, addCurrencyAlerts)
+      accountAlert(currency.assets, addCurrencyAlerts)
+      accountAlert(currency.liabilities, addCurrencyAlerts)
+    }, [currency])
 
-    accountAlert(currency.capitals)
-    accountAlert(currency.assets)
-    accountAlert(currency.liabilities)
 
     const currentColor = discrepancyColor({
       discrepancy: currency.discrepancy,
@@ -481,10 +544,8 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
       colors: colors
     })
 
-    // TODO tooltip is cut off if unexpanded, z index does not work.
     return (
-      <div className={classNames(currency.symbol == currentCurrency ?? "sticky", "top-0 mt-3 z-10")}>
-        <div className="w-full h-3 bg-stone-100"/>
+      <div className={classNames(currency.symbol == currentCurrency ?? "sticky", "top-0 z-10")}>
         <div
           onClick={() => changeCurrency(currency.symbol)}
           className="w-full px-4 sm:px-6 lg:px-8 p-4 rounded-lg border border-gray-200 shadow-md bg-white hover:bg-gray-50"
@@ -660,7 +721,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                             <PopoverComp position="top">
                               {/* TODO when converting to API-consumed data, please implement snapshot time instead of new Date() for snapshots */}
                               <p className="hover:text-sky-600">{convertMsToTimeAgo(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
-                              <p className="text-sm text-gray-900">{convertAgeMsToDateTime(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
+                              <p className="text-sm text-white">{convertAgeMsToDateTime(account.ageMS - (new Date().getMilliseconds() + snapshotTime.getMilliseconds()))}</p>
                             </PopoverComp>
                             {/* Somehow the following <button> needs to be CSR for some reason
                                 The above <p>s are client only because of the data, there should
@@ -674,7 +735,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                                     className="h-4 w-4"
                                   />
                                 </button>
-                                <p className="text-sm text-gray-900">Mark as up-to-date</p>
+                                <p className="text-sm text-white">Mark as up-to-date</p>
                               </PopoverComp>
                             }
                           </ClientOnly>
@@ -711,6 +772,50 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
       </>
     )
   }
+}
+
+function GapHelp() {
+  function GapCard({disc, text}) {
+    return (
+      <div className="flex rounded-md bg-zinc-50 px-4 py-3 border border-zinc-100 text-sm text-zinc-600">
+        <div className="flex w-28 items-center">
+          <DiscLabel discrepancy={disc}/>
+        </div>
+        <p className="w-80">{text}</p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="flex flex-col pt-1">
+        <p className="text-zinc-500 text-sm line-clamp-3 w-96 pb-6">
+          Gap represents the difference between The sum of <span className="font-semibold text-zinc-800">Total Capital and Liabilities</span>, and <span className="font-semibold text-zinc-800">Total Assets</span>. If everything is properly accounted for, the gap should be close to zero.
+        </p>
+        <div
+          name="separator"
+          className="flex justify-center items-center m-1"
+          aria-hidden="true"
+        >
+          <div
+            style={{
+              backgroundImage: "linear-gradient(-90deg, #d4d4d8 50%, transparent 50%, transparent 100%)",
+              backgroundSize: "16px 16px"
+            }}
+            className="h-px w-full"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="flex flex-col pt-6 gap-y-2">
+          <GapCard disc={2} text="Total Assets are significantly higher than the sum of Total Capital and Liabilities."/>
+          <GapCard disc={1} text="Total Assets are considerably higher than the sum of Total Capital and Liabilities."/>
+          <GapCard disc={0} text="All Capital, Assets, and Liabilities are accounted for, assuming no account data is outdated."/>
+          <GapCard disc={-1} text="Total Assets are considerably lower than the sum of Total Capital and Liabilities."/>
+          <GapCard disc={-2} text="Total Assets are significantly lower than the sum of Total Capital and Liabilities."/>
+        </div>
+      </div>
+    </>
+  )
 }
 
 // Not used anymore since the last UI change

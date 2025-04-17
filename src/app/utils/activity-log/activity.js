@@ -1,4 +1,5 @@
 import { convertShortDate } from '@/app/utils/dates'
+import { SeeMore } from '@/app/components/seemore'
 import _ from 'lodash'
 
 // output:
@@ -11,7 +12,7 @@ export const activity = {
     "create": ({ buCode, buName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">created </span> the business unit {buCode} {buName}.</>
-        : <p><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</p>
+        : <><span className="font-semibold">Created </span> the business unit {buCode} {buName}.</>
     },
     "update": ({ buCode, buName, oldData, newData, isOneLine=false }) => ( // data: { buCode, buName, description }
       <Compare of={`the business unit ${buCode} ${buName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine}/>
@@ -19,14 +20,14 @@ export const activity = {
     "delete": ({ buCode, buName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">deleted </span> the business unit {buCode} {buName}.</>
-        : <p><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</p>
+        : <><span className="font-semibold">Deleted </span> the business unit {buCode} {buName}.</>
     }
   },
   "account": {
     "create": ({ accountCode, accountName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">created </span> the account {accountCode} {accountName}.</>
-        : <p><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</p>
+        : <><span className="font-semibold">Created </span> the account {accountCode} {accountName}.</>
     },
     "updateMetadata": ({ accountCode, accountName, oldData, newData, isOneLine=false }) => ( // data: { accountCode, accountName, description, currency, accountType }
       <Compare of={`the account ${accountCode} ${accountName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine}/>
@@ -40,14 +41,14 @@ export const activity = {
     "delete": ({ accountCode, accountName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">deleted </span> the account {accountCode} {accountName}.</>
-        : <p><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</p>
+        : <><span className="font-semibold">Deleted </span> the account {accountCode} {accountName}.</>
     },
   },
   "api": {
     "create": ({ apiCode, apiName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">created </span> the API {apiCode} {apiName}.</>
-        : <p><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</p>
+        : <><span className="font-semibold">Created </span> the API {apiCode} {apiName}.</>
     },
     "update": ({ apiCode, apiName, oldData, newData, isOneLine=false }) => ( // data: { apiCode, apiName, url, customHeaders }
       <Compare of={`the API ${apiCode} ${apiName}`} fromObj={oldData} toObj={newData} isOneLine={isOneLine} className="break-all"/>
@@ -55,7 +56,7 @@ export const activity = {
     "delete": ({ apiCode, apiName, isOneLine=false }) => {
       return isOneLine
         ? <><span className="font-semibold">deleted </span> the API {apiCode} {apiName}.</>
-        : <p><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</p>
+        : <><span className="font-semibold">Deleted </span> the API {apiCode} {apiName}.</>
     },
   },
   "config": {
@@ -191,7 +192,7 @@ export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
     return (
       <>
         <span className="font-semibold">{isOneLine ? 'set ' : 'Set '}</span>
-        <span className={className}>{joinWithAnd(addedStr)}</span>
+        <span className={className}>{joinWithAnd(addedStr).join("")}</span>
       </>
     )
   }
@@ -199,7 +200,7 @@ export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
     return (
       <>
         <span className="font-semibold">{isOneLine ? 'changed ' : 'Changed '}</span>
-        <span className={className}>{joinWithAnd(changedStr)}</span>
+        <span className={className}>{joinWithAnd(changedStr).join("")}</span>
       </>
     )
   }
@@ -207,7 +208,7 @@ export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
     return ( 
       <>
         <span className="font-semibold">{isOneLine ? 'removed ' : 'Removed '} </span>
-        <span className={className}>{joinWithAnd(deletedStr)}</span>
+        <span className={className}>{joinWithAnd(deletedStr).join("")}</span>
       </>
     )
   }
@@ -226,9 +227,9 @@ export function Compare({ of, fromObj, toObj, className, isOneLine=false }) {
     return (
       // Can't use && here since it returns false instead of null
       <div className="flex flex-col font-normal gap-y-1">
-        <p>{addedStr.length ? <><AddedComp/>.</> : null }</p>
-        <p>{changedStr.length ? <><ChangedComp/>.</> : null }</p>
-        <p>{deletedStr.length ? <><DeletedComp/>.</> : null }</p>
+        <p className="flex"><SeeMore>{addedStr.length ? <><AddedComp/>.</> : null }</SeeMore></p>
+        <p className="flex"><SeeMore>{changedStr.length ? <><ChangedComp/>.</> : null }</SeeMore></p>
+        <p className="flex"><SeeMore>{deletedStr.length ? <><DeletedComp/>.</> : null }</SeeMore></p>
       </div>
     )
   }

@@ -9,7 +9,7 @@ export const businessUnits = [
     balance: "16463613.68740567",
     gap: "1833.61636341",
     description: 'Concerns the assets associated with CAMP Investment Exchange, including Swap and Spot Market products. Assets include customer funds, working capital, and escrow funds.',
-    alerts: ["gap_unacceptable_entireBU", "gap_critical_currency", "api_request_failed"],
+    alerts: {"gap_unacceptable_entireBU": 0, "gap_critical_currency": 2, "api_request_failed": 1},
     snapshotSettings: {
       startingDate: "2024-05-20T11:23Z",
       intervalType: "hour",
@@ -102,7 +102,7 @@ export const businessUnits = [
     balance: "13577524.32265859",
     gap: "4226.6919247",
     description: 'Concerns the assets required to maintain the Staking products, whether derived from user staking or internal staking. Assets are stored in staking wallets or external staking providers',
-    alerts: ["too_long_since_last_update"],
+    alerts: {"too_long_since_last_update": 2},
     snapshotSettings: null,
     discrAlertConf: null
   },
@@ -114,7 +114,7 @@ export const businessUnits = [
     balance: "83694865.57046921", 
     gap: "3124.88460947",
     description: 'Concerns the assets in multiple counterparties in order to arbitrage the discrepancies between their order books.',
-    alerts: ["gap_unacceptable_entireBU", "blockchain_connection_failed"],
+    alerts: {"gap_unacceptable_entireBU": 0, "blockchain_connection_failed": 1},
     snapshotSettings: {
       startingDate: "2024-05-20T11:23Z",
       intervalType: "week",
@@ -161,7 +161,7 @@ export const businessUnits = [
     balance: "67659470.58309516",
     gap: "794.59775464",
     description: 'Concerns the assets used in Loan, product that offers liquid fiat and stablecoins loaned with comparatively volatile crypto assets.',
-    alerts: ["api_config_error"],
+    alerts: {"api_config_error": 1},
     snapshotSettings: null,
     discrAlertConf: null,
     otherAlertConf: null

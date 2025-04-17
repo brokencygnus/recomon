@@ -48,7 +48,7 @@ export function PopoverComp({ children, position="top" }) {
   // };
 
   const handleLeave = (isOpen) => {
-    isOpen && triggerRef.current?.click()
+    // isOpen && triggerRef.current?.click()
   };
 
   return (
@@ -73,9 +73,9 @@ export function PopoverComp({ children, position="top" }) {
             leaveFrom="opacity-100 -translate-y-0"
             leaveTo={`opacity-0 ${enterFrom[position]}`}
           >
-            <PopoverPanel className={classNames(positions[position], "size-0 absolute left-1/2 top-1/2 flex items-center z-50")}>
-              <div className={classNames(childPositions[position], "w-0 absolute -translate-x-1/2 z-50")}>
-                <div className={classNames(margins[position],"w-max max-w-72 text-center rounded-md whitespace-normal break-words bg-white px-2 py-1 shadow-sm ring-1 ring-inset ring-gray-300 -translate-x-1/2")}>
+            <PopoverPanel className={classNames(positions[position], "size-0 absolute left-1/2 top-1/2 flex items-center")}>
+              <div className={classNames(childPositions[position], "w-0 absolute -translate-x-1/2")}>
+                <div className={classNames(margins[position],"w-max max-w-72 text-center rounded-xl whitespace-normal break-words bg-zinc-900 px-2 py-1 shadow-sm -translate-x-1/2")}>
                   {childrenArray[1]}
                 </div>
               </div>

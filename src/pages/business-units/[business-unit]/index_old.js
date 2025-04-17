@@ -26,6 +26,18 @@ import { exchangeCurrencies, exchangeSummary } from "@/app/constants/mockdata/ex
 
 // Mock data end
 
+
+const accountAlert = (accountGroup, alertCallback) => {
+  accountGroup.forEach(account => {
+    if (account.alerts) {
+      Object.keys(account.alerts).forEach(newAlert => {
+        alertCallback(newAlert)
+      })
+    }
+  })
+}
+
+
 export default function SummaryPage() {
   const router = useRouter()
 
@@ -47,33 +59,47 @@ export default function SummaryPage() {
 
   const [buAlerts, setBuAlerts] = useState([])
 
-  const addBuAlerts = (newAlert) => {
-    if (!buAlerts.some(alert => alert === newAlert)) {
+  const addBuAlerts = (newAlert, amount=1) => {
+    setBuAlerts(prev => ({
+      ...prev,
+      [newAlert]: (prev[newAlert] || 0) + amount
+    }));
+  }
 
-      // Critical currency blocks unacceptable currency
-      if (!(newAlert === "gap_unacceptable_currency" && buAlerts.some(alert => alert === "gap_critical_currency"))) {
-        setBuAlerts([...buAlerts, newAlert])
-      }
-      // Critical currency replaces unacceptable currency
-      if (newAlert === "gap_critical_currency" && buAlerts.some(alert => alert === "gap_unacceptable_currency")) {
-        const newBuAlerts = buAlerts.filter(alert => alert !== "gap_unacceptable_currency")
-        setBuAlerts([...newBuAlerts, newAlert])
-      }
+  useEffect(() => {
+    switch (getDiscrLvl({
+      discrepancy: exchangeSummary.discrepancy,
+      discrAlertConf: exchangeSummary.discrAlertConf,
+      capital: exchangeSummary.capital
+    })) {
+      case 2: case -2:
+        addBuAlerts("gap_critical_entireBU", 0)
+        break
+      case 1: case -1:
+        addBuAlerts("gap_unacceptable_entireBU", 0)
+        break
     }
-  }
 
-  switch (getDiscrLvl({
-    discrepancy: exchangeSummary.discrepancy,
-    discrAlertConf: exchangeSummary.discrAlertConf,
-    capital: exchangeSummary.capital
-  })) {
-    case "critical":
-      addBuAlerts("gap_critical_entireBU")
-      break
-    case "unacceptable":
-      addBuAlerts("gap_unacceptable_entireBU")
-      break
-  }
+    exchangeCurrencies.map(currency => {
+      switch (getDiscrLvl({
+        discrepancy: currency.discrepancy,
+        discrAlertConf: currency.discrAlertConf,
+        capital: currency.capitalTotal,
+        symbol: currency.symbol
+      })) {
+        case 2: case -2:
+          addBuAlerts("gap_critical_currency", 1)
+          break
+        case 1: case -1:
+            addBuAlerts("gap_unacceptable_currency", 1)
+          break
+      }
+
+      accountAlert(currency.capitals, addBuAlerts)
+      accountAlert(currency.assets, addBuAlerts)
+      accountAlert(currency.liabilities, addBuAlerts)
+    })
+  }, [exchangeSummary, exchangeCurrencies])
   
   return (
     <Layout currentTab="bu" breadcrumbPages={breadcrumbPages} >
@@ -430,42 +456,33 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
 
     const [currencyAlerts, setCurrencyAlerts] = useState([])
 
-    const addCurrencyAlerts = (newAlert) => {
-      if (!currencyAlerts.some(alert => alert === newAlert)) {
-          setCurrencyAlerts([...currencyAlerts, newAlert])
+    const addCurrencyAlerts = (newAlert, amount=1) => {
+      setCurrencyAlerts(prev => ({
+        ...prev,
+        [newAlert]: (prev[newAlert] || 0) + amount
+      }));
+    }
+
+    useEffect(() => {
+      switch (getDiscrLvl({
+        discrepancy: currency.discrepancy,
+        discrAlertConf: currency.discrAlertConf,
+        capital: currency.capitalTotal,
+        symbol: currency.symbol
+      })) {
+        case 2: case -2:
+          addCurrencyAlerts("gap_critical_currency", 0)
+          break
+        case 1: case -1:
+            addCurrencyAlerts("gap_unacceptable_currency", 0)
+          break
       }
-    }
-    
-    switch (getDiscrLvl({
-      discrepancy: currency.discrepancy,
-      discrAlertConf: currency.discrAlertConf,
-      capital: currency.capitalTotal,
-      symbol: currency.symbol
-    })) {
-      case "critical":
-        addCurrencyAlerts("gap_critical_currency")
-        addBuAlerts("gap_critical_currency")
-        break
-      case "unacceptable":
-        addCurrencyAlerts("gap_unacceptable_currency")
-        addBuAlerts("gap_unacceptable_currency")
-        break
-    }
 
-    const accountAlert = (accountGroup) => {
-      accountGroup.forEach(account => {
-        if (account.alerts) {
-          account.alerts.forEach(newAlert => {
-            addBuAlerts(newAlert)
-            addCurrencyAlerts(newAlert)
-          })
-        }
-      })
-    }
+      accountAlert(currency.capitals, addCurrencyAlerts)
+      accountAlert(currency.assets, addCurrencyAlerts)
+      accountAlert(currency.liabilities, addCurrencyAlerts)
+    }, [currency])
 
-    accountAlert(currency.capitals)
-    accountAlert(currency.assets)
-    accountAlert(currency.liabilities)
 
     const currentColor = discrepancyColor({
       discrepancy: currency.discrepancy,

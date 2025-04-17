@@ -1,3 +1,3 @@
 export const user = {
-  name: "Buhut Lihar Pandjaitan"
+  name: "Christian Hsieh"
 }

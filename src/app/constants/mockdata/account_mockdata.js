@@ -13,7 +13,7 @@ export const accounts = [
     "type": "capital",
     "balance": "24.74735730",
     "ageMS": 15432735449,
-    "alerts": ["too_long_since_last_update"]
+    "alerts": {"too_long_since_last_update": 0}
   },
   {
     "id": 2,
@@ -169,7 +169,7 @@ export const accounts = [
     "type": "capital",
     "balance": "648.89245672",
     "ageMS": 9894523612,
-    "alerts": ["too_long_since_last_update"]
+    "alerts": {"too_long_since_last_update": 0}
   },
   {
     "id": 16,

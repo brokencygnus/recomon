@@ -11,10 +11,10 @@ export const discrepancyColor = ({ discrepancy, discrAlertConf, capital, symbol,
   let color = ""
   
   switch (getDiscrLvl({ discrepancy, discrAlertConf, capital, symbol })) {
-    case "critical":
+    case 2: case -2:
       color = colors.crit
       break;
-    case "unacceptable":
+    case 1: case -1:
       color = colors.acctble
       break;
     default:
@@ -24,7 +24,7 @@ export const discrepancyColor = ({ discrepancy, discrAlertConf, capital, symbol,
   return color
 }
 
-// output = "normal" | "unacceptable" | "critical"
+// output = -2 | -1 | 0 | 1 | 2
 export const getDiscrLvl = ({ discrepancy, discrAlertConf, capital, symbol='USD' }) => {
   let disc = parseFloat(discrepancy)
 
@@ -44,20 +44,11 @@ export const getDiscrLvl = ({ discrepancy, discrAlertConf, capital, symbol='USD'
       break;
   }
 
-  if (!disc) {
-    return "normal"
-  } else if (
-      (discrAlertConf?.critHigh && disc > discrAlertConf.critHigh)
-      || (discrAlertConf?.critLow && disc < discrAlertConf.critLow)
-    ) {
-    return "critical"
-  } else if (
-      (discrAlertConf?.acctbleHigh && disc > discrAlertConf.acctbleHigh)
-      || (discrAlertConf?.acctbleLow && disc < discrAlertConf.acctbleLow)
-    ) {
-    return "unacceptable"
-  } else {
-    return "normal"
-  }
+  if (disc === null) return null;
+  if (discrAlertConf?.critHigh && disc > discrAlertConf.critHigh) return 2;
+  if (discrAlertConf?.critLow && disc < discrAlertConf.critLow) return -2;
+  if (discrAlertConf?.acctbleHigh && disc > discrAlertConf.acctbleHigh) return 1;
+  if (discrAlertConf?.acctbleLow && disc < discrAlertConf.acctbleLow) return -1;
+  return 0;
 
 }

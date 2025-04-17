@@ -15,7 +15,7 @@ function classNames(...classes) {
 const badgeTypes = {
   "gap_unacceptable_entireBU": {
     icon: Square3Stack3DIcon,
-    color: "text-yellow-500",
+    color: "text-amber-600",
     snapshotMsg: "This business unit as a whole has surpassed the acceptable gap threshold.",
     currencyMsg: null,
     accountMsg: null,
@@ -31,7 +31,7 @@ const badgeTypes = {
   },
   "gap_unacceptable_currency": {
     icon: BanknotesIcon,
-    color: "text-yellow-500",
+    color: "text-amber-600",
     snapshotMsg: "One or more currencies has surpassed the acceptable gap threshold.",
     currencyMsg: "This currency has surpassed the acceptable gap threshold.",
     accountMsg: null,
@@ -55,7 +55,7 @@ const badgeTypes = {
   },
   "api_request_failed": {
     icon: CodeBracketSquareIcon,
-    color: "text-yellow-500",
+    color: "text-amber-600",
     snapshotMsg: "A retrieval attempt to one of your APIs has recently failed.",
     currencyMsg: "A retrieval attempt to one of your APIs has recently failed.",
     accountMsg: "A recent attempt to retrieve this account's balances from the API has failed",
@@ -63,7 +63,7 @@ const badgeTypes = {
   },
   "blockchain_connection_failed": {
     icon: CubeTransparentIcon,
-    color: "text-yellow-500",
+    color: "text-amber-600",
     snapshotMsg: "A retrieval attempt to the blockchain network has recently failed.",
     currencyMsg: "A retrieval attempt to the blockchain network has recently failed.",
     accountMsg: "A recent attempt to retrieve this account's balances from the blockchain has failed",
@@ -79,7 +79,7 @@ const badgeTypes = {
   },
 }
 
-// input: alerts: ["gap_critical_entireBU", "gap_unacceptable_currency", ...]
+// input: alerts: {"gap_critical_entireBU": 0, "gap_unacceptable_currency": 0, ...}
 // output:
 // <>
 //   <icon/>
@@ -87,8 +87,20 @@ const badgeTypes = {
 //   ...
 // </>
 // size: sm, md, lg
+//
+// Alerts with 0 count doesn't show counters,
+// use this if the counter doesn't make sense if it was other than 1,
+// e.g. currency discrepancy on currency
 export function NotificationBadges({ size, alerts, message }) {
-  const sortedAlerts = alerts.sort()
+  // https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+  const sortedAlerts = Object.keys(alerts).sort().reduce(
+    (obj, key) => { 
+      obj[key] = alerts[key]; 
+      return obj;
+    }, 
+    {}
+  );
+  
   
   const badgeSize = () => {
     switch (size) {
@@ -99,7 +111,16 @@ export function NotificationBadges({ size, alerts, message }) {
     }
   }
 
-  function alertComp(alert) {
+  const textSize = () => {
+    switch (size) {
+      case "sm": return "text-xs";
+      case "md": return "text-sm";
+      case "lg": return "text-md";
+      default: return "text-xs";
+    }
+  }
+
+  function alertComp(alert, count) {
     const badgeType = badgeTypes[alert]
     const BadgeIcon = badgeType.icon
     const badgeColor = badgeType.color
@@ -121,18 +142,21 @@ export function NotificationBadges({ size, alerts, message }) {
 
     return (
       <PopoverComp position="bottom">
-        <div>
+        <div className="flex items-center">
           <BadgeIcon className={classNames(badgeColor, badgeSize(), "flex-shrink-0")} />
+          {count !== 0 &&
+            <p className={classNames(badgeColor, textSize(), "font-semibold leading-none")}>{count}</p>
+          }
         </div>
-        <p className="leading-6 text-sm font-normal text-gray-900">{badgeMsg}</p>
+        <p className="leading-6 text-sm font-normal text-white">{badgeMsg}</p>
       </PopoverComp>
     )
   }
 
   return (
     <>
-      {sortedAlerts?.map(alert => (
-        alertComp(alert)
+      {!_.isEqual(sortedAlerts, {}) && Object.entries(sortedAlerts).map(([alert, count]) => (
+        alertComp(alert, count)
       ))}
     </>
   )

@@ -1,23 +1,39 @@
 
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Transition } from "@headlessui/react";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
 
 // Parent component needs to bound width
 
-export function SeeMore({ content }) {
+export function SeeMore({ children }) {
   const ref = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  useLayoutEffect(() => {
-    const { offsetHeight, scrollHeight } = ref.current || {};
-    
-    if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
+  const checkTruncation = () => {
+    setExpanded(false)
+    if (!ref.current) return;
+
+    const { offsetHeight, scrollHeight } = ref.current;
+
+    if (offsetHeight < scrollHeight) {
       setIsTruncated(true);
     } else {
       setIsTruncated(false);
     }
-  }, [ref]);
+  };
+
+  useLayoutEffect(() => {
+    checkTruncation();
+  }, [ref, children]);
+
+  useEffect(() => {
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
+  }, []);
 
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -28,10 +44,10 @@ export function SeeMore({ content }) {
     <>
       {!expanded && (
         <>
-          <span ref={ref} className="break-all text-wrap line-clamp-1">{content}</span>
+          <span ref={ref} className={classNames("break-all text-wrap line-clamp-1", isTruncated && "max-w-[calc(100%-80px)]")}>{children}</span>
           {isTruncated && (
           <button
-            className="font-medium text-sky-600 hover:text-sky-900 ml-2 focus:outline-none"
+            className="line-clamp-1 font-medium text-sky-600 hover:text-sky-900 ml-2 focus:outline-none"
             onClick={toggleExpand}
           >
             See more
@@ -49,7 +65,7 @@ export function SeeMore({ content }) {
       leaveTo="hidden"
       >
         <div className="flex justify-between items-center">
-          <span className="text-wrap break-all">{content}
+          <span className="text-wrap break-all">{children}
             <span>
             <button
               className="font-sans font-medium text-sky-600 hover:text-sky-900 hover:cursor-pointer ml-2 focus:outline-none"

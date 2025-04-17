@@ -86,11 +86,11 @@ export const alertIcons = [
 ]
 
 export const alertColors = [
-  {name: "green", text: "text-green-400", textLight: "text-green-300", progress: "bg-green-400"},
-  {name: "red", text: "text-red-400", textLight: "text-red-300", progress: "bg-red-400"},
-  {name: "amber", text: "text-amber-400", textLight: "text-amber-300", progress: "bg-amber-400"},
-  {name: "sky", text: "text-sky-400", textLight: "text-sky-300", progress: "bg-sky-400"},
-  {name: "gray", text: "text-gray-400", textLight: "text-gray-300", progress: "bg-gray-400"},
+  {name: "green", text: "text-green-600", textLight: "text-green-500", progress: "bg-green-400"},
+  {name: "red", text: "text-red-600", textLight: "text-red-500", progress: "bg-red-400"},
+  {name: "amber", text: "text-amber-600", textLight: "text-amber-500", progress: "bg-amber-400"},
+  {name: "sky", text: "text-sky-600", textLight: "text-sky-500", progress: "bg-sky-400"},
+  {name: "gray", text: "text-gray-600", textLight: "text-gray-500", progress: "bg-gray-400"},
 ]
 
 export function AlertGroup() {

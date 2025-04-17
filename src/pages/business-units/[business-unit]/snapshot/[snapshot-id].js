@@ -49,10 +49,10 @@ export default function SnapshotDetailsPage() {
     discrAlertConf: exchangeSummary.discrAlertConf,
     capital: exchangeSummary.capital
   })) {
-    case "critical":
+    case 2: case -2:
       addBuAlerts("gap_critical_entireBU")
       break
-    case "unacceptable":
+    case 1: case -1:
       addBuAlerts("gap_unacceptable_entireBU")
       break
   }

@@ -29,14 +29,14 @@ export function Modal({ open, setClose, children, panelTitle }) {
               <DialogPanel
                 className="flex flex-col transform max-h-full overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all"
               >
-                <div className="sticky top-0 p-6 pb-3 bg-gray-100 flex items-start justify-between border-b border-gray-200">
+                <div className="sticky top-0 p-6 pb-3 flex items-start justify-between">
                   <DialogTitle className="text-base font-semibold leading-6 text-gray-900">
                     {panelTitle}
                   </DialogTitle>
                   <div className="ml-3 flex h-7 items-center">
                     <button
                       type="button"
-                      className="relative rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                      className="relative rounded-md text-zinc-500 hover:text-zinc-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                       onClick={setClose}
                     >
                       <span className="absolute -inset-2.5" />
@@ -47,7 +47,7 @@ export function Modal({ open, setClose, children, panelTitle }) {
                 </div>
                 <div
                   style={{ scrollbarGutter: "stable" }}
-                  className="grow overflow-y-auto p-6"
+                  className="grow overflow-y-auto p-6 pt-0"
                 >
                   {children}
                 </div>

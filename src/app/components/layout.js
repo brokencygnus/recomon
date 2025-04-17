@@ -19,7 +19,6 @@ import {
   IconSettings,
   IconMenu2
 } from "@tabler/icons-react";
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { enabledCurrencies as currencies } from '@/app/utils/currencies'
 import { CurrencyIcon } from "@/app/components/currency_icon";
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
@@ -28,7 +27,7 @@ import { AlertProvider, AlertGroup } from '@/app/components/notifications/alert'
 import { NotificationMenu } from '@/app/components/notifications/notification_menu'
 import { Breadcrumbs } from "@/app/components/breadcrumbs";
 import { Dropdown } from "@/app/components/dropdown";
-import KeyboardHotkey from "@/app/components/keyboard_hotkey";
+import { KeyboardHotkey } from "@/app/components/KeyboardHotkey";
 import { config } from "@/app/constants/config";
 import { NotificationBadges } from "./notifications/notification_badges";
 
@@ -203,7 +202,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         )}
                         <p className={classNames(
                           'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
-                          'text-nowrap overflow-hidden',
+                          'text-nowrap',
                         )}>
                           {navMenu.name}
                         </p>
@@ -394,7 +393,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
 
           <div 
             style={{ scrollbarGutter: "stable" }}
-            className="grow overflow-y-auto"
+            className="grow"
           >
             <RefCurContext.Provider value={{ referenceCurrency }}>
               <ToastProvider>
