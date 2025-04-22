@@ -1,24 +1,8 @@
 'use client'
 import "../globals.css";
 import { createContext, useCallback, useEffect, useState } from 'react'
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from '@headlessui/react'
-import {
-  IconLayoutSidebar,
-  IconHome,
-  IconPackage,
-  IconCamera,
-  IconCode,
-  IconNews,
-  IconBug,
-  IconSettings,
-  IconMenu2
-} from "@tabler/icons-react";
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
+import { SidebarSimple, HouseSimple, Package, Camera, Code, Newspaper, BugBeetle, Gear, List} from "@phosphor-icons/react"
 import { enabledCurrencies as currencies } from '@/app/utils/currencies'
 import { CurrencyIcon } from "@/app/components/currency_icon";
 import { formatNumber, convertCurrency } from '@/app/utils/utils';
@@ -45,15 +29,15 @@ const businessUnitNav = structuredClone(businessUnits)
 
 
 const navigation = [
-  { code: 'dash', name: 'Dashboard', href: '/dashboard', icon: IconHome, submenus: []},
-  { code: 'bu', name: 'Business Units', href: '/business-units', icon: IconPackage, submenus: businessUnitNav},
-  { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: IconCamera, submenus: []},
-  { code: 'api', name: 'Manage APIs', href: '/api-list', icon: IconCode, submenus: []},
-  { code: 'log', name: 'Activity Log', href: '/activity-log', icon: IconNews, submenus: []},
+  { code: 'dash', name: 'Dashboard', href: '/dashboard', icon: HouseSimple, submenus: []},
+  { code: 'bu', name: 'Business Units', href: '/business-units', icon: Package, submenus: businessUnitNav},
+  { code: 'snap', name: 'Snapshots', href: '/snapshots', icon: Camera, submenus: []},
+  { code: 'api', name: 'Manage APIs', href: '/api-list', icon: Code, submenus: []},
+  { code: 'log', name: 'Activity Log', href: '/activity-log', icon: Newspaper, submenus: []},
 ]
 
 
-config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: IconBug, submenus: []})
+config.env !== 'prod' && navigation.push({ code: 'dbug', name: 'Debug', href: '/debug', icon: BugBeetle, submenus: []})
 
 
 const userNavigation = [
@@ -187,7 +171,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         )}
                       >
                         <navMenu.icon
-                          className={classNames(
+                          weight="bold" className={classNames(
                             navMenu.code == currentTab ? 'text-white' : hoveredMenu === navMenu.name ? 'text-white' : 'text-stone-200',
                             'h-6 w-6 shrink-0'
                           )}
@@ -262,7 +246,8 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         'group flex gap-x-3 rounded-md p-3 text-stone-200 hover:bg-stone-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
-                      <IconSettings
+                      <Gear
+                        weight="bold"
                         className="h-6 w-6 shrink-0 text-stone-200 group-hover:text-white"
                         aria-hidden="true"
                       />
@@ -279,14 +264,14 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
           </div>
         </div>
 
-        <div className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-hidden">
+        <div className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-auto">
           <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-1 border-b border-zinc-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
 
             <button
               onClick={openSidebarAndKeepOpen}
               className="flex rounded-lg hover:bg-zinc-50"
             >
-              <IconLayoutSidebar
+              <SidebarSimple
                 className="size-5 m-1 shrink-0 text-zinc-500 hover:text-zinc-700"
                 aria-hidden="true"
               />
@@ -341,7 +326,8 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                   <MenuButton className="group flex items-center gap-x-2">
                     <span className="sr-only">Open user menu</span>
                     <div className="flex items-center outline outline-1 outline-zinc-200 py-1 p-1 gap-x-1 rounded-full group-hover:bg-zinc-50 group-hover:outline-zinc-300">
-                      <IconMenu2
+                      <List
+                        weight="bold"
                         className="size-5 shrink-0 text-zinc-500 hover:text-zinc-500 group-hover:text-zinc-700"
                         aria-hidden="true"
                       />
