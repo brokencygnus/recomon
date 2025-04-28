@@ -24,7 +24,6 @@
     "react-apexcharts": "^1.4.1",
     "react-aria-components": "^1.2.1",
     "react-dom": "^18",
-    "react-resizable-panels": "^2.1.7",
     "react-time-ago": "^7.3.3"
   },
   "devDependencies": {

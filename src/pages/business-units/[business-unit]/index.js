@@ -659,32 +659,37 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <table className="min-w-full divide-y divide-gray-300">
                 <thead>
-                  <tr>
-                    <th scope="col" className="py-3.5 pl-2 pr-3 text-left text-sm font-semibold text-gray-700">
+                  <tr className=" bg-zinc-50">
+                    <th scope="col" className="py-3.5 pl-6 pr-4 text-left text-sm font-semibold text-zinc-500">
                       Code
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
+                    <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-zinc-500">
                       Account Name
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
+                    <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-zinc-500">
                       Balance
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
+                    <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-zinc-500">
                       Balance &#40;converted&#41;
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
+                    <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-zinc-500">
                       Data source
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-700">
+                    <th scope="col" className={classNames("px-4 py-3.5 text-left text-sm font-semibold text-zinc-500", !snapshotID ? "px-4" : "pr-6 pl-4")}>
                       {snapshotID ? "Data age at snapshot" : "Data age"}
                     </th>
+                    {!snapshotID && 
+                      <th scope="col" className="py-3.5 pr-6 pl-4 text-left text-sm font-semibold text-zinc-500">
+                        Action
+                      </th>
+                    }
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {accounts.map((account) => (
                     <tr key={account.code} className="bg-white hover:bg-gray-50">
-                      <td className="whitespace-nowrap py-4 pl-2 pr-3 text-sm text-gray-500">{account.code}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-600">
+                      <td className="whitespace-nowrap py-7 pl-6 pr-4 text-sm text-gray-500">{account.code}</td>
+                      <td className="whitespace-nowrap px-4 py-7 text-sm font-medium text-gray-600">
                         <div className="flex gap-x-3">
                           {account.name}
                           {account.alerts && account.alerts.length !== 0 &&
@@ -696,7 +701,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                           }
                         </div>
                       </td>
-                      <td className="whitespace-nowrap px-3 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-4 text-sm text-gray-500">
                         { !snapshotID && account.dataSource == "manual" ?
                           <EditableField
                             onSave={handleSave}
@@ -713,9 +718,9 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                           </>
                         }
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{convert(account.balance)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{dataSources.find((data) => data.value == account.dataSource).name}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-4 py-7 text-sm text-gray-500">{convert(account.balance)}</td>
+                      <td className="whitespace-nowrap px-4 py-7 text-sm text-gray-500">{dataSources.find((data) => data.value == account.dataSource).name}</td>
+                      <td className={classNames("whitespace-nowrap px-4 py-7 text-sm text-gray-500", !snapshotID ? "px-4" : "pr-6 pl-4")}>
                         <div className="w-fit flex gap-x-3">
                           <ClientOnly>
                             <PopoverComp position="top">
@@ -742,7 +747,7 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                         </div>
                       </td>
                       {!snapshotID ?
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-2 text-right text-sm font-semibold">
+                        <td className="relative whitespace-nowrap py-7 pl-3 pr-2 text-right text-sm font-semibold">
                           <Link
                             href={{
                               pathname: `/business-units/${businessUnit?.slug}/accounts`,
@@ -759,10 +764,10 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
                 </tbody>
                 <tbody className="divide-y divide-gray-200">
                   <tr>
-                  <td className="py-4 pl-4 pr-3 sm:pl-0"></td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-700">Total</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-700">{formatNumber(+parseFloat(total).toFixed(8)) + " " + symbol}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-700">{convert(total)}</td>
+                    <td></td>
+                    <td className="whitespace-nowrap px-4 py-7 text-sm font-medium text-gray-700">Total</td>
+                    <td className="whitespace-nowrap px-4 py-7 text-sm font-medium text-gray-700">{formatNumber(+parseFloat(total).toFixed(8)) + " " + symbol}</td>
+                    <td className="whitespace-nowrap px-4 py-7 text-sm font-medium text-gray-700">{convert(total)}</td>
                   </tr>
                 </tbody>
               </table>

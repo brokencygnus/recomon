@@ -7,6 +7,7 @@ import {
   EllipsisHorizontalIcon,
 } from "@heroicons/react/16/solid";
 import { PopoverComp } from "@/app/components/popover";
+import _ from 'lodash'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
