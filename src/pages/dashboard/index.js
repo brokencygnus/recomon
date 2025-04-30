@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import Layout from '@/app/components/layout';
 import { config } from '@/app/constants/config';
 import ClientOnly from '@/app/components/csr';
 import { convertMsToTimeAgo, getTimeGreeting } from '@/app/utils/dates'
+import { GradientBackground } from '@/app/components/GradientBackground'
+import './react-grid-layout.css'
+import './react-resizable.css'
+import { SquaresFour, ArrowCounterClockwise } from '@phosphor-icons/react';
+
+// grid layout
+import RGL, { WidthProvider }  from "react-grid-layout";
+const ReactGridLayout = WidthProvider(RGL);
+//
 
 // chart
 import { ChartProvider, TimelineChart, Legend, RangeSelector } from '@/app/components/charts'
@@ -20,68 +30,82 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-// mock data start
-
+// mock data
 import { snapshotBusinessUnits } from '@/app/constants/mockdata/snapshot_mockdata'
 import { activityLogs } from '@/app/constants/mockdata/activity_log_mockdata'
 import { notifications } from '@/app/constants/mockdata/notification_mockdata'
 import { user } from '@/app/constants/mockdata/user_mockdata'
-
-// mock data end
-
-const chartSeries = snapshotBusinessUnits.map(bu => (
-  {
-    name: bu.name,
-    color: stringToColor(bu.slug, {maxLum:70, minLum:40, maxSat:60, minSat:30}),
-    data:bu.snapshots.map(snap => (
-      {x:snap.date, y:snap.gap*100/snap.capital}
-    ))
-  }
-))
+//
 
 export default function DashboardPage() {
+  const [isEditing, setEditing] = useState(false)
+  
+  const defaultLayout = [
+    { i: "a", x: 0, y: 0, w: 8, h: 6, static: true },
+    { i: "b", x: 8, y: 0, w: 3, h: 2, static: true },
+    { i: "c", x: 4, y: 6, w: 1, h: 2, static: true }
+  ]
+
+  const [layout, setLayout] = useState(defaultLayout)
+
+  const onLayoutChange = (layout) => {
+    setLayout(layout)
+  }
+
+  const toggleEdit = () => {
+    if (isEditing) {
+      setLayout(layout.map(i => ({...i, static: true})))
+    } else {
+      setLayout(layout.map(i => ({...i, static: false})))
+    }
+    setEditing(!isEditing)
+  }
+
+  const resetLayout = () => {
+    setLayout(defaultLayout.map(i => ({...i, static: !isEditing})))
+  }
+
   return (
     <Layout>
-      <main className="relative flex flex-col min-h-full pt-6 pb-12 px-12 2xl:px-16 bg-stone-100">
+      <main className="relative flex flex-col min-h-full pt-6 pb-12 px-12 2xl:px-16 bg-zinc-100">
         {/* Background */}
         <GradientBackground />
-        <div className="relative flex gap-x-6 grow z-10">
-          <div className="w-3/5 min-h-0 grow flex flex-col">
-            <DashboardHeader />
-            <div className="flex h-1/2 pt-4">
-              <ChartSection />
+        <div className="relative flex z-10">
+          <div className="flex flex-col w-full">
+            <DashboardHeader
+              toggleEdit={toggleEdit}
+              resetLayout={resetLayout}
+            />
+            <div className={classNames("transition-all duration-500 origin-top", isEditing ? "scale-[0.75]" : "scale-100")}>
+              {/* Background */}
+              <div className={classNames("absolute inset-0 z-0 bg-zinc-500 rounded-xl transition-opacity", isEditing ? "opacity-10" : "opacity-0")}/>
+              <ReactGridLayout
+                onLayoutChange={onLayoutChange}
+                className="layout w-full"
+                layout={layout}
+                cols={12}
+                rowHeight={56}
+                transformScale={isEditing ? 0.75 : 1}
+              >
+                <div key="a">
+                <GridCard title="test" interactable={!isEditing}>
+                  <ChartSection />
+                </GridCard>
+
+                </div>
+                <div key="b">
+                <GridCard title="test" interactable={!isEditing}/>
+
+                </div>
+                <div key="c">
+                  <GridCard title="test" interactable={!isEditing}/>
+                </div>
+              </ReactGridLayout>
             </div>
-            <div className="flex h-1/2 pt-4">
-              <ActivityLogSection />
-            </div>
-          </div>
-          <div className="w-px bg-gray-900/10 mt-8" aria-hidden="true" />
-          <div className="flex-none w-96 mt-8">
-            <NotificationSection />
           </div>
         </div>
       </main>
     </Layout>
-  )
-}
-
-function GradientBackground() {
-  return (
-    <>
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 z-0 translate-x-[-10%] translate-y-[-10%] opacity-30 blur-3xl overflow-hidden"
-      >
-        <div
-          style={{
-            clipPath:
-              'polygon(30% 0%, 49% 18%, 100% 11%, 100% 46%, 50% 100%, 44% 51%, 0% 61%, 0 0)',
-          }}
-          className={`size-[120%] bg-gradient-to-br bg-sky-500 to-blue-500`}
-        />
-      </div>
-      <div className="absolute inset-0 size-full bg-gradient-to-l from-stone-100/40 via-50% via-stone-100/70 to-80% to-transparent z-[1]"/>
-    </>
   )
 }
 
@@ -95,38 +119,69 @@ function Card({ children, className, ...props }) {
 }
 
   
-function DashboardHeader() {
+function DashboardHeader({ toggleEdit, resetLayout }) {
   return (
-    <div className="flex">
+    <div className="flex items-center mb-4 bg-white rounded-xl border p-6 border-zinc-200 gap-x-12 shadow-sm">
       <div className="flex-auto">
-        <div className="py-4">
-          <header>
-            <div className="max-w-7xl">
-              <h1 className="text-2xl font-medium leading-tight tracking-tight text-gray-900">
-                {getTimeGreeting() + ", " + user.name}
-              </h1>
-              {/* <p className="mt-2 text-sm text-gray-700">This is 404, by the way</p> */}
-            </div>
-          </header>
-        </div>
+        <header>
+          <div className="max-w-7xl">
+            <h1 className="text-2xl font-medium leading-tight tracking-tight text-gray-900">
+              {getTimeGreeting() + ", " + user.name}
+            </h1>
+            {/* <p className="mt-2 text-sm text-gray-700">This is 404, by the way</p> */}
+          </div>
+        </header>
       </div>
       <div className="flex items-end">
-      {/* Buttons etc. go here */}
+        <button
+          onClick={toggleEdit}
+          className="flex rounded-lg hover:bg-zinc-50"
+        >
+          <SquaresFour
+            className="size-5 m-1 shrink-0 text-zinc-500 hover:text-zinc-700"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          onClick={resetLayout}
+          className="flex rounded-lg hover:bg-zinc-50"
+        >
+          <ArrowCounterClockwise
+            className="size-5 m-1 shrink-0 text-zinc-500 hover:text-zinc-700"
+            aria-hidden="true"
+          />
+        </button>
       </div>
     </div>
   );
 }
 
+function GridCard({ title, children, interactable=true }) {
+  return (
+    <div className={classNames("relative flex flex-col grow bg-zinc-50 size-full rounded-xl border border-zinc-200 shadow-sm",
+      !interactable && "pointer-events-none"
+    )}>
+      <div className="px-5 py-4">
+        <p className="text-base font-semibold text-zinc-800">{title}</p>
+      </div>
+      <div className="flex flex-col grow overflow-hidden rounded-xl bg-white border-t border-zinc-200">
+        {children}
+      </div>
+    </div>
+
+  )
+}
+
 function ChartSection() {
-  const { dashboardShowNLogs } = config
-
-  const renderActivity = (log) => {
-    const category = activity[log.eventCategory]
-    const action = category[log.eventName]
-    return action({ ...log.details, isOneLine:true});
-  };
-
-  const slicedActivityLogs = activityLogs.slice(0, dashboardShowNLogs)
+  const chartSeries = snapshotBusinessUnits.map(bu => (
+    {
+      name: bu.name,
+      color: stringToColor(bu.slug, {maxLum:70, minLum:40, maxSat:60, minSat:30}),
+      data:bu.snapshots.map(snap => (
+        {x:snap.date, y:snap.gap*100/snap.capital}
+      ))
+    }
+  ))
 
   return (
     <ChartProvider

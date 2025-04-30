@@ -16,6 +16,8 @@ import { ChevronRightIcon, DocumentCheckIcon } from '@heroicons/react/24/outline
 import { NotificationBadges } from '@/app/components/notifications/notification_badges';
 import { IconPlus, IconInfoCircle, IconHelp } from '@tabler/icons-react'
 import { DiscLabel } from '@/app/components/DiscLabel';
+import { GradientBackground } from '@/app/components/GradientBackground'
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -120,17 +122,20 @@ export default function SummaryPage() {
   return (
     <Layout currentTab="bu" breadcrumbPages={breadcrumbPages} >
       <main className="min-h-full pt-8 pb-12 px-8 bg-zinc-100">
-        <ReconciliationHeader
-          businessUnit={businessUnit}
-          buAlerts={buAlerts}
-        />
-        <div className="flex grow flex-col">
-          <ReconciliationSection
+        {/* <GradientBackground /> */}
+        <div className="relative z-10">
+          <ReconciliationHeader
             businessUnit={businessUnit}
-            currencyData={exchangeCurrencies}
-            summaryData={exchangeSummary}
-            addBuAlerts={addBuAlerts}
+            buAlerts={buAlerts}
           />
+          <div className="flex grow flex-col">
+            <ReconciliationSection
+              businessUnit={businessUnit}
+              currencyData={exchangeCurrencies}
+              summaryData={exchangeSummary}
+              addBuAlerts={addBuAlerts}
+            />
+          </div>
         </div>
       </main>
     </Layout>
@@ -294,76 +299,74 @@ export function ReconciliationSection({ businessUnit, currencyData, summaryData,
           <GapHelp/>
         </Modal>
         <div className="relative bg-zinc-50 rounded-xl border border-zinc-200 shadow-sm">
-          <div className="border-b">
-            <div className="px-5 py-4">
-              <p className="text-base font-semibold text-zinc-800">Spotlight</p>
-            </div>
-            <dl className="rounded-xl w-full grid grid-cols-4 bg-white border-t border-zinc-200">
-              {stats.map((stat, statIdx) => (
-                <div
-                  key={stat.name}
-                  className={classNames(
-                    statIdx !== 0 && 'border-l border-zinc-200',
-                    'flex flex-col items-baseline justify-start gap-x-3 gap-y-2 px-6 py-8',
-                  )}
-                >
-                  <dt>
-                    {stat.name !== 'Gap'
-                      ?
-                        <PopoverComp position="top">
-                          <div className="flex items-center gap-x-0.5 pb-1">
-                            <span className="text-sm font-medium leading-[17px] text-zinc-500">{stat.name}</span>
-                            <IconInfoCircle className="size-4 shrink-0 text-zinc-600"/>
-                          </div>
-                          <p className="leading-[27px] text-sm font-normal text-white">{stat.tooltip}</p>
-                        </PopoverComp>
-                      :
-                        <button
-                          className="group flex items-center p-1 -m-1 pb-2 rounded-lg gap-x-0.5 hover:cursor-pointer hover:bg-zinc-50"
-                          onClick={openHelp}
-                        >
-                          <span className="text-sm font-medium leading-[17px] text-zinc-500 group-hover:text-zinc-700">{stat.name}</span>
-                          <IconHelp className="size-4 shrink-0 text-zinc-600 group-hover:text-zinc-800"/>
-                        </button>
-                    }
-                  </dt>
-                  <dd className={classNames(
-                    stat.name === 'Gap' && discrepancyColor({
+          <div className="px-5 py-4">
+            <p className="text-base font-semibold text-zinc-800">Spotlight</p>
+          </div>
+          <dl className="rounded-xl w-full grid grid-cols-4 bg-white border-t border-zinc-200">
+            {stats.map((stat, statIdx) => (
+              <div
+                key={stat.name}
+                className={classNames(
+                  statIdx !== 0 && 'border-l border-zinc-200',
+                  'flex flex-col items-baseline justify-start gap-x-3 gap-y-2 px-6 py-8',
+                )}
+              >
+                <dt>
+                  {stat.name !== 'Gap'
+                    ?
+                      <PopoverComp position="top">
+                        <div className="flex items-center gap-x-0.5 pb-1">
+                          <span className="text-sm font-medium leading-[17px] text-zinc-500">{stat.name}</span>
+                          <IconInfoCircle className="size-4 shrink-0 text-zinc-600"/>
+                        </div>
+                        <p className="leading-[27px] text-sm font-normal text-white">{stat.tooltip}</p>
+                      </PopoverComp>
+                    :
+                      <button
+                        className="group flex items-center p-1 -m-1 pb-2 rounded-lg gap-x-0.5 hover:cursor-pointer hover:bg-zinc-50"
+                        onClick={openHelp}
+                      >
+                        <span className="text-sm font-medium leading-[17px] text-zinc-500 group-hover:text-zinc-700">{stat.name}</span>
+                        <IconHelp className="size-4 shrink-0 text-zinc-600 group-hover:text-zinc-800"/>
+                      </button>
+                  }
+                </dt>
+                <dd className={classNames(
+                  stat.name === 'Gap' && discrepancyColor({
+                    discrepancy: summaryData.discrepancy,
+                    discrAlertConf: summaryData.discrAlertConf,
+                    capital: summaryData.capital,
+                    colors: colors
+                  }), "w-full flex-none text-2xl font-medium leading-10 tracking-tight"
+                )}>
+                  {stat.value}
+                </dd>
+                {stat.change && 
+                  <dd className='flex items-center justify-center text-xs font-medium gap-x-1'>
+                    <div>
+                      <span className={classNames(
+                        stat.name === 'Gap' && discrepancyColor({
+                          discrepancy: summaryData.discrepancy,
+                          discrAlertConf: summaryData.discrAlertConf,
+                          capital: summaryData.capital,
+                          colors: colors
+                        })
+                      )}>
+                        {stat.change}
+                      </span>
+                      <span className="text-gray-500"> of capital</span>
+                    </div>
+                    <DiscLabel discrepancy={getDiscrLvl({
                       discrepancy: summaryData.discrepancy,
                       discrAlertConf: summaryData.discrAlertConf,
                       capital: summaryData.capital,
                       colors: colors
-                    }), "w-full flex-none text-2xl font-medium leading-10 tracking-tight"
-                  )}>
-                    {stat.value}
+                    })}/>
                   </dd>
-                  {stat.change && 
-                    <dd className='flex items-center justify-center text-xs font-medium gap-x-1'>
-                      <div>
-                        <span className={classNames(
-                          stat.name === 'Gap' && discrepancyColor({
-                            discrepancy: summaryData.discrepancy,
-                            discrAlertConf: summaryData.discrAlertConf,
-                            capital: summaryData.capital,
-                            colors: colors
-                          })
-                        )}>
-                          {stat.change}
-                        </span>
-                        <span className="text-gray-500"> of capital</span>
-                      </div>
-                      <DiscLabel discrepancy={getDiscrLvl({
-                        discrepancy: summaryData.discrepancy,
-                        discrAlertConf: summaryData.discrAlertConf,
-                        capital: summaryData.capital,
-                        colors: colors
-                      })}/>
-                    </dd>
-                  }
-                </div>
-              ))}
-            </dl>
-          </div>
+                }
+              </div>
+            ))}
+          </dl>
         </div>
 
         {/* Old header */}

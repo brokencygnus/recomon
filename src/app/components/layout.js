@@ -80,7 +80,7 @@ export const convertedCurrency = (amount, currency, referenceCurrency, signed=fa
 
 
 export default function Layout({ children, breadcrumbPages, currentTab }) {
-  const [expanded, setExpanded] = useState(false)
+  const [isExpanded, setExpanded] = useState(false)
   const [keepExpanded, setKeepExpanded] = useState(false)
   const [hoveredMenu, setHoveredMenu] = useState(null)
   const [referenceCurrency, setReferenceCurrency] = useState({ noSelectionLabel:"None", name:"None", value:"self" })
@@ -90,7 +90,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
   const currencyOptions = currencies.map(currency => ({ name: currency.name, value: currency.symbol, icon: <CurrencyIcon size="xs" symbol={currency.symbol} /> }))
 
   const openSidebar = () => {
-    !expanded && setKeepExpanded(false)
+    !isExpanded && setKeepExpanded(false)
     setExpanded(true)
   };
 
@@ -129,14 +129,14 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
         <div 
           onClick={forceCloseSidebar}
           className={classNames(
-            'transition-opacity ease-in-out', expanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
+            'transition-opacity ease-in-out', isExpanded ? 'w-screen opacity-75' : 'w-0 opacity-0', 'duration-300',
             "fixed inset-0 max-w-screen h-screen z-[60] bg-gray-500")}
         />
         <div
           onMouseEnter={openSidebar}
           onMouseLeave={closeSidebar}
           className={classNames(
-            'transition-all ease-in-out', expanded ? 'w-72' : 'w-20', 'duration-300',
+            'transition-all ease-in-out', isExpanded ? 'w-72' : 'w-20', 'duration-300',
             "fixed inset-y-0 left-0 z-[61] block w-20 overflow-visible bg-stone-600 pb-10"
           )}>
           <div className="flex flex-col h-full px-4 justify-start">
@@ -166,7 +166,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         href={navMenu.href}
                         className={classNames(
                           navMenu.code == currentTab ? 'bg-stone-700 text-white' : hoveredMenu === navMenu.name ? 'bg-stone-700 text-white' : 'text-stone-200',
-                          'transition-all ease-in-out', expanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
+                          'transition-all ease-in-out', isExpanded ? 'w-64 delay-75' : 'w-12', 'duration-300',
                           'group flex gap-x-3 rounded-md p-3 text-sm font-semibold leading-6'
                         )}
                       >
@@ -185,7 +185,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                           </div>
                         )}
                         <p className={classNames(
-                          'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
+                          'transition-all ease-in-out duration-200', isExpanded ? 'opacity-100' : 'opacity-0 invisible',
                           'text-nowrap',
                         )}>
                           {navMenu.name}
@@ -193,40 +193,47 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         <span className="sr-only">{navMenu.name}</span>
                       </a>
                       { navMenu.code === "bu" ?
-                        navMenu.submenus && navMenu.submenus.length > 0 && (
-                          <div className={classNames(
-                            'transition-all ease-in-out', hoveredMenu === navMenu.name ? 'opacity-100 translate-x-52' : 'opacity-0 translate-x-48', 'duration-200',
-                            "absolute left-12 top-0"
-                            )}>{/* Hacky way to extend the hover surface */}
-                            <div
-                              hidden = {hoveredMenu !== navMenu.name}
-                              className={classNames(
-                                "ml-8",
-                                "rounded-md bg-white shadow-sm border border-gray-200"
-                            )}>
-                              <dl className="flex flex-col divide-y-2 divide-gray-200 text-sm leading-6">
-                                { navMenu.submenus.map((submenu) => (
-                                  <a
-                                    key={submenu.id}
-                                    href={submenu.href ?? "/business-units/" + submenu.slug}
-                                    className="group flex items-center px-6 py-3 hover:bg-gray-100"
-                                  >
-                                    <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">
-                                      <div className="flex w-48 items-center justify-between gap-x-3">
-                                        {submenu.name}
-                                        {submenu.alerts && submenu.alerts.length !== 0 &&
-                                          <div className="flex gap-x-1">
-                                            <NotificationBadges size="sm" alerts={submenu.alerts}/>
+                          <Transition
+                            show={hoveredMenu === navMenu.name}
+                            enter="transition ease-out duration-200"
+                            enterFrom="opacity-0 translate-x-56"
+                            enterTo="opacity-100 translate-x-52"
+                            leave="transition ease-in duration-150"
+                            leaveFrom="opacity-100 translate-x-52"
+                            leaveTo="opacity-0 translate-x-56"
+                          >
+                            { navMenu.submenus && navMenu.submenus.length > 0 && (
+                              <div className="absolute left-12 top-0">
+                                {/* Hacky way to extend the hover surface */}
+                                <div
+                                  className={classNames(
+                                    "ml-8",
+                                    "rounded-md bg-white shadow-sm border border-gray-200"
+                                )}>
+                                  <dl className="flex flex-col divide-y-2 divide-gray-200 text-sm leading-6">
+                                    { navMenu.submenus.map((submenu) => (
+                                      <a
+                                        key={submenu.id}
+                                        href={submenu.href ?? "/business-units/" + submenu.slug}
+                                        className="group flex items-center px-6 py-3 hover:bg-gray-100"
+                                      >
+                                        <dt className="h-6 text-gray-600 text-nowrap font-medium group-hover:text-gray-800">
+                                          <div className="flex w-48 items-center justify-between gap-x-3">
+                                            {submenu.name}
+                                            {submenu.alerts && submenu.alerts.length !== 0 &&
+                                              <div className="flex gap-x-1">
+                                                <NotificationBadges size="sm" alerts={submenu.alerts}/>
+                                              </div>
+                                            }
                                           </div>
-                                        }
-                                      </div>
-                                    </dt>
-                                  </a>
-                                ))}
-                              </dl>
-                            </div>
-                          </div>
-                        )
+                                        </dt>
+                                      </a>
+                                    ))}
+                                  </dl>
+                                </div>
+                              </div>
+                            )}
+                          </Transition>
                         :
                         // If for some reason other menus other than business unit
                         // needs their submenus, add their logic here.
@@ -242,7 +249,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                     <a
                       href="/settings"
                       className={classNames(
-                        'transition-all ease-in-out', expanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
+                        'transition-all ease-in-out', isExpanded ? 'w-60 delay-75' : 'w-12', 'duration-300',
                         'group flex gap-x-3 rounded-md p-3 text-stone-200 hover:bg-stone-700 hover:text-white text-sm font-semibold leading-6'
                       )}
                     >
@@ -252,7 +259,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
                         aria-hidden="true"
                       />
                       <p className={classNames(
-                        'transition-all ease-in-out', expanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
+                        'transition-all ease-in-out', isExpanded ? 'opacity-100 delay-150' : 'opacity-0', 'duration-200',
                         'text-nowrap overflow-hidden',
                       )}>
                         Settings
@@ -264,14 +271,14 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
           </div>
         </div>
 
-        <div className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-auto">
-          <div className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-x-1 border-b border-zinc-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
-
+        <div style={{ scrollbarGutter: "stable" }} className="relative flex flex-col pl-20 bg-white h-screen w-screen overflow-auto">
+          <div className="fixed w-full top-0 -ml-20 pr-8 pl-28 h-16 z-50 flex shrink-0 items-center gap-x-1 border-b border-zinc-200 bg-white shadow-sm">
             <button
               onClick={openSidebarAndKeepOpen}
               className="flex rounded-lg hover:bg-zinc-50"
             >
               <SidebarSimple
+                weight="bold" 
                 className="size-5 m-1 shrink-0 text-zinc-500 hover:text-zinc-700"
                 aria-hidden="true"
               />
@@ -377,10 +384,7 @@ export default function Layout({ children, breadcrumbPages, currentTab }) {
             </div>
           </div>
 
-          <div 
-            style={{ scrollbarGutter: "stable" }}
-            className="grow"
-          >
+          <div className="grow pt-16">
             <RefCurContext.Provider value={{ referenceCurrency }}>
               <ToastProvider>
                 <AlertProvider>

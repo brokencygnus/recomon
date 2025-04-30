@@ -34,6 +34,7 @@ export function ChartProvider({ id, series, defaultZoomDays=30, showOnLoad, chil
 
 export function TimelineChart({ height='100%', children }) {
   const { id, series, initialState, defaultZoomDays } = useContext(ChartContext)
+  const [zoom, setZoom] = useState(defaultZoomDays*86400000)
 
   const chartConfig = {
     type: 'line',
@@ -48,7 +49,6 @@ export function TimelineChart({ height='100%', children }) {
     options: {
       chart: {
         id: id,
-        // https://github.com/apexcharts/apexcharts.js/issues/1138
         events: {
           mounted: function() {
             Object.entries(initialState).forEach(entry => {
@@ -60,9 +60,13 @@ export function TimelineChart({ height='100%', children }) {
               }
             })
           },
+          // https://github.com/apexcharts/apexcharts.js/issues/1138
           beforeZoom: function(ctx) {
-            // we need to clear the range as we only need it on the iniital load.
+            // we need to clear the range as we only need it on the initial load.
             ctx.w.config.xaxis.range = undefined
+          },
+          zoomed: function(ctx) {
+            setZoom(ctx.w.globals.xRange)
           }
         },
         toolbar: {
@@ -128,7 +132,7 @@ export function TimelineChart({ height='100%', children }) {
             fontFamily: "inherit",
           }
         },
-        range: defaultZoomDays*86400000
+        range: zoom
       },
       grid: {
         show: true,
@@ -284,6 +288,7 @@ export function RangeSelector() {
       // chart.updateOptions({xaxis:{range:selectedRange.value}}, false, false, false)
     } catch (error) {
     }
+
   }, [selectedRange])
   
   return (

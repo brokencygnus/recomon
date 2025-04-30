@@ -1,7 +1,7 @@
 import { notifications } from '@/app/constants/mockdata/notification_mockdata'
 import { NotificationCard } from '@/app/components/notifications/notification_card'
 import { Menu, MenuButton, MenuItems, Transition } from '@headlessui/react'
-import { IconBell } from "@tabler/icons-react";
+import { Bell } from "@phosphor-icons/react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -17,7 +17,7 @@ export function NotificationMenu() {
       <MenuButton className="relative flex items-center p-0.5 mx-2 text-zinc-400 rounded-lg hover:bg-zinc-50 hover:text-zinc-500">
         <a type="button">
           <span className="sr-only">View notifications</span>
-          <IconBell className="h-6 w-6" aria-hidden="true" />
+          <Bell  weight="bold" className="h-6 w-6" aria-hidden="true" />
         </a>
         {displayBadge &&
           <div className="absolute -top-1 -right-1 size-5 flex items-center justify-center rounded-full bg-red-500 border-2 border-white">
