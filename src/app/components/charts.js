@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { createContext, useContext, useState, useEffect } from "react";
 import { Dropdown } from '@/app/components/dropdown';
+import { formatApprox, formatNumber } from "../utils/utils";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 const ApexCharts = dynamic(() => import("apexcharts"), { ssr: false });
 
@@ -32,7 +33,7 @@ export function ChartProvider({ id, series, defaultZoomDays=30, showOnLoad, chil
   )
 }
 
-export function TimelineChart({ height='100%', children }) {
+export function TimelineChart({ height='100%', formatY = (a) => {return a}, children }) {
   const { id, series, initialState, defaultZoomDays } = useContext(ChartContext)
   const [zoom, setZoom] = useState(defaultZoomDays*86400000)
 
@@ -106,7 +107,8 @@ export function TimelineChart({ height='100%', children }) {
             fontWeight: 400,
           },
           formatter: function (val) {
-            return (val).toFixed(1)+'%'
+            if (val === undefined) return null
+            return formatY(formatApprox(val))
           },
         },
       },
@@ -153,7 +155,8 @@ export function TimelineChart({ height='100%', children }) {
         custom: children?.tooltip ?? undefined,
         y: {
           formatter: function (val) {
-            return (val).toFixed(4)+'%'
+            if (val === undefined) return null
+            return formatY(formatNumber(val.toFixed(2)))
           },
         }
       },

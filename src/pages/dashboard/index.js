@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import Layout from '@/app/components/layout';
+import { useContext, useState } from 'react';
+import Layout, {RefCurContext, convertedCurrency} from '@/app/components/layout';
 import { config } from '@/app/constants/config';
 import ClientOnly from '@/app/components/csr';
 import { convertMsToTimeAgo, getTimeGreeting } from '@/app/utils/dates'
@@ -35,6 +35,8 @@ import { snapshotBusinessUnits } from '@/app/constants/mockdata/snapshot_mockdat
 import { activityLogs } from '@/app/constants/mockdata/activity_log_mockdata'
 import { notifications } from '@/app/constants/mockdata/notification_mockdata'
 import { user } from '@/app/constants/mockdata/user_mockdata'
+import { fixedDepositData30D } from '@/app/constants/mockdata/BackOfficeDashboardMockdata'
+import { convertCurrency } from '@/app/utils/utils';
 //
 
 export default function DashboardPage() {
@@ -42,8 +44,9 @@ export default function DashboardPage() {
   
   const defaultLayout = [
     { i: "a", x: 0, y: 0, w: 8, h: 6, static: true },
-    { i: "b", x: 8, y: 0, w: 3, h: 2, static: true },
-    { i: "c", x: 4, y: 6, w: 1, h: 2, static: true }
+    { i: "b", x: 0, y: 6, w: 8, h: 6, static: true },
+    { i: "c", x: 8, y: 0, w: 4, h: 7, static: true },
+    { i: "d", x: 8, y: 7, w: 4, h: 5, static: true }
   ]
 
   const [layout, setLayout] = useState(defaultLayout)
@@ -88,17 +91,27 @@ export default function DashboardPage() {
                 transformScale={isEditing ? 0.75 : 1}
               >
                 <div key="a">
-                <GridCard title="test" interactable={!isEditing}>
-                  <ChartSection />
-                </GridCard>
-
+                  <GridCard title="Asset Reconciliation" interactable={!isEditing}>
+                    <ReconciliationChartSection />
+                  </GridCard>
                 </div>
+
                 <div key="b">
-                <GridCard title="test" interactable={!isEditing}/>
-
+                  <GridCard title="Fixed Deposit 30D Volume" interactable={!isEditing}>
+                    <UserVolumeChartSection />
+                  </GridCard>
                 </div>
+
                 <div key="c">
-                  <GridCard title="test" interactable={!isEditing}/>
+                  <GridCard title="Notifications" interactable={!isEditing}>
+                    <NotificationSection />
+                  </GridCard>
+                </div>
+
+                <div key="d">
+                  <GridCard title="Latest Admin Activity" interactable={!isEditing}>
+                    <ActivityLogSection />
+                  </GridCard>
                 </div>
               </ReactGridLayout>
             </div>
@@ -172,36 +185,100 @@ function GridCard({ title, children, interactable=true }) {
   )
 }
 
-function ChartSection() {
+function ReconciliationChartSection() {
   const chartSeries = snapshotBusinessUnits.map(bu => (
     {
       name: bu.name,
       color: stringToColor(bu.slug, {maxLum:70, minLum:40, maxSat:60, minSat:30}),
-      data:bu.snapshots.map(snap => (
-        {x:snap.date, y:snap.gap*100/snap.capital}
+      data:bu.snapshots.map(data => (
+        {x:data.date, y:data.gap*100/data.capital}
       ))
     }
   ))
 
   return (
     <ChartProvider
-      id={"snapshotsTimelineChart"}
+      id={"reconciliationChart"}
       series={chartSeries}
       showOnLoad={3}
     >
       <Card className="flex flex-col grow">
         <div className="flex gap-x-6 items-center">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Snapshot gap over time</h3>
+          <h3 className="text-base font-semibold leading-6 text-gray-900">Snapshot gap in the last</h3>
           <RangeSelector />
         </div>
         <div className="flex justify-between gap-x-6 h-0 grow">
           <div className="grow">
             <TimelineChart
               defaultZoomDays={60}
+              formatY={(a)=>`${a}%`}
             />
           </div>
           <div className="flex flex-col gap-y-2">
             <p className="flex-none text-sm font-medium text-gray-600">Business units</p>
+            <div className="h-0 grow overflow-y-auto">
+              <Legend />
+            </div>
+          </div>
+        </div>
+      </Card>
+    </ChartProvider>
+  )
+}
+
+
+function UserVolumeChartSection() {
+  const { referenceCurrency } = useContext(RefCurContext)
+
+  const collapsedData = () => {
+    const tempArray = []
+    Object.values(fixedDepositData30D.currencies).forEach(products => {
+      Object.entries(products).forEach(([product, data]) => {
+        tempArray.push({ name:product, data });
+      });
+    });
+    return tempArray
+  }
+
+  const refCurButDefaultToUSD = () => {
+    if (referenceCurrency?.value === "self") {
+      return "USD"
+    } else {
+      return referenceCurrency?.value
+    }
+  }
+
+  const chartSeries = collapsedData().map(product => (
+    {
+      name: product.name,
+      color: stringToColor(product.name, {maxLum:70, minLum:40, maxSat:60, minSat:30}),
+      data: product.data.map(data => (
+        {x:data.date, y:convertCurrency(data.volume, "USD", refCurButDefaultToUSD())}
+      ))
+    }
+  ))
+
+  const formatChart = (a) => {
+    if (referenceCurrency.value === "self") return `${a} USD`
+    return `${a} ${referenceCurrency.value}`
+  }
+
+  return (
+    <ChartProvider
+      id={"userVolumeChart"}
+      series={chartSeries}
+      showOnLoad={3}
+    >
+      <Card className="flex flex-col grow">
+        <div className="flex justify-between gap-x-6 h-0 grow">
+          <div className="grow">
+            <TimelineChart
+              defaultZoomDays={60}
+              formatY={formatChart}
+            />
+          </div>
+          <div className="flex flex-col gap-y-2">
+            <p className="flex-none text-sm font-medium text-gray-600">Products</p>
             <div className="h-0 grow overflow-y-auto">
               <Legend />
             </div>
@@ -227,10 +304,6 @@ function ActivityLogSection() {
   return (
     
     <Card className="flex flex-col grow">
-      <div className="flex gap-x-6 mb-6 items-center">
-        <h3 className="text-base font-semibold leading-6 text-gray-900">Latest Activity</h3>
-      </div>
-
       <div className="h-0 grow overflow-y-auto">
         <div className="-my-2">
           <div className="inline-block w-full py-2 align-middle">
@@ -262,7 +335,6 @@ function ActivityLogSection() {
             </table>
           </div>
         </div>
-        <div className="h-16 sticky bottom-0 pointer-events-none bg-gradient-to-t from-white to-transparent"></div>
       </div>
 
     </Card>
@@ -276,16 +348,12 @@ function NotificationSection() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex gap-x-6 items-center">
-        <h3 className="text-base font-semibold leading-6 text-gray-900">Latest alerts</h3>
-      </div>
       <div className="h-0 grow overflow-y-auto mt-4 p-2 pb-0">
         <div className="flex flex-col gap-y-5">
           {slicedNotifs.map((notification) => (
             <NotificationCard data={notification} displayedIn="dashboard"/>
           ))}
         </div>
-        <div className="h-16 sticky bottom-0 pointer-events-none bg-gradient-to-t from-stone-100 to-transparent"></div>
       </div>
     </div>
   )
